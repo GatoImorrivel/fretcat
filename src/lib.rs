@@ -1,3 +1,4 @@
+pub mod effects;
 use nih_plug::prelude::*;
 use std::sync::Arc;
 
@@ -12,6 +13,9 @@ struct FretCatParams {
 
     #[id = "threshold"]
     pub threshold: FloatParam,
+
+    #[id = "blend"]
+    pub blend: FloatParam,
 }
 
 impl Default for FretCat {
@@ -43,10 +47,19 @@ impl Default for FretCatParams {
                 "Threshold",
                 util::db_to_gain(0.0),
                 FloatRange::Linear  {
-                    min: util::db_to_gain(0.0),
-                    max: util::db_to_gain(1.0),
+                    min: util::db_to_gain(1.0),
+                    max: util::db_to_gain(30.0),
                 },
-            )
+            ).with_smoother(SmoothingStyle::Linear(50.0)),
+
+            blend: FloatParam::new(
+                "Blend",
+                util::db_to_gain(0.0),
+                FloatRange::Linear  {
+                    min: util::db_to_gain(0.0),
+                    max: util::db_to_gain(2.0),
+                },
+            ).with_smoother(SmoothingStyle::Linear(50.0)),
         }
     }
 }
@@ -119,11 +132,12 @@ impl Plugin for FretCat {
         for channel_samples in buffer.iter_samples() {
             // Smoothing is optionally built into the parameters themselves
             let gain = self.params.gain.smoothed.next();
-            let threshold = self.params.gain.smoothed.next();
+            let threshold = self.params.threshold.smoothed.next();
+            let blend = self.params.blend.smoothed.next();
             nih_log!("{}", channel_samples.len());
 
             for sample in channel_samples {
-                *sample = gain * libm::tanhf(*sample / gain / threshold);
+                *sample = effects::overdrive(*sample, gain, threshold, blend);
             }
         }
 
