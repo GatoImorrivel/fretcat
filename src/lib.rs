@@ -1,5 +1,8 @@
 pub mod effects;
-use nih_plug::prelude::*;
+pub mod editor;
+
+use nih_plug::{log::log, prelude::*, params::persist};
+use nih_plug_iced::IcedState;
 use std::sync::Arc;
 
 struct FretCat {
@@ -8,6 +11,9 @@ struct FretCat {
 
 #[derive(Params)]
 struct FretCatParams {
+    #[persist = "editor-state"]
+    editor_state: Arc<IcedState>,
+    
     #[id = "gain"]
     pub gain: FloatParam,
 
@@ -29,6 +35,8 @@ impl Default for FretCat {
 impl Default for FretCatParams {
     fn default() -> Self {
         Self {
+            editor_state: editor::default_state(),
+
             gain: FloatParam::new(
                 "Gain",
                 util::db_to_gain(0.0),
@@ -46,20 +54,26 @@ impl Default for FretCatParams {
             threshold: FloatParam::new(
                 "Threshold",
                 util::db_to_gain(0.0),
-                FloatRange::Linear  {
-                    min: util::db_to_gain(1.0),
+                FloatRange::Skewed {
+                    min: util::db_to_gain(0.0),
                     max: util::db_to_gain(30.0),
+                    factor: FloatRange::gain_skew_factor(0.0, 30.0),
                 },
-            ).with_smoother(SmoothingStyle::Linear(50.0)),
+            )
+            .with_smoother(SmoothingStyle::Logarithmic(50.0))
+            .with_unit("dB")
+            .with_value_to_string(formatters::v2s_f32_gain_to_db(2))
+            .with_string_to_value(formatters::s2v_f32_gain_to_db()),
 
             blend: FloatParam::new(
                 "Blend",
                 util::db_to_gain(0.0),
-                FloatRange::Linear  {
+                FloatRange::Linear {
                     min: util::db_to_gain(0.0),
                     max: util::db_to_gain(2.0),
                 },
-            ).with_smoother(SmoothingStyle::Linear(50.0)),
+            )
+            .with_smoother(SmoothingStyle::Linear(50.0)),
         }
     }
 }
@@ -87,7 +101,6 @@ impl Plugin for FretCat {
         names: PortNames::const_default(),
     }];
 
-
     const MIDI_INPUT: MidiConfig = MidiConfig::None;
     const MIDI_OUTPUT: MidiConfig = MidiConfig::None;
 
@@ -106,15 +119,19 @@ impl Plugin for FretCat {
         self.params.clone()
     }
 
+    fn editor(&self, _async_executor: AsyncExecutor<Self>) -> Option<Box<dyn Editor>> {
+        editor::create(
+            self.params.clone(),
+            self.params.editor_state.clone(),
+        )
+    }
+
     fn initialize(
         &mut self,
         _audio_io_layout: &AudioIOLayout,
         _buffer_config: &BufferConfig,
         _context: &mut impl InitContext<Self>,
     ) -> bool {
-        // Resize buffers and perform other potentially expensive initialization operations here.
-        // The `reset()` function is always called right after this function. You can remove this
-        // function if you do not need it
         true
     }
 
@@ -134,7 +151,6 @@ impl Plugin for FretCat {
             let gain = self.params.gain.smoothed.next();
             let threshold = self.params.threshold.smoothed.next();
             let blend = self.params.blend.smoothed.next();
-            nih_log!("{}", channel_samples.len());
 
             for sample in channel_samples {
                 *sample = effects::overdrive(*sample, gain, threshold, blend);
