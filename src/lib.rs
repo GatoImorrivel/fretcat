@@ -156,7 +156,7 @@ impl Plugin for FretCat {
             let blend = self.params.blend.smoothed.next();
 
             for sample in channel_samples {
-                *sample = effects::overdrive(*sample, gain, threshold, blend);
+                *sample = *sample;
             }
         }
 
