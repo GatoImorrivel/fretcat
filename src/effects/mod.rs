@@ -43,7 +43,7 @@ pub mod overdrive {
         fn view(&mut self) -> nih_plug_iced::Element<'_, Self::Message> {
             Column::new()
                 .push(
-                    Slider::new(&mut self.gain_slider_state, -30.0..=30.0, 0.0, Message::GainChange)
+                    Slider::new(&mut self.gain_slider_state, -30.0..=30.0, self.gain, Message::GainChange)
                 )
             .into()
         }

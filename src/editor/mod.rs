@@ -1,55 +1,41 @@
-
 use nih_plug::prelude::{Editor, GuiContext};
-use nih_plug_iced::widgets as nih_widgets;
 use nih_plug_iced::*;
 use std::sync::Arc;
 
-
-use crate::effects::overdrive::{Overdrive, self};
+use crate::effects::overdrive::{self, Overdrive};
 use crate::effects::EffectUI;
 
-use super::FretCatParams;
-
-// Makes sense to also define this here, makes it a bit easier to keep track of
 pub(crate) fn default_state() -> Arc<IcedState> {
-    IcedState::from_size(200, 150)
+    IcedState::from_size(1024, 848)
 }
 
-pub(crate) fn create(
-    params: Arc<FretCatParams>,
-    editor_state: Arc<IcedState>,
-) -> Option<Box<dyn Editor>> {
-    create_iced_editor::<FretCatEditor>(editor_state, params)
+pub(crate) fn create(editor_state: Arc<IcedState>) -> Option<Box<dyn Editor>> {
+    create_iced_editor::<FretCatEditor>(editor_state, ())
 }
 
 struct FretCatEditor {
-    params: Arc<FretCatParams>,
     context: Arc<dyn GuiContext>,
-
-    overdrive: Overdrive
+    overdrive: Overdrive,
 }
 
 #[derive(Debug, Clone, Copy)]
 enum Message {
-    /// Update a parameter's value.
-    ParamUpdate(nih_widgets::ParamMessage),
-    Overdrive(overdrive::Message)
+    Overdrive(overdrive::Message),
 }
 
 impl IcedEditor for FretCatEditor {
     type Executor = executor::Default;
     type Message = Message;
-    type InitializationFlags = Arc<FretCatParams>;
+    type InitializationFlags = ();
 
     fn new(
-        params: Self::InitializationFlags,
+        _params: Self::InitializationFlags,
         context: Arc<dyn GuiContext>,
     ) -> (Self, Command<Self::Message>) {
         let editor = FretCatEditor {
-            params,
             context,
 
-            overdrive: Overdrive::new()
+            overdrive: Overdrive::new(),
         };
 
         (editor, Command::none())
@@ -71,8 +57,9 @@ impl IcedEditor for FretCatEditor {
         Column::new()
             .align_items(Alignment::Center)
             .push(
-                self.overdrive.view()
-                    .map(move |message| Message::Overdrive(message))
+                self.overdrive
+                    .view()
+                    .map(move |message| Message::Overdrive(message)),
             )
             .into()
     }

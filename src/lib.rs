@@ -1,7 +1,7 @@
 pub mod effects;
 pub mod editor;
 
-use nih_plug::{prelude::*};
+use nih_plug::prelude::*;
 use nih_plug_iced::IcedState;
 use std::sync::Arc;
 
@@ -65,7 +65,6 @@ impl Plugin for FretCat {
 
     fn editor(&self, _async_executor: AsyncExecutor<Self>) -> Option<Box<dyn Editor>> {
         editor::create(
-            self.params.clone(),
             self.params.editor_state.clone(),
         )
     }
