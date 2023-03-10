@@ -1,7 +1,7 @@
 pub mod effects;
 pub mod editor;
 
-use nih_plug::{log::log, prelude::*, params::persist};
+use nih_plug::{prelude::*};
 use nih_plug_iced::IcedState;
 use std::sync::Arc;
 

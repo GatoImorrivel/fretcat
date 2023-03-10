@@ -1,9 +1,9 @@
-use atomic_float::AtomicF32;
-use nih_plug::prelude::{util, Editor, GuiContext};
+
+use nih_plug::prelude::{Editor, GuiContext};
 use nih_plug_iced::widgets as nih_widgets;
 use nih_plug_iced::*;
 use std::sync::Arc;
-use std::time::Duration;
+
 
 use crate::effects::overdrive::{Overdrive, self};
 use crate::effects::EffectUI;
@@ -62,7 +62,7 @@ impl IcedEditor for FretCatEditor {
     fn update(
         &mut self,
         _window: &mut WindowQueue,
-        message: Self::Message,
+        _message: Self::Message,
     ) -> Command<Self::Message> {
         Command::none()
     }
