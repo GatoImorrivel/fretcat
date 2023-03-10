@@ -5,6 +5,9 @@ use nih_plug_iced::*;
 use std::sync::Arc;
 use std::time::Duration;
 
+use crate::effects::overdrive::{Overdrive, self};
+use crate::effects::EffectUI;
+
 use super::FretCatParams;
 
 // Makes sense to also define this here, makes it a bit easier to keep track of
@@ -23,13 +26,14 @@ struct FretCatEditor {
     params: Arc<FretCatParams>,
     context: Arc<dyn GuiContext>,
 
-    gain_slider_state: nih_widgets::param_slider::State,
+    overdrive: Overdrive
 }
 
 #[derive(Debug, Clone, Copy)]
 enum Message {
     /// Update a parameter's value.
     ParamUpdate(nih_widgets::ParamMessage),
+    Overdrive(overdrive::Message)
 }
 
 impl IcedEditor for FretCatEditor {
@@ -45,7 +49,7 @@ impl IcedEditor for FretCatEditor {
             params,
             context,
 
-            gain_slider_state: Default::default(),
+            overdrive: Overdrive::new()
         };
 
         (editor, Command::none())
@@ -60,10 +64,6 @@ impl IcedEditor for FretCatEditor {
         _window: &mut WindowQueue,
         message: Self::Message,
     ) -> Command<Self::Message> {
-        match message {
-            Message::ParamUpdate(message) => self.handle_param_message(message),
-        }
-
         Command::none()
     }
 
@@ -71,26 +71,9 @@ impl IcedEditor for FretCatEditor {
         Column::new()
             .align_items(Alignment::Center)
             .push(
-                Text::new("Gain GUI")
-                    .font(assets::NOTO_SANS_LIGHT)
-                    .size(40)
-                    .height(50.into())
-                    .width(Length::Fill)
-                    .horizontal_alignment(alignment::Horizontal::Center)
-                    .vertical_alignment(alignment::Vertical::Bottom),
+                self.overdrive.view()
+                    .map(move |message| Message::Overdrive(message))
             )
-            .push(
-                Text::new("Gain")
-                    .height(20.into())
-                    .width(Length::Fill)
-                    .horizontal_alignment(alignment::Horizontal::Center)
-                    .vertical_alignment(alignment::Vertical::Center),
-            )
-            .push(
-                nih_widgets::ParamSlider::new(&mut self.gain_slider_state, &self.params.gain)
-                    .map(Message::ParamUpdate),
-            )
-            .push(Space::with_height(10.into()))
             .into()
     }
 

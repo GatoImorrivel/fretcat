@@ -3,12 +3,11 @@ use nih_plug_iced::Element;
 pub trait EffectUI {
     type Message;
     
-    fn view<'a>(&mut self) -> Element<'a, Self::Message>;
+    fn view(&mut self) -> Element<'_, Self::Message>;
     fn update(&mut self, message: Self::Message);
 }
 
 pub mod overdrive {
-    use iced::widget::{slider, column};
     use nih_plug_iced::{slider, Column, Slider};
 
     use super::EffectUI;
@@ -41,10 +40,12 @@ pub mod overdrive {
            } 
         }
 
-        fn view<'a>(&mut self) -> nih_plug_iced::Element<'a, Self::Message> {
-            column( 
-                slider(-30.0..=30.0, 0.0, Message::GainChange)
-            ).into()
+        fn view(&mut self) -> nih_plug_iced::Element<'_, Self::Message> {
+            Column::new()
+                .push(
+                    Slider::new(&mut self.gain_slider_state, -30.0..=30.0, 0.0, Message::GainChange)
+                )
+            .into()
         }
     }
 }
