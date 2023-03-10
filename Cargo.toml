@@ -5,16 +5,17 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [workspace]
-members = ["xtask"]
+members = ["xtask", "standalone"]
 
 [lib]
-crate-type = ["cdylib"]
+crate-type = ["cdylib", "lib"]
 
 [dependencies]
 atomic_float = "0.1.0"
+fundsp = "0.12.0"
 # Remove the `assert_process_allocs` feature to allow allocations on the audio
 # thread in debug builds.
-nih_plug = { git = "https://github.com/robbert-vdh/nih-plug.git", features = ["assert_process_allocs"] }
+nih_plug = { git = "https://github.com/robbert-vdh/nih-plug.git", features = ["assert_process_allocs", "standalone"] }
 nih_plug_iced = { git = "https://github.com/robbert-vdh/nih-plug.git" }
 rustfft = "6.1.0"
 # Uncomment the below line to disable the on-by-default VST3 feature to remove

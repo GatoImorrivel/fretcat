@@ -5,7 +5,9 @@ use nih_plug::{log::log, prelude::*, params::persist};
 use nih_plug_iced::IcedState;
 use std::sync::Arc;
 
-struct FretCat {
+pub use nih_plug;
+
+pub struct FretCat {
     params: Arc<FretCatParams>,
 }
 
@@ -132,6 +134,7 @@ impl Plugin for FretCat {
         _buffer_config: &BufferConfig,
         _context: &mut impl InitContext<Self>,
     ) -> bool {
+        nih_log!("Hello World");
         true
     }
 

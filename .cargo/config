@@ -1,2 +1,5 @@
 [alias]
 xtask = "run --package xtask --release --"
+standalone-release = "run --package standalone --release --"
+standalone-debug = "run --package standalone --"
+debug = "watch -x standalone-debug"
