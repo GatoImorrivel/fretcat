@@ -1,6 +1,7 @@
 pub mod effects;
 pub mod editor;
 
+use effects::Effect;
 use nih_plug::prelude::*;
 use nih_plug_iced::IcedState;
 use std::sync::Arc;
@@ -9,6 +10,7 @@ pub use nih_plug;
 
 pub struct FretCat {
     params: Arc<FretCatParams>,
+    loaded_effects: Vec<Effect>
 }
 
 #[derive(Params)]
@@ -21,6 +23,7 @@ impl Default for FretCat {
     fn default() -> Self {
         Self {
             params: Arc::new(FretCatParams::default()),
+            loaded_effects: vec![]
         }
     }
 }
@@ -75,7 +78,7 @@ impl Plugin for FretCat {
         _buffer_config: &BufferConfig,
         _context: &mut impl InitContext<Self>,
     ) -> bool {
-        nih_log!("Hello World");
+        self.loaded_effects.push(effects::make_overdrive());
         true
     }
 
@@ -90,9 +93,10 @@ impl Plugin for FretCat {
         _aux: &mut AuxiliaryBuffers,
         _context: &mut impl ProcessContext<Self>,
     ) -> ProcessStatus {
+        let overdrive = self.loaded_effects.get(0).unwrap();
         for channel_samples in buffer.iter_samples() {
             for sample in channel_samples {
-                *sample = *sample;
+                *sample = overdrive.process(*sample);
             }
         }
 

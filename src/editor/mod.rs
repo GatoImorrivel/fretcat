@@ -1,12 +1,13 @@
+use nih_plug::nih_log;
 use nih_plug::prelude::{Editor, GuiContext};
 use nih_plug_iced::*;
 use std::sync::Arc;
 
-use crate::effects::overdrive::{self, Overdrive};
-use crate::effects::EffectUI;
+const WINDOW_WIDTH: u32 = 1024;
+const WINDOW_HEIGHT: u32 = 848;
 
 pub(crate) fn default_state() -> Arc<IcedState> {
-    IcedState::from_size(1024, 848)
+    IcedState::from_size(WINDOW_WIDTH, WINDOW_HEIGHT)
 }
 
 pub(crate) fn create(editor_state: Arc<IcedState>) -> Option<Box<dyn Editor>> {
@@ -15,12 +16,10 @@ pub(crate) fn create(editor_state: Arc<IcedState>) -> Option<Box<dyn Editor>> {
 
 struct FretCatEditor {
     context: Arc<dyn GuiContext>,
-    overdrive: Overdrive,
 }
 
 #[derive(Debug, Clone, Copy)]
 enum Message {
-    Overdrive(overdrive::Message),
 }
 
 impl IcedEditor for FretCatEditor {
@@ -35,7 +34,6 @@ impl IcedEditor for FretCatEditor {
         let editor = FretCatEditor {
             context,
 
-            overdrive: Overdrive::new(),
         };
 
         (editor, Command::none())
@@ -50,25 +48,21 @@ impl IcedEditor for FretCatEditor {
         _window: &mut WindowQueue,
         _message: Self::Message,
     ) -> Command<Self::Message> {
+
         Command::none()
     }
 
     fn view(&mut self) -> Element<'_, Self::Message> {
         Column::new()
             .align_items(Alignment::Center)
-            .push(
-                self.overdrive
-                    .view()
-                    .map(move |message| Message::Overdrive(message)),
-            )
             .into()
     }
 
     fn background_color(&self) -> nih_plug_iced::Color {
         nih_plug_iced::Color {
-            r: 0.98,
-            g: 0.98,
-            b: 0.98,
+            r: 25. / 255.,
+            g: 25. / 255.,
+            b: 26. / 255.,
             a: 1.0,
         }
     }

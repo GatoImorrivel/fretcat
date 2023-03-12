@@ -1,51 +1,40 @@
+mod macros;
+
 use nih_plug_iced::Element;
 
-pub trait EffectUI {
-    type Message;
-    
-    fn view(&mut self) -> Element<'_, Self::Message>;
-    fn update(&mut self, message: Self::Message);
+use crate::create_messages;
+
+create_messages!(Overdrive { gain: f32 }, Highpass { freq: f32 });
+
+pub enum EffectCategory {
+    Distortion,
+    Filter,
+}
+pub struct Effect {
+    name: String,
+    kind: EffectCategory,
+    state: EffectState,
+    algorithm: fn(&EffectState, f32) -> f32,
 }
 
-pub mod overdrive {
-    use nih_plug_iced::{slider, Column, Slider};
-
-    use super::EffectUI;
-
-    pub struct Overdrive {
-        gain: f32,
-        gain_slider_state: slider::State
+impl Effect {
+    pub fn info(&self) -> (&String, &EffectCategory) {
+        (&self.name, &self.kind)
     }
 
-    impl Overdrive {
-        pub fn new() -> Self {
-            Self {
-                gain: 0.0,
-                gain_slider_state: slider::State::new()
-            }
-        }
+    pub fn process(&self, sample: f32) -> f32 {
+        (self.algorithm)(&self.state, sample)
     }
+}
 
-    #[derive(Debug, Clone, Copy)]
-    pub enum Message {
-        GainChange(f32)
-    }
-
-    impl EffectUI for Overdrive {
-        type Message = Message;
-
-        fn update(&mut self, message: Self::Message) {
-           match message {
-                Message::GainChange(gain) => self.gain = gain,
-           } 
-        }
-
-        fn view(&mut self) -> nih_plug_iced::Element<'_, Self::Message> {
-            Column::new()
-                .push(
-                    Slider::new(&mut self.gain_slider_state, -30.0..=30.0, self.gain, Message::GainChange)
-                )
-            .into()
-        }
+pub fn make_overdrive() -> Effect {
+    Effect {
+        name: "Overdrive".to_owned(),
+        kind: EffectCategory::Distortion,
+        state: EffectState::Overdrive { gain: 2.0 },
+        algorithm: move |state, sample| match state {
+            EffectState::Overdrive { gain } => sample * gain,
+            _ => sample,
+        },
     }
 }
