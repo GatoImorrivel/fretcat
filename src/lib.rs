@@ -1,7 +1,8 @@
-pub mod effects;
 pub mod editor;
+pub mod effects;
 
 use effects::Effect;
+use fundsp::prelude::U1;
 use nih_plug::prelude::*;
 use nih_plug_iced::IcedState;
 use std::sync::Arc;
@@ -10,20 +11,25 @@ pub use nih_plug;
 
 pub struct FretCat {
     params: Arc<FretCatParams>,
-    loaded_effects: Vec<Effect>
+    loaded_effects: Vec<Effect>,
+    prev_samples: Vec<f32>
 }
 
 #[derive(Params)]
 struct FretCatParams {
     #[persist = "editor-state"]
     editor_state: Arc<IcedState>,
+
+    #[id = "freq"]
+    freq: FloatParam,
 }
 
 impl Default for FretCat {
     fn default() -> Self {
         Self {
             params: Arc::new(FretCatParams::default()),
-            loaded_effects: vec![]
+            loaded_effects: vec![],
+            prev_samples: vec![],
         }
     }
 }
@@ -32,6 +38,16 @@ impl Default for FretCatParams {
     fn default() -> Self {
         Self {
             editor_state: editor::default_state(),
+
+            freq: FloatParam::new(
+                "Cutoff",
+                0.0,
+                FloatRange::Linear {
+                    min: 0.0,
+                    max: 44100.0,
+                },
+            )
+            .with_unit(" Hz"),
         }
     }
 }
@@ -67,9 +83,7 @@ impl Plugin for FretCat {
     }
 
     fn editor(&self, _async_executor: AsyncExecutor<Self>) -> Option<Box<dyn Editor>> {
-        editor::create(
-            self.params.editor_state.clone(),
-        )
+        editor::create(self.params.editor_state.clone())
     }
 
     fn initialize(
@@ -93,10 +107,13 @@ impl Plugin for FretCat {
         _aux: &mut AuxiliaryBuffers,
         _context: &mut impl ProcessContext<Self>,
     ) -> ProcessStatus {
-        let overdrive = self.loaded_effects.get(0).unwrap();
-        for channel_samples in buffer.iter_samples() {
-            for sample in channel_samples {
-                *sample = overdrive.process(*sample);
+        let freq = self.params.freq.value();
+
+        let filter: fundsp::prelude::ButterLowpass<f32, f32, U1> = fundsp::filter::ButterLowpass::new(44100.0, freq);
+
+        for buffer in buffer.as_slice() {
+            for sample in buffer.iter() {
+               self.prev_samples.push(*sample);
             }
         }
 
