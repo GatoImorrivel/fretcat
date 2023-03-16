@@ -91,7 +91,6 @@ impl Plugin for FretCat {
         _aux: &mut AuxiliaryBuffers,
         _context: &mut impl ProcessContext<Self>,
     ) -> ProcessStatus {
-
         for buffer in buffer.as_slice() {
             buffer.reverse();
         }
