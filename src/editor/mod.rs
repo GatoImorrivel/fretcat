@@ -1,7 +1,10 @@
-use nih_plug::nih_log;
+
+use crossbeam::atomic::AtomicCell;
 use nih_plug::prelude::{Editor, GuiContext};
 use nih_plug_iced::*;
 use std::sync::Arc;
+
+use crate::chain::EffectChain;
 
 const WINDOW_WIDTH: u32 = 1024;
 const WINDOW_HEIGHT: u32 = 848;
@@ -10,31 +13,28 @@ pub(crate) fn default_state() -> Arc<IcedState> {
     IcedState::from_size(WINDOW_WIDTH, WINDOW_HEIGHT)
 }
 
-pub(crate) fn create(editor_state: Arc<IcedState>) -> Option<Box<dyn Editor>> {
-    create_iced_editor::<FretCatEditor>(editor_state, ())
+pub(crate) fn create(editor_state: Arc<IcedState>, chain: Arc<AtomicCell<EffectChain>>) -> Option<Box<dyn Editor>> {
+    create_iced_editor::<FretCatEditor>(editor_state, chain)
 }
 
 struct FretCatEditor {
     context: Arc<dyn GuiContext>,
+    chain: Arc<AtomicCell<EffectChain>>
 }
 
 #[derive(Debug, Clone, Copy)]
-enum Message {
-}
+enum Message {}
 
 impl IcedEditor for FretCatEditor {
     type Executor = executor::Default;
     type Message = Message;
-    type InitializationFlags = ();
+    type InitializationFlags = Arc<AtomicCell<EffectChain>>;
 
     fn new(
         _params: Self::InitializationFlags,
         context: Arc<dyn GuiContext>,
     ) -> (Self, Command<Self::Message>) {
-        let editor = FretCatEditor {
-            context,
-
-        };
+        let editor = FretCatEditor { context, chain: _params};
 
         (editor, Command::none())
     }
@@ -48,14 +48,11 @@ impl IcedEditor for FretCatEditor {
         _window: &mut WindowQueue,
         _message: Self::Message,
     ) -> Command<Self::Message> {
-
         Command::none()
     }
 
     fn view(&mut self) -> Element<'_, Self::Message> {
-        Column::new()
-            .align_items(Alignment::Center)
-            .into()
+        Column::new().align_items(Alignment::Center).into()
     }
 
     fn background_color(&self) -> nih_plug_iced::Color {

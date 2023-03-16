@@ -1,9 +1,9 @@
-pub mod editor;
-pub mod effects;
+mod editor;
+mod chain;
 
-use effects::Effect;
-use fundsp::prelude::U1;
-use nih_plug::prelude::*;
+use chain::EffectChain;
+use crossbeam::atomic::AtomicCell;
+use nih_plug::{prelude::*, params::persist};
 use nih_plug_iced::IcedState;
 use std::sync::Arc;
 
@@ -11,25 +11,20 @@ pub use nih_plug;
 
 pub struct FretCat {
     params: Arc<FretCatParams>,
-    loaded_effects: Vec<Effect>,
-    prev_samples: Vec<f32>
+    chain: Arc<AtomicCell<EffectChain>>
 }
 
 #[derive(Params)]
 struct FretCatParams {
     #[persist = "editor-state"]
     editor_state: Arc<IcedState>,
-
-    #[id = "freq"]
-    freq: FloatParam,
 }
 
 impl Default for FretCat {
     fn default() -> Self {
         Self {
             params: Arc::new(FretCatParams::default()),
-            loaded_effects: vec![],
-            prev_samples: vec![],
+            chain: Arc::new(EffectChain::default().into())
         }
     }
 }
@@ -38,16 +33,6 @@ impl Default for FretCatParams {
     fn default() -> Self {
         Self {
             editor_state: editor::default_state(),
-
-            freq: FloatParam::new(
-                "Cutoff",
-                0.0,
-                FloatRange::Linear {
-                    min: 0.0,
-                    max: 44100.0,
-                },
-            )
-            .with_unit(" Hz"),
         }
     }
 }
@@ -83,7 +68,7 @@ impl Plugin for FretCat {
     }
 
     fn editor(&self, _async_executor: AsyncExecutor<Self>) -> Option<Box<dyn Editor>> {
-        editor::create(self.params.editor_state.clone())
+        editor::create(self.params.editor_state.clone(), self.chain.clone())
     }
 
     fn initialize(
@@ -92,7 +77,6 @@ impl Plugin for FretCat {
         _buffer_config: &BufferConfig,
         _context: &mut impl InitContext<Self>,
     ) -> bool {
-        self.loaded_effects.push(effects::make_overdrive());
         true
     }
 
@@ -107,14 +91,9 @@ impl Plugin for FretCat {
         _aux: &mut AuxiliaryBuffers,
         _context: &mut impl ProcessContext<Self>,
     ) -> ProcessStatus {
-        let freq = self.params.freq.value();
-
-        let filter: fundsp::prelude::ButterLowpass<f32, f32, U1> = fundsp::filter::ButterLowpass::new(44100.0, freq);
 
         for buffer in buffer.as_slice() {
-            for sample in buffer.iter() {
-               self.prev_samples.push(*sample);
-            }
+            buffer.reverse();
         }
 
         ProcessStatus::Normal

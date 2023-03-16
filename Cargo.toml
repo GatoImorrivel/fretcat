@@ -12,6 +12,7 @@ crate-type = ["cdylib", "lib"]
 
 [dependencies]
 atomic_float = "0.1.0"
+crossbeam = "0.8.2"
 enum_derive = "0.1.7"
 fundsp = "0.12.0"
 # Remove the `assert_process_allocs` feature to allow allocations on the audio
