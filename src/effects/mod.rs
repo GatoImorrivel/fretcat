@@ -1,4 +1,4 @@
-use std::sync::{Mutex, MutexGuard};
+use std::sync::{Mutex};
 
 use nih_plug::params::persist::PersistentField;
 

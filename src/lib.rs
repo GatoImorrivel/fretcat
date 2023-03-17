@@ -1,10 +1,10 @@
 mod editor;
 mod effects;
 
-use crossbeam::atomic::AtomicCell;
-use nih_plug::{prelude::*, params::persist};
-use nih_plug_iced::{IcedState, futures::lock::Mutex};
-use std::{sync::Arc, collections::LinkedList};
+
+use nih_plug::{prelude::*};
+use nih_plug_iced::{IcedState};
+use std::{sync::Arc};
 
 pub use nih_plug;
 

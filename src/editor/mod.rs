@@ -1,5 +1,5 @@
 
-use crossbeam::atomic::AtomicCell;
+
 use nih_plug::prelude::{Editor, GuiContext};
 use nih_plug_iced::*;
 use std::sync::Arc;
