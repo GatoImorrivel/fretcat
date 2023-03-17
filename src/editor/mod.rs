@@ -4,8 +4,6 @@ use nih_plug::prelude::{Editor, GuiContext};
 use nih_plug_iced::*;
 use std::sync::Arc;
 
-use crate::chain::EffectChain;
-
 const WINDOW_WIDTH: u32 = 1024;
 const WINDOW_HEIGHT: u32 = 848;
 
@@ -13,13 +11,12 @@ pub(crate) fn default_state() -> Arc<IcedState> {
     IcedState::from_size(WINDOW_WIDTH, WINDOW_HEIGHT)
 }
 
-pub(crate) fn create(editor_state: Arc<IcedState>, chain: Arc<AtomicCell<EffectChain>>) -> Option<Box<dyn Editor>> {
-    create_iced_editor::<FretCatEditor>(editor_state, chain)
+pub(crate) fn create(editor_state: Arc<IcedState>) -> Option<Box<dyn Editor>> {
+    create_iced_editor::<FretCatEditor>(editor_state, ())
 }
 
 struct FretCatEditor {
     context: Arc<dyn GuiContext>,
-    chain: Arc<AtomicCell<EffectChain>>
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -28,13 +25,13 @@ enum Message {}
 impl IcedEditor for FretCatEditor {
     type Executor = executor::Default;
     type Message = Message;
-    type InitializationFlags = Arc<AtomicCell<EffectChain>>;
+    type InitializationFlags = ();
 
     fn new(
         _params: Self::InitializationFlags,
         context: Arc<dyn GuiContext>,
     ) -> (Self, Command<Self::Message>) {
-        let editor = FretCatEditor { context, chain: _params};
+        let editor = FretCatEditor { context };
 
         (editor, Command::none())
     }

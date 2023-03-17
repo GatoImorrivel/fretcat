@@ -1,30 +1,30 @@
 mod editor;
-mod chain;
+mod effects;
 
-use chain::EffectChain;
 use crossbeam::atomic::AtomicCell;
 use nih_plug::{prelude::*, params::persist};
-use nih_plug_iced::IcedState;
-use std::sync::Arc;
+use nih_plug_iced::{IcedState, futures::lock::Mutex};
+use std::{sync::Arc, collections::LinkedList};
 
 pub use nih_plug;
 
 pub struct FretCat {
     params: Arc<FretCatParams>,
-    chain: Arc<AtomicCell<EffectChain>>
 }
 
 #[derive(Params)]
 struct FretCatParams {
     #[persist = "editor-state"]
     editor_state: Arc<IcedState>,
+
+    #[persist = "chain-state"]
+    chain_state: effects::VecField<'static, f32>
 }
 
 impl Default for FretCat {
     fn default() -> Self {
         Self {
             params: Arc::new(FretCatParams::default()),
-            chain: Arc::new(EffectChain::default().into())
         }
     }
 }
@@ -33,6 +33,7 @@ impl Default for FretCatParams {
     fn default() -> Self {
         Self {
             editor_state: editor::default_state(),
+            chain_state: effects::VecField::new(vec![2.0; 3])
         }
     }
 }
@@ -68,7 +69,7 @@ impl Plugin for FretCat {
     }
 
     fn editor(&self, _async_executor: AsyncExecutor<Self>) -> Option<Box<dyn Editor>> {
-        editor::create(self.params.editor_state.clone(), self.chain.clone())
+        editor::create(self.params.editor_state.clone())
     }
 
     fn initialize(
@@ -91,6 +92,7 @@ impl Plugin for FretCat {
         _aux: &mut AuxiliaryBuffers,
         _context: &mut impl ProcessContext<Self>,
     ) -> ProcessStatus {
+
         for buffer in buffer.as_slice() {
             buffer.reverse();
         }

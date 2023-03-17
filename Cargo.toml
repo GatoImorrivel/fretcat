@@ -20,6 +20,7 @@ fundsp = "0.12.0"
 nih_plug = { git = "https://github.com/robbert-vdh/nih-plug.git", features = ["assert_process_allocs", "standalone"] }
 nih_plug_iced = { git = "https://github.com/robbert-vdh/nih-plug.git" }
 rustfft = "6.1.0"
+serde = "1.0.156"
 # Uncomment the below line to disable the on-by-default VST3 feature to remove
 # the GPL compatibility requirement
 # nih_plug = { git = "https://github.com/robbert-vdh/nih-plug.git", default_features = false, features = ["assert_process_allocs"] }
