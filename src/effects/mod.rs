@@ -1,36 +1,47 @@
-use std::sync::{Mutex};
+use std::default;
 
-use nih_plug::params::persist::PersistentField;
+use serde::{Serialize, Deserialize};
 
-pub struct VecField<'a, T> {
-    data: Mutex<Vec<T>>,
-    marker: std::marker::PhantomData<&'a ()>,
+pub mod field;
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+pub enum Effects {
+    Overdrive(Overdrive)
 }
 
-impl<'a, T> VecField<'a, T> {
-    pub fn new(initial_value: Vec<T>) -> Self {
-        Self {
-            data: Mutex::new(initial_value),
-            marker: std::marker::PhantomData,
+impl Effects {
+    pub fn into_inner(&self) -> &impl Effect {
+        match self {
+            Effects::Overdrive(overdrive) => overdrive
         }
     }
 }
 
-impl<'a, T> PersistentField<'a, Vec<T>> for VecField<'a, T>
-where
-    T: serde::Serialize + serde::Deserialize<'a> + 'static + Send + Sync,
-{
-    fn set(&self, new_value: Vec<T>) {
-        *self.data.lock().unwrap() = new_value;
-    }
+pub trait Effect {
+    fn process(&self, sample: f32) -> f32;
+}
 
-    fn map<F, R>(&self, f: F) -> R
-    where
-        F: Fn(&Vec<T>) -> R,
-    {
-        let data = self.data.lock().unwrap();
-        let result = f(&*data);
-        std::mem::drop(data); // Release the lock before returning the result
-        result
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+pub struct Overdrive {
+    gain: f32,
+}
+
+impl Default for Overdrive {
+    fn default() -> Self {
+        Self {
+            gain: 0.0
+        }
+    }
+}
+
+impl Effect for Overdrive {
+    fn process(&self, sample: f32) -> f32 {
+        self.gain * sample
+    }
+}
+
+impl Into<Effects> for Overdrive {
+    fn into(self) -> Effects {
+        Effects::Overdrive(self)
     }
 }
