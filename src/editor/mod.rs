@@ -1,5 +1,3 @@
-
-
 use nih_plug::prelude::{Editor, GuiContext};
 use nih_plug_iced::*;
 use std::sync::Arc;
@@ -11,7 +9,9 @@ pub(crate) fn default_state() -> Arc<IcedState> {
     IcedState::from_size(WINDOW_WIDTH, WINDOW_HEIGHT)
 }
 
-pub(crate) fn create(editor_state: Arc<IcedState>) -> Option<Box<dyn Editor>> {
+pub(crate) fn create(
+    editor_state: Arc<IcedState>,
+) -> Option<Box<dyn Editor>> {
     create_iced_editor::<FretCatEditor>(editor_state, ())
 }
 
@@ -20,7 +20,9 @@ struct FretCatEditor {
 }
 
 #[derive(Debug, Clone, Copy)]
-enum Message {}
+enum Message {
+    BtnPress
+}
 
 impl IcedEditor for FretCatEditor {
     type Executor = executor::Default;
@@ -31,8 +33,9 @@ impl IcedEditor for FretCatEditor {
         _params: Self::InitializationFlags,
         context: Arc<dyn GuiContext>,
     ) -> (Self, Command<Self::Message>) {
-        let editor = FretCatEditor { context };
-
+        let editor = FretCatEditor {
+            context,
+        };
         (editor, Command::none())
     }
 
@@ -49,7 +52,9 @@ impl IcedEditor for FretCatEditor {
     }
 
     fn view(&mut self) -> Element<'_, Self::Message> {
-        Column::new().align_items(Alignment::Center).into()
+        Column::new()
+            .align_items(Alignment::Center)
+            .into()
     }
 
     fn background_color(&self) -> nih_plug_iced::Color {

@@ -1,5 +1,5 @@
 mod editor;
-mod effects;
+mod chain;
 mod params;
 
 use nih_plug::{prelude::*};
@@ -11,7 +11,6 @@ pub use nih_plug;
 pub struct FretCat {
     params: Arc<FretCatParams>,
 }
-
 
 impl Default for FretCat {
     fn default() -> Self {
@@ -76,7 +75,6 @@ impl Plugin for FretCat {
         _aux: &mut AuxiliaryBuffers,
         _context: &mut impl ProcessContext<Self>,
     ) -> ProcessStatus {
-        let effects = self.params.chain_state.data().lock().unwrap();
 
         for buffer in buffer.as_slice() {
             buffer.reverse();
