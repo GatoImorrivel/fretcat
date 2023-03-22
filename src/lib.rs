@@ -1,6 +1,7 @@
 mod editor;
 mod chain;
 mod params;
+mod effects;
 
 use nih_plug::{prelude::*};
 use params::FretCatParams;

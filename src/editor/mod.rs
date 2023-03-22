@@ -5,7 +5,8 @@ use nih_plug::{
 use nih_plug_iced::*;
 use std::sync::Arc;
 
-use crate::chain::{EffectChain, EffectState};
+use crate::{chain::EffectChain, effects::{Effect, OverdriveMessages}};
+use crate::effects::EffectState;
 
 const WINDOW_WIDTH: u32 = 1024;
 const WINDOW_HEIGHT: u32 = 848;
@@ -24,7 +25,7 @@ struct FretCatEditor {
 
 #[derive(Debug, Clone, Copy)]
 enum Message {
-    BtnPress,
+    OverdriveMsg(OverdriveMessages)
 }
 
 impl IcedEditor for FretCatEditor {
@@ -53,6 +54,14 @@ impl IcedEditor for FretCatEditor {
     }
 
     fn view(&mut self) -> Element<'_, Self::Message> {
+        let chain = self.get_chain();
+
+        let elements: Vec<Element<'_, Message>> = chain.into_iter().map(|effect| {
+            match effect {
+                EffectState::Overdrive(o) => o.view().map(|m| Message::OverdriveMsg(m))
+            }
+        }).collect();
+
         Column::new().align_items(Alignment::Center).into()
     }
 
