@@ -75,6 +75,7 @@ impl Plugin for FretCat {
         _aux: &mut AuxiliaryBuffers,
         _context: &mut impl ProcessContext<Self>,
     ) -> ProcessStatus {
+        nih_log!("{:?}", self.params.chain_state);
 
         for buffer in buffer.as_slice() {
             buffer.reverse();
