@@ -26,7 +26,7 @@ struct FretCatEditor {
 
 #[derive(Debug, Clone, Copy)]
 enum Message {
-    OverdriveMsg(OverdriveMessages),
+    GenericEffectMessage(u32, EffectMessages),
 }
 
 impl IcedEditor for FretCatEditor {
@@ -38,12 +38,10 @@ impl IcedEditor for FretCatEditor {
         _params: Self::InitializationFlags,
         context: Arc<dyn GuiContext>,
     ) -> (Self, Command<Self::Message>) {
-        let mut editor = FretCatEditor {
+        let editor = FretCatEditor {
             context,
             chain: EffectChain::default(),
         };
-
-        nih_log!("Bolas");
 
         (editor, Command::none())
     }
@@ -61,16 +59,13 @@ impl IcedEditor for FretCatEditor {
     }
 
     fn view(&mut self) -> Element<'_, Self::Message> {
-        Element::new(self.chain.iter_mut().fold(
-            Column::new(),
-            |column, effect | {
-                let element = match effect {
-                    EffectState::Overdrive(o) => o.view().map(|msg| Message::OverdriveMsg(msg)),
-                };
+        Element::new(self.chain.iter_mut().fold(Column::new(), |column, effect| {
+            let element = match effect {
+                EffectState::Overdrive(o) => o.view().map(|msg| Message::GenericEffectMessage(o.id(), msg)),
+            };
 
-                column.push(element)
-            },
-        ))
+            column.push(element)
+        }))
         .into()
     }
 
