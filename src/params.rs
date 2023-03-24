@@ -2,7 +2,7 @@ use std::sync::Arc;
 use nih_plug::{prelude::Params, params::persist};
 use nih_plug_iced::IcedState;
 
-use crate::{editor, chain::EffectChain};
+use crate::{editor, effects::chain::EffectChain};
 
 #[derive(Params)]
 pub struct FretCatParams {

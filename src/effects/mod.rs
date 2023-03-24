@@ -1,3 +1,5 @@
+pub mod chain;
+
 use nih_plug_iced::{slider, Column, Element};
 use serde::{Deserialize, Serialize};
 
@@ -13,6 +15,8 @@ pub trait Effect {
     fn view(&mut self) -> Element<'_, Self::Message>;
 }
 
+pub trait EffectMessage {}
+
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, Default)]
 pub struct Overdrive {
     gain: f32,
@@ -25,6 +29,8 @@ pub struct Overdrive {
 pub enum OverdriveMessages {
     GainChange(f32),
 }
+
+impl EffectMessage for OverdriveMessages {}
 
 impl Effect for Overdrive {
     type Message = OverdriveMessages;

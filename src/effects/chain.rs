@@ -1,4 +1,4 @@
-use std::{sync::{Arc, RwLock}, slice::Iter, vec::IntoIter};
+use std::{sync::{Arc, RwLock}, slice::{Iter, IterMut}, vec::IntoIter};
 
 use nih_plug::params::persist::PersistentField;
 use serde::{Deserialize, Serialize};
@@ -17,12 +17,16 @@ impl EffectChain {
             .expect("Poisoned lock on add")
             .push(effect);
     }
+
+    pub fn iter_mut(&mut self) -> IterMut<EffectState> {
+        self.chain.get_mut().unwrap().iter_mut()
+    }
 }
 
 impl Default for EffectChain {
     fn default() -> Self {
         Self {
-            chain: RwLock::new(vec![EffectState::Overdrive(Overdrive::default())]),
+            chain: RwLock::new(vec![EffectState::Overdrive(Overdrive::default()); 2]),
         }
     }
 }
@@ -34,13 +38,7 @@ impl<'a> PersistentField<'a, EffectChain> for Arc<EffectChain> {
             .write()
             .expect("Poisoned write on set Effect chain");
         chain.clear();
-        chain.append(
-            &mut new_value
-                .chain
-                .read()
-                .expect("Poisoned read of new value")
-                .clone(),
-        );
+        *chain = new_value.chain.into_inner().unwrap();
     }
 
     fn map<F, R>(&self, f: F) -> R

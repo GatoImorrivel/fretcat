@@ -5,8 +5,8 @@ use nih_plug::{
 use nih_plug_iced::*;
 use std::sync::Arc;
 
-use crate::{chain::EffectChain, effects::{Effect, OverdriveMessages}};
 use crate::effects::EffectState;
+use crate::effects::{chain::EffectChain, *};
 
 const WINDOW_WIDTH: u32 = 1024;
 const WINDOW_HEIGHT: u32 = 848;
@@ -21,11 +21,12 @@ pub(crate) fn create(editor_state: Arc<IcedState>) -> Option<Box<dyn Editor>> {
 
 struct FretCatEditor {
     context: Arc<dyn GuiContext>,
+    chain: EffectChain,
 }
 
 #[derive(Debug, Clone, Copy)]
 enum Message {
-    OverdriveMsg(OverdriveMessages)
+    OverdriveMsg(OverdriveMessages),
 }
 
 impl IcedEditor for FretCatEditor {
@@ -37,7 +38,13 @@ impl IcedEditor for FretCatEditor {
         _params: Self::InitializationFlags,
         context: Arc<dyn GuiContext>,
     ) -> (Self, Command<Self::Message>) {
-        let editor = FretCatEditor { context };
+        let mut editor = FretCatEditor {
+            context,
+            chain: EffectChain::default(),
+        };
+
+        nih_log!("Bolas");
+
         (editor, Command::none())
     }
 
@@ -54,15 +61,17 @@ impl IcedEditor for FretCatEditor {
     }
 
     fn view(&mut self) -> Element<'_, Self::Message> {
-        let chain = self.get_chain();
+        Element::new(self.chain.iter_mut().fold(
+            Column::new(),
+            |column, effect | {
+                let element = match effect {
+                    EffectState::Overdrive(o) => o.view().map(|msg| Message::OverdriveMsg(msg)),
+                };
 
-        let elements: Vec<Element<'_, Message>> = chain.into_iter().map(|effect| {
-            match effect {
-                EffectState::Overdrive(o) => o.view().map(|m| Message::OverdriveMsg(m))
-            }
-        }).collect();
-
-        Column::new().align_items(Alignment::Center).into()
+                column.push(element)
+            },
+        ))
+        .into()
     }
 
     fn background_color(&self) -> nih_plug_iced::Color {
@@ -76,7 +85,7 @@ impl IcedEditor for FretCatEditor {
 }
 
 impl FretCatEditor {
-    pub fn get_chain(&self) -> EffectChain {
+    pub fn get_chain_from_context(&self) -> EffectChain {
         serde_json::from_str(
             &self
                 .context
@@ -88,13 +97,23 @@ impl FretCatEditor {
         .unwrap()
     }
 
-    pub fn set_chain(&mut self, chain: &EffectChain) {
+    pub fn set_chain_to_context(&mut self, chain: &EffectChain) {
         let mut state = self.context.get_state();
         let chain_field = state
             .fields
             .get_mut("chain-state")
             .expect("chain-state not found");
-        *chain_field = serde_json::to_string(&chain).unwrap();
+        *chain_field = serde_json::to_string(chain).unwrap();
+        self.context.set_state(state);
+    }
+
+    pub fn sync_chain_to_context(&mut self) {
+        let mut state = self.context.get_state();
+        let chain_field = state
+            .fields
+            .get_mut("chain-state")
+            .expect("chain-state not found");
+        *chain_field = serde_json::to_string(&self.chain).unwrap();
         self.context.set_state(state);
     }
 }
