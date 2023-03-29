@@ -3,9 +3,9 @@ use nih_plug::{
     prelude::{Editor, GuiContext},
 };
 use nih_plug_iced::*;
-use std::sync::Arc;
+use std::sync::{Arc, RwLock};
 
-use crate::effects::EffectState;
+use crate::effects::Effects;
 use crate::effects::{chain::EffectChain, *};
 
 const WINDOW_WIDTH: u32 = 1024;
@@ -15,33 +15,30 @@ pub(crate) fn default_state() -> Arc<IcedState> {
     IcedState::from_size(WINDOW_WIDTH, WINDOW_HEIGHT)
 }
 
-pub(crate) fn create(editor_state: Arc<IcedState>) -> Option<Box<dyn Editor>> {
+pub(crate) fn create(editor_state: Arc<IcedState>, chain: RwLock<EffectChain>) -> Option<Box<dyn Editor>> {
     create_iced_editor::<FretCatEditor>(editor_state, ())
 }
 
 struct FretCatEditor {
     context: Arc<dyn GuiContext>,
-    chain: EffectChain,
+    chain: RwLock<EffectChain>,
 }
 
 #[derive(Debug, Clone, Copy)]
 enum Message {
-    GenericEffectMessage(u32, EffectMessages),
+    Placeholder,
 }
 
 impl IcedEditor for FretCatEditor {
     type Executor = executor::Default;
     type Message = Message;
-    type InitializationFlags = ();
+    type InitializationFlags = RwLock<EffectChain>;
 
     fn new(
         _params: Self::InitializationFlags,
         context: Arc<dyn GuiContext>,
     ) -> (Self, Command<Self::Message>) {
-        let editor = FretCatEditor {
-            context,
-            chain: EffectChain::default(),
-        };
+        let editor = FretCatEditor { context, chain: EffectChain::default() };
 
         (editor, Command::none())
     }
@@ -61,7 +58,7 @@ impl IcedEditor for FretCatEditor {
     fn view(&mut self) -> Element<'_, Self::Message> {
         Element::new(self.chain.iter_mut().fold(Column::new(), |column, effect| {
             let element = match effect {
-                EffectState::Overdrive(o) => o.view().map(|msg| Message::GenericEffectMessage(o.id(), msg)),
+                Effects::Overdrive(o) => o.view().map(|msg| Message::Placeholder),
             };
 
             column.push(element)

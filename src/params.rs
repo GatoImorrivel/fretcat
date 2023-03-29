@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::sync::{Arc, RwLock};
 use nih_plug::{prelude::Params, params::persist};
 use nih_plug_iced::IcedState;
 
@@ -10,14 +10,14 @@ pub struct FretCatParams {
     pub(crate) editor_state: Arc<IcedState>,
 
     #[persist = "chain-state"]
-    pub(crate) chain_state: Arc<EffectChain>
+    pub(crate) chain_state: RwLock<EffectChain>
 }
 
 impl Default for FretCatParams {
     fn default() -> Self {
         Self {
             editor_state: editor::default_state(),
-            chain_state: Arc::new(EffectChain::default())
+            chain_state: RwLock::new(EffectChain::default())
         }
     }
 }
