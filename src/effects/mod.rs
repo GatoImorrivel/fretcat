@@ -1,5 +1,3 @@
-pub mod chain;
-
 use nih_plug_iced::{slider, Column, Element};
 use serde::{Deserialize, Serialize};
 
