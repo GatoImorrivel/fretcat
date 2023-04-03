@@ -1,8 +1,11 @@
-use nih_plug::prelude::{Editor, GuiContext};
+use nih_plug::{
+    nih_log,
+    prelude::{Editor, GuiContext},
+};
 use nih_plug_iced::*;
 use std::sync::{Arc, RwLock};
 
-use crate::effects::*;
+use crate::effects::{*, self};
 
 const WINDOW_WIDTH: u32 = 1024;
 const WINDOW_HEIGHT: u32 = 848;
@@ -22,7 +25,7 @@ struct FretCatEditor {
 
 #[derive(Debug, Clone, Copy)]
 enum Message {
-    GenericEffectMessage(),
+    GenericEffectMessage(usize, EffectMessages),
 }
 
 impl IcedEditor for FretCatEditor {
@@ -51,6 +54,18 @@ impl IcedEditor for FretCatEditor {
         _window: &mut WindowQueue,
         _message: Self::Message,
     ) -> Command<Self::Message> {
+        match _message {
+            Message::GenericEffectMessage(id, msg) => {
+                nih_log!("{}: {:?}", id, msg);
+
+                match msg {
+                    EffectMessages::OverdriveMessage(o_msg) => {
+                        nih_log!("{:?}", self.chain.as_mut().unwrap()[id]);
+                    }
+
+                }
+            }
+        }
         Command::none()
     }
 
@@ -66,16 +81,19 @@ impl IcedEditor for FretCatEditor {
 
         let mut effect_elements = vec![];
 
-        for effect in self.chain.as_mut().unwrap() {
+        for (i, effect) in self.chain.as_mut().unwrap().iter_mut().enumerate() {
             let element = match effect {
-                Effects::Overdrive(o) => o.view().map(|msg| Message::GenericEffectMessage())
+                Effects::Overdrive(o) => {
+                    o.view()
+                        .map(move |msg| Message::GenericEffectMessage(i, msg.into()))
+                }
             };
             effect_elements.push(element);
         }
 
-        let column = effect_elements.into_iter().fold(Column::new(), |column, element| {
-            column.push(element)
-        });
+        let column = effect_elements
+            .into_iter()
+            .fold(Column::new(), |column, element| column.push(element));
 
         let element: Element<_> = column.into();
 

@@ -49,3 +49,4 @@ impl Effect<OverdriveMessage> for Overdrive {
 
 
 effects!(Overdrive);
+effect_messages!(OverdriveMessage);

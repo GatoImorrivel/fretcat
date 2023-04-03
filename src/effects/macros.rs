@@ -25,3 +25,22 @@ macro_rules! effects {
         )*
     };
 }
+
+macro_rules! effect_messages {
+    ($($effect:ident),*) => {
+        #[derive(Debug, Copy, Clone)]
+        pub enum EffectMessages {
+            $(
+                $effect($effect),
+            )*
+        }
+
+        $(
+            impl From<$effect> for EffectMessages {
+                fn from(effect: $effect) -> Self {
+                    EffectMessages::$effect(effect)
+                }
+            }
+        )*
+    };
+}
