@@ -17,7 +17,7 @@ impl Default for FretCatParams {
     fn default() -> Self {
         Self {
             editor_state: editor::default_state(),
-            chain_state: Arc::new(RwLock::new(vec![Effects::from(Overdrive::default()); 4]))
+            chain_state: Arc::new(RwLock::new(vec![Effects::from(Overdrive::default())]))
         }
     }
 }
