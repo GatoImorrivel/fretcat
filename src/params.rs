@@ -1,4 +1,4 @@
-use std::sync::{Arc, RwLock, Mutex};
+use std::sync::{Arc};
 use nih_plug::{prelude::Params};
 use nih_plug_iced::IcedState;
 

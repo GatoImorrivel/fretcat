@@ -1,6 +1,6 @@
-use fundsp::prelude::Biquad;
+
 use nih_plug_iced::{slider, Column, Element, Text, Color};
-use serde::{Deserialize, Serialize};
+
 
 pub trait EffectUI: Send + Sync {
     type Message;

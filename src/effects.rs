@@ -1,4 +1,4 @@
-use std::sync::Arc;
+
 
 pub trait Effect {
     fn process(&self, sample: f32) -> f32;
@@ -11,6 +11,6 @@ pub struct Overdrive {
 
 impl Effect for Overdrive {
     fn process(&self, sample: f32) -> f32 {
-        10.0 * sample
+        self.gain * sample
     }
 }
