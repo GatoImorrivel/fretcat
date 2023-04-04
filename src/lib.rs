@@ -11,8 +11,7 @@ pub use nih_plug;
 
 pub struct FretCat {
     params: Arc<FretCatParams>,
-
-    chain: Vec<Box<dyn Effect + Send + Sync>>
+    chain: Vec<Box<dyn Effect + Send + Sync>>,
 }
 
 impl Default for FretCat {
@@ -56,7 +55,7 @@ impl Plugin for FretCat {
     }
 
     fn editor(&self, _async_executor: AsyncExecutor<Self>) -> Option<Box<dyn Editor>> {
-        editor::create(self.params.editor_state.clone())
+        editor::create(self.params.editor_state.clone(), self.params.ui_message.clone())
     }
 
     fn initialize(
@@ -79,6 +78,7 @@ impl Plugin for FretCat {
         _aux: &mut AuxiliaryBuffers,
         _context: &mut impl ProcessContext<Self>,
     ) -> ProcessStatus {
+        nih_log!("{:#?}", self.params.ui_message);
         for channel_samples in buffer.iter_samples() {
             for sample in channel_samples {
                 for effect in &self.chain {
