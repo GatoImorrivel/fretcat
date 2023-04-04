@@ -1,21 +1,20 @@
 #[macro_use]
 mod macros;
 
-use nih_plug_iced::{slider, Column, Element};
+use fundsp::prelude::Biquad;
+use nih_plug_iced::{slider, Column, Element, Text, Color};
 use serde::{Deserialize, Serialize};
 
-pub trait Effect<M> {
-    fn process(&self, sample: f32) -> f32;
-    fn view(&mut self) -> Element<'_, M>;
-    fn update(&mut self, message: M);
+pub trait EffectUI {
+    type Message;
+    fn view(&mut self) -> Element<'_, Self::Message>;
+    fn update(&mut self, message: Self::Message);
 }
 
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize, Default)]
-pub struct Overdrive {
+#[derive(Debug, Clone, Copy, Default)]
+pub struct OverdriveUI {
     gain: f32,
-
-    #[serde(skip)]
     gain_slider_state: slider::State,
 }
 
@@ -24,19 +23,18 @@ pub enum OverdriveMessage {
     GainChange(f32),
 }
 
-impl Effect<OverdriveMessage> for Overdrive {
-    fn process(&self, sample: f32) -> f32 {
-        self.gain * sample
-    }
+impl EffectUI for OverdriveUI {
+    type Message = OverdriveMessage; 
 
     fn view(&mut self) -> Element<'_, OverdriveMessage> {
         Column::new()
+            .push(Text::new("Gain").color(Color::WHITE))
             .push(slider::Slider::new(
                 &mut self.gain_slider_state,
-                -30.0..=30.0,
+                0.0..=5.0,
                 self.gain,
                 OverdriveMessage::GainChange,
-            ))
+            ).step(0.5))
             .into()
     }
 
@@ -46,7 +44,3 @@ impl Effect<OverdriveMessage> for Overdrive {
         }
     }
 }
-
-
-effects!(Overdrive);
-effect_messages!(OverdriveMessage);
