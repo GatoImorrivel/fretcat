@@ -2,6 +2,7 @@ mod editor;
 mod params;
 mod effects;
 
+use effects::Effect;
 use nih_plug::{prelude::*};
 use params::FretCatParams;
 use std::{sync::Arc};
@@ -75,8 +76,14 @@ impl Plugin for FretCat {
         _aux: &mut AuxiliaryBuffers,
         _context: &mut impl ProcessContext<Self>,
     ) -> ProcessStatus {
-        for buffer in buffer.as_slice() {
-            buffer.reverse();
+        for channel_samples in buffer.iter_samples() {
+            for sample in channel_samples {
+                for effect in self.params.chain_state.read().unwrap().iter() {
+                   match effect {
+                        effects::Effects::Overdrive(o) => *sample = o.process(*sample) 
+                   } 
+                }
+            }
         }
 
         ProcessStatus::Normal

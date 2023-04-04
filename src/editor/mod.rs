@@ -64,17 +64,17 @@ impl IcedEditor for FretCatEditor {
 
                         match &mut chain[id] {
                             Effects::Overdrive(effect) => effect.update(o_msg),
-                            _ => unreachable!()
-                        }                        
-
-                        let mut state = self.context.get_state();
-                        let field = state.fields.get_mut("chain-state").unwrap();
-
-                        *field = serde_json::to_string(self.chain.as_ref().unwrap()).unwrap();
-
-                        self.context.set_state(state);
+                            _ => unreachable!(),
+                        }
                     }
                 }
+
+                let mut state = self.context.get_state();
+                let field = state.fields.get_mut("chain-state").unwrap();
+
+                *field = serde_json::to_string(self.chain.as_ref().unwrap()).unwrap();
+
+                self.context.set_state(state);
             }
         }
         Command::none()
@@ -89,8 +89,6 @@ impl IcedEditor for FretCatEditor {
                 .expect("No chain-state"),
         )
         .unwrap();
-
-        nih_log!("{:#?}", self.chain.as_ref().unwrap());
 
         let mut effect_elements = vec![];
 
