@@ -105,9 +105,7 @@ impl IcedEditor for FretCatEditor {
             .into_iter()
             .fold(Column::new(), |column, element| column.push(element));
 
-        let element: Element<_> = column.into();
-
-        element
+        column.into()
     }
 
     fn background_color(&self) -> nih_plug_iced::Color {
