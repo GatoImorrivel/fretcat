@@ -1,11 +1,8 @@
-#[macro_use]
-mod macros;
-
 use fundsp::prelude::Biquad;
 use nih_plug_iced::{slider, Column, Element, Text, Color};
 use serde::{Deserialize, Serialize};
 
-pub trait EffectUI {
+pub trait EffectUI: Send + Sync {
     type Message;
     fn view(&mut self) -> Element<'_, Self::Message>;
     fn update(&mut self, message: Self::Message);

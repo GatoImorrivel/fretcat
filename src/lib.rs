@@ -2,6 +2,7 @@ mod editor;
 mod params;
 mod effects;
 
+use effects::{Effect, Overdrive};
 use nih_plug::{prelude::*};
 use params::FretCatParams;
 use std::{sync::Arc};
@@ -10,12 +11,15 @@ pub use nih_plug;
 
 pub struct FretCat {
     params: Arc<FretCatParams>,
+
+    chain: Vec<Box<dyn Effect + Send + Sync>>
 }
 
 impl Default for FretCat {
     fn default() -> Self {
         Self {
             params: Arc::new(FretCatParams::default()),
+            chain: vec![Box::new(Overdrive::default())]
         }
     }
 }
@@ -77,7 +81,9 @@ impl Plugin for FretCat {
     ) -> ProcessStatus {
         for channel_samples in buffer.iter_samples() {
             for sample in channel_samples {
-                *sample = *sample;
+                for effect in &self.chain {
+                    *sample = effect.process(*sample);
+                }
             }
         }
 

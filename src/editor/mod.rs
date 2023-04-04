@@ -1,3 +1,5 @@
+mod effect;
+
 use nih_plug::{
     nih_log,
     prelude::{Editor, GuiContext},
