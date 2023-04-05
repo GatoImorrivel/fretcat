@@ -27,11 +27,9 @@ impl FretCat {
     pub fn update(&mut self) {
         let msg = self.params.ui_message.take();
         if msg.is_some() {
-            let (id, gain_increment) = msg.unwrap();
-
-            nih_log!("{}: {}", id, gain_increment);
+            let content = msg.unwrap();
+            self.chain[content.get_id()].update(content.get_message());
         }
-        nih_log!("{:#?}", msg);
     }
 }
 

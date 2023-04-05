@@ -1,4 +1,7 @@
-mod effect;
+pub mod components;
+
+#[macro_use]
+pub(self) mod macros;
 
 use crossbeam::atomic::AtomicCell;
 use nih_plug::{

@@ -3,7 +3,7 @@ use crossbeam::atomic::AtomicCell;
 use nih_plug::{prelude::Params, params::persist};
 use nih_plug_iced::IcedState;
 
-use crate::editor;
+use crate::{editor, effects::GenericEffectUpdate};
 
 
 #[derive(Params)]
@@ -12,7 +12,7 @@ pub struct FretCatParams {
     pub(crate) editor_state: Arc<IcedState>,
 
     #[persist = "ui-message"]
-    pub(crate) ui_message: Arc<AtomicCell<Option<(usize, f32)>>>
+    pub(crate) ui_message: Arc<AtomicCell<Option<GenericEffectUpdate>>>
 }
 
 impl Default for FretCatParams {

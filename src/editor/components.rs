@@ -1,13 +1,11 @@
 
 use nih_plug_iced::{slider, Column, Element, Text, Color};
 
-
 pub trait EffectUI: Send + Sync {
     type Message;
     fn view(&mut self) -> Element<'_, Self::Message>;
     fn update(&mut self, message: Self::Message);
 }
-
 
 #[derive(Debug, Clone, Copy, Default)]
 pub struct OverdriveUI {
@@ -19,6 +17,7 @@ pub struct OverdriveUI {
 pub enum OverdriveMessage {
     GainChange(f32),
 }
+
 
 impl EffectUI for OverdriveUI {
     type Message = OverdriveMessage; 
@@ -41,3 +40,5 @@ impl EffectUI for OverdriveUI {
         }
     }
 }
+
+ui_message
