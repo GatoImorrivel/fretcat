@@ -5,7 +5,7 @@ mod effects;
 use effects::{Effect, Overdrive};
 use nih_plug::{prelude::*};
 use params::FretCatParams;
-use std::{sync::Arc};
+use std::{sync::Arc, any::Any};
 
 pub use nih_plug;
 
@@ -20,6 +20,18 @@ impl Default for FretCat {
             params: Arc::new(FretCatParams::default()),
             chain: vec![Box::new(Overdrive::default())]
         }
+    }
+}
+
+impl FretCat {
+    pub fn update(&mut self) {
+        let msg = self.params.ui_message.take();
+        if msg.is_some() {
+            let (id, gain_increment) = msg.unwrap();
+
+            nih_log!("{}: {}", id, gain_increment);
+        }
+        nih_log!("{:#?}", msg);
     }
 }
 
@@ -78,7 +90,7 @@ impl Plugin for FretCat {
         _aux: &mut AuxiliaryBuffers,
         _context: &mut impl ProcessContext<Self>,
     ) -> ProcessStatus {
-        nih_log!("{:#?}", self.params.ui_message);
+        self.update();
         for channel_samples in buffer.iter_samples() {
             for sample in channel_samples {
                 for effect in &self.chain {
