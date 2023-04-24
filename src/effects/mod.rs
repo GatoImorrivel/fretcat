@@ -1,3 +1,5 @@
+use std::fmt::Debug;
+
 use nih_plug::nih_log;
 
 
@@ -25,7 +27,7 @@ impl EffectUpdate {
     }
 }
 
-pub trait Effect {
+pub trait Effect: Debug {
     fn process(&self, sample: f32) -> f32;
     fn update(&mut self, message: EffectMessage);
     fn ui(&self, id: usize) -> Box<dyn EffectUI + Send + Sync>;

@@ -2,6 +2,7 @@
 
 use super::{Effect, ui::EffectUI, EffectUpdate, OverdriveEffect};
 
+#[derive(Debug)]
 pub struct Chain {
     effects: Vec<Box<dyn Effect + Send + Sync>>,
 }
@@ -38,3 +39,9 @@ impl Default for Chain {
         }
     }
 }
+
+#[derive(Debug, Clone)]
+pub struct ChainPtr(pub *mut Chain);
+
+unsafe impl Send for ChainPtr {}
+unsafe impl Sync for ChainPtr {}

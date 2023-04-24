@@ -2,23 +2,23 @@ mod editor;
 mod params;
 mod effects;
 
-use effects::chain::Chain;
+use effects::chain::{Chain, ChainPtr};
 use nih_plug::{prelude::*};
 use params::FretCatParams;
-use std::{sync::Arc};
+use std::{sync::Arc, cell::Cell};
 
 pub use nih_plug;
 
 pub struct FretCat {
     params: Arc<FretCatParams>,
-    chain: Arc<Chain>
+    chain: Cell<Chain> 
 }
 
 impl Default for FretCat {
     fn default() -> Self {
         Self {
             params: Arc::new(FretCatParams::default()),
-            chain: Arc::new(Chain::default())
+            chain: Cell::new(Chain::default())
         }
     }
 }
@@ -54,7 +54,7 @@ impl Plugin for FretCat {
     }
 
     fn editor(&self, _async_executor: AsyncExecutor<Self>) -> Option<Box<dyn Editor>> {
-        editor::create(self.params.editor_state.clone(), self.chain.clone()) 
+        editor::create(self.params.editor_state.clone(), ChainPtr(self.chain.as_ptr()))
     }
 
     fn initialize(
@@ -79,7 +79,7 @@ impl Plugin for FretCat {
     ) -> ProcessStatus {
         for channel_samples in buffer.iter_samples() {
             for sample in channel_samples {
-                *sample = self.chain.process(*sample);
+                *sample = self.chain.get_mut().process(*sample);
             }
         }
 
