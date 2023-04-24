@@ -36,17 +36,20 @@ impl EffectUI for OverdriveUI {
     }
 
     fn view(&mut self) -> Element<'_, EffectUpdate> {
+        let id = self.id;
+
         let slider = Slider::new(
             &mut self.gain_slider,
             0.0..=30.0,
             self.gain,
-            |gain| EffectUpdate {
-                id: self.id,
+            move |gain| EffectUpdate {
+                id,
                 message: OverdriveMessage::Gain(gain).into()
-            }
+            } 
         );
 
         Column::new()
+            .push(slider)
             .into()
     }
 }
