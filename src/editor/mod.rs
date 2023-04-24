@@ -15,7 +15,6 @@ pub(crate) fn default_state() -> Arc<IcedState> {
 }
 
 pub(crate) fn create(editor_state: Arc<IcedState>, chain_ptr: ChainPtr) -> Option<Box<dyn Editor>> {
-    nih_log!("CREATING EDITOR");
     create_iced_editor::<FretCatEditor>(editor_state, chain_ptr)
 }
 
@@ -50,8 +49,6 @@ impl IcedEditor for FretCatEditor {
             chain_ptr: _params
         };
 
-        nih_log!("INSIDE EDITOR NEW");
-
         (editor, Command::none())
     }
 
@@ -73,7 +70,6 @@ impl IcedEditor for FretCatEditor {
 
                 let (id, message) = update.take();
                 self.ui_effects[id].update(message);
-                nih_log!("{:#?}", update);
             }
         }
         Command::none()
