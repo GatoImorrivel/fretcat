@@ -2,37 +2,26 @@ mod editor;
 mod params;
 mod effects;
 
-use effects::{Effect, Overdrive};
+use effects::chain::Chain;
 use nih_plug::{prelude::*};
 use params::FretCatParams;
-use std::{sync::Arc, any::Any};
+use std::{sync::Arc};
 
 pub use nih_plug;
 
 pub struct FretCat {
     params: Arc<FretCatParams>,
-    chain: Vec<Box<dyn Effect + Send + Sync>>,
+    chain: Arc<Chain>
 }
 
 impl Default for FretCat {
     fn default() -> Self {
         Self {
             params: Arc::new(FretCatParams::default()),
-            chain: vec![Box::new(Overdrive::default())]
+            chain: Arc::new(Chain::default())
         }
     }
 }
-
-impl FretCat {
-    pub fn update(&mut self) {
-        let msg = self.params.ui_message.take();
-        if msg.is_some() {
-            let content = msg.unwrap();
-            self.chain[content.get_id()].update(content.get_message());
-        }
-    }
-}
-
 
 impl Plugin for FretCat {
     const NAME: &'static str = "FretCat";
@@ -65,7 +54,7 @@ impl Plugin for FretCat {
     }
 
     fn editor(&self, _async_executor: AsyncExecutor<Self>) -> Option<Box<dyn Editor>> {
-        editor::create(self.params.editor_state.clone(), self.params.ui_message.clone())
+        editor::create(self.params.editor_state.clone(), self.chain.clone()) 
     }
 
     fn initialize(
@@ -88,12 +77,9 @@ impl Plugin for FretCat {
         _aux: &mut AuxiliaryBuffers,
         _context: &mut impl ProcessContext<Self>,
     ) -> ProcessStatus {
-        self.update();
         for channel_samples in buffer.iter_samples() {
             for sample in channel_samples {
-                for effect in &self.chain {
-                    *sample = effect.process(*sample);
-                }
+                *sample = self.chain.process(*sample);
             }
         }
 
