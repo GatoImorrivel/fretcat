@@ -1,4 +1,3 @@
-use crossbeam::atomic::AtomicCell;
 use nih_plug::{
     nih_log,
     prelude::{Editor, GuiContext},
@@ -6,7 +5,7 @@ use nih_plug::{
 use nih_plug_iced::*;
 use std::sync::Arc;
 
-use crate::effects::{chain::Chain, ui::EffectUI, EffectMessage, EffectUpdate};
+use crate::effects::{chain::Chain, ui::EffectUI, EffectUpdate};
 
 const WINDOW_WIDTH: u32 = 1024;
 const WINDOW_HEIGHT: u32 = 848;

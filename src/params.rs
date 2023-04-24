@@ -1,6 +1,6 @@
 use std::sync::{Arc};
-use crossbeam::atomic::AtomicCell;
-use nih_plug::{prelude::Params, params::persist};
+
+use nih_plug::{prelude::Params};
 use nih_plug_iced::IcedState;
 
 use crate::{editor};

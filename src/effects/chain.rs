@@ -1,6 +1,6 @@
-use nih_plug::nih_log;
 
-use super::{Effect, ui::EffectUI, EffectUpdate, OverdriveMessage, OverdriveEffect};
+
+use super::{Effect, ui::EffectUI, EffectUpdate, OverdriveEffect};
 
 pub struct Chain {
     effects: Vec<Box<dyn Effect + Send + Sync>>,
