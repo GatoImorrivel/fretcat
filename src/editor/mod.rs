@@ -58,6 +58,13 @@ impl IcedEditor for FretCatEditor {
         _window: &mut WindowQueue,
         _message: Self::Message,
     ) -> Command<Self::Message> {
+        match _message {
+            Message::EffectUpdate(update) => {
+                let (id, message) = update.take();
+                self.ui_effects[id].update(message);
+                nih_log!("{:#?}", update);
+            }
+        }
         Command::none()
     }
 
