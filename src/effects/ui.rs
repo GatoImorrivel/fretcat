@@ -12,15 +12,23 @@ pub trait EffectUI {
 pub struct OverdriveUI {
     id: usize,
     gain: f32,
+    volume: f32,
+    threshold: f32,
     gain_slider: slider::State,
+    volume_slider: slider::State,
+    threshold_slider: slider::State,
 }
 
 impl OverdriveUI {
-    pub fn new(id: usize, gain: f32) -> Self {
+    pub fn new(id: usize, gain: f32, volume: f32, threshold: f32) -> Self {
         Self {
             id: id,
-            gain: gain,
-            gain_slider: slider::State::new()
+            gain,
+            volume,
+            threshold,
+            gain_slider: slider::State::new(),
+            volume_slider: slider::State::new(),
+            threshold_slider: slider::State::new(),
         }
     }
 }
@@ -30,6 +38,8 @@ impl EffectUI for OverdriveUI {
         match message {
             EffectMessage::OverdriveMessage(msg) => match msg {
                 super::OverdriveMessage::Gain(gain) => self.gain = gain,
+                super::OverdriveMessage::Volume(volume) => self.volume = volume,
+                super::OverdriveMessage::Threshold(threshold) => self.threshold = threshold,
             },
             _ => nih_log!("OverdriveUI received invalid message, discarding"),
         }
@@ -38,9 +48,9 @@ impl EffectUI for OverdriveUI {
     fn view(&mut self) -> Element<'_, EffectUpdate> {
         let id = self.id;
 
-        let slider = Slider::new(
+        let gain_slider = Slider::new(
             &mut self.gain_slider,
-            0.0..=30.0,
+            1.0..=10.0,
             self.gain,
             move |gain| EffectUpdate {
                 id,
@@ -48,8 +58,30 @@ impl EffectUI for OverdriveUI {
             } 
         );
 
+        let volume_slider = Slider::new(
+            &mut self.volume_slider,
+            1.0..=10.0,
+            self.volume,
+            move |volume| EffectUpdate {
+                id,
+                message: OverdriveMessage::Volume(volume).into()
+            } 
+        );
+
+        let threshold_slider = Slider::new(
+            &mut self.threshold_slider,
+            1.0..=10.0,
+            self.threshold,
+            move |threshold| EffectUpdate {
+                id,
+                message: OverdriveMessage::Threshold(threshold).into()
+            } 
+        );
+
         Column::new()
-            .push(slider)
+            .push(gain_slider)
+            .push(volume_slider)
+            .push(threshold_slider)
             .into()
     }
 }

@@ -35,24 +35,32 @@ pub trait Effect: Debug {
 
 #[derive(Debug, Clone, Copy)]
 pub enum OverdriveMessage {
-    Gain(f32)
+    Gain(f32),
+    Volume(f32),
+    Threshold(f32)
 }
 
 #[derive(Debug, Default)]
 pub struct OverdriveEffect {
-    gain: f32
+    gain: f32,
+    volume: f32,
+    threshold: f32
 }
 
 impl Effect for OverdriveEffect {
     fn process(&self, sample: f32) -> f32 {
-        self.gain * sample
+        let amplified = self.gain * sample;
+
+        amplified.clamp(-self.threshold, self.threshold) * self.volume
     }
 
     fn update(&mut self, message: EffectMessage) {
         match message {
             EffectMessage::OverdriveMessage(msg) => {
                 match msg {
-                    OverdriveMessage::Gain(gain) => self.gain = gain
+                    OverdriveMessage::Gain(gain) => self.gain = gain,
+                    OverdriveMessage::Volume(volume) => self.volume = volume,
+                    OverdriveMessage::Threshold(threshold) => self.threshold = threshold
                 }
             },
             _ => nih_log!("Overdrive received invalid message, discarding")
@@ -60,7 +68,7 @@ impl Effect for OverdriveEffect {
     }
 
     fn ui(&self, id: usize) -> Box<dyn EffectUI + Send + Sync> {
-        let effect = OverdriveUI::new(id, self.gain);
+        let effect = OverdriveUI::new(id, self.gain, self.volume, self.threshold);
 
         Box::new(effect)
     }
