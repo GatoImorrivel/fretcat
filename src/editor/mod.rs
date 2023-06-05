@@ -76,13 +76,24 @@ impl IcedEditor for FretCatEditor {
     }
 
     fn view(&mut self) -> Element<'_, Self::Message> {
-        let mut column = Column::new();
+        let mut effect_column = Column::new().width(Length::FillPortion(4));
+        let sidebar: Column<Message> = Column::new().width(Length::Fill);
 
         for effect in &mut self.ui_effects {
-           column = column.push(effect.view().map(|msg| Self::Message::EffectUpdate(msg))); 
+           effect_column = effect_column.push(effect.view().map(|msg| Self::Message::EffectUpdate(msg))); 
         }
 
-        column.into()
+        let top_row: Row<Message>= Row::new().height(Length::Fill);
+        let bottom_row: Row<Message> = Row::new().height(Length::FillPortion(20));
+
+
+        Column::new()
+            .push(top_row)
+            .push(bottom_row
+                .push(sidebar)
+                .push(effect_column)
+            )
+            .into()
     }
 
     fn background_color(&self) -> nih_plug_iced::Color {
