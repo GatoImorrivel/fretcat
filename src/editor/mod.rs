@@ -1,107 +1,48 @@
-use nih_plug::{
-    nih_log,
-    prelude::{Editor, GuiContext},
-};
-use nih_plug_iced::*;
 use std::sync::Arc;
 
-use crate::{effects::{chain::{Chain, ChainPtr}, ui::EffectUI, EffectUpdate}, params};
+use nih_plug::prelude::Editor;
+use nih_plug_vizia::vizia::prelude::*;
+use nih_plug_vizia::{
+    create_vizia_editor,
+    vizia::{prelude::Lens, state::Model, views::VStack},
+    widgets::ResizeHandle,
+    ViziaState, ViziaTheming,
+};
 
-const WINDOW_WIDTH: u32 = 1024;
-const WINDOW_HEIGHT: u32 = 848;
+use crate::chain::ChainPtr;
+use crate::params::FretcatParams;
 
-pub(crate) fn default_state() -> Arc<IcedState> {
-    IcedState::from_size(WINDOW_WIDTH, WINDOW_HEIGHT)
+const EDITOR_WIDTH: u32 = 1260;
+const EDITOR_HEIGHT: u32 = 848;
+
+#[derive(Lens, Clone)]
+pub(crate) struct Data {
+    pub(crate) params: Arc<FretcatParams>,
+    pub(crate) chain: ChainPtr,
 }
 
-pub(crate) fn create(editor_state: Arc<IcedState>, chain_ptr: ChainPtr) -> Option<Box<dyn Editor>> {
-    create_iced_editor::<FretCatEditor>(editor_state, chain_ptr)
+impl Model for Data {}
+
+// Makes sense to also define this here, makes it a bit easier to keep track of
+pub(crate) fn default_state() -> Arc<ViziaState> {
+    ViziaState::new(|| (EDITOR_WIDTH, EDITOR_HEIGHT))
 }
 
-struct FretCatEditor {
-    context: Arc<dyn GuiContext>,
-    ui_effects: Vec<Box<dyn EffectUI + Send + Sync>>,
-    chain_ptr: ChainPtr
-}
+pub(crate) fn create(editor_data: Data, editor_state: Arc<ViziaState>) -> Option<Box<dyn Editor>> {
+    create_vizia_editor(editor_state, ViziaTheming::Custom, move |cx, _| {
+        editor_data.clone().build(cx);
 
-#[derive(Debug, Clone, Copy)]
-enum Message {
-    EffectUpdate(EffectUpdate)
-}
+        ResizeHandle::new(cx);
 
-impl IcedEditor for FretCatEditor {
-    type Executor = executor::Default;
-    type Message = Message;
-    type InitializationFlags = ChainPtr;
+        VStack::new(cx, |cx| {
+            HStack::new(cx, |cx| {
+                Label::new(cx, "Bolas");
+            })
+            .background_color(Color::black());
 
-    fn new(
-        _params: Self::InitializationFlags,
-        context: Arc<dyn GuiContext>,
-    ) -> (Self, Command<Self::Message>) {
-        let ui_effects = unsafe {
-            let chain = &*_params.0;
-            chain.build_ui()
-        };
-
-        let editor = FretCatEditor {
-            context,
-            ui_effects,
-            chain_ptr: _params
-        };
-
-        (editor, Command::none())
-    }
-
-    fn context(&self) -> &dyn GuiContext {
-        self.context.as_ref()
-    }
-
-    fn update(
-        &mut self,
-        _window: &mut WindowQueue,
-        _message: Self::Message,
-    ) -> Command<Self::Message> {
-        match _message {
-            Message::EffectUpdate(update) => {
-                unsafe {
-                    let chain = &mut *self.chain_ptr.0;
-                    chain.update(update);
-                }
-
-                let (id, message) = update.take();
-                self.ui_effects[id].update(message);
-            }
-        }
-        Command::none()
-    }
-
-    fn view(&mut self) -> Element<'_, Self::Message> {
-        let mut effect_column = Column::new().width(Length::FillPortion(4));
-        let sidebar: Column<Message> = Column::new().width(Length::Fill);
-
-        for effect in &mut self.ui_effects {
-           effect_column = effect_column.push(effect.view().map(|msg| Self::Message::EffectUpdate(msg))); 
-        }
-
-        let top_row: Row<Message>= Row::new().height(Length::Fill);
-        let bottom_row: Row<Message> = Row::new().height(Length::FillPortion(20));
-
-
-        Column::new()
-            .push(top_row)
-            .push(bottom_row
-                .push(sidebar)
-                .push(effect_column)
-            )
-            .into()
-    }
-
-    fn background_color(&self) -> nih_plug_iced::Color {
-        nih_plug_iced::Color {
-            r: 25. / 255.,
-            g: 25. / 255.,
-            b: 26. / 255.,
-            a: 1.0,
-        }
-    }
+            HStack::new(cx, |cx| {
+                Label::new(cx, "Bolas");
+            });
+        });
+    })
 }

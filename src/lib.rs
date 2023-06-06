@@ -1,48 +1,51 @@
 mod editor;
 mod params;
-mod effects;
+mod effect;
+mod chain;
 
-use effects::chain::{Chain, ChainPtr};
-use nih_plug::{prelude::*};
-use params::FretCatParams;
-use std::{sync::Arc, cell::Cell};
+use chain::{Chain, ChainPtr};
+use effect::Effect;
+pub use nih_plug::{
+    nih_export_vst3,
+    prelude::{
+        AsyncExecutor, AudioIOLayout, AuxiliaryBuffers, Buffer, BufferConfig, InitContext, Params,
+        Plugin, PluginState, ProcessContext, ProcessStatus, Vst3Plugin, Vst3SubCategory, Editor,
+    },
+};
+use params::FretcatParams;
+use std::{num::NonZeroU32, sync::Arc, cell::Cell};
 
-pub use nih_plug;
+const NUM_INPUT_CHANNELS: u32 = 1;
+const NUM_OUTPUT_CHANNELS: u32 = 2;
 
-pub struct FretCat {
-    params: Arc<FretCatParams>,
-    chain: Cell<Chain> 
+pub struct Fretcat {
+    params: Arc<FretcatParams>,
+    chain: Cell<Chain>
 }
 
-impl Default for FretCat {
+impl Default for Fretcat {
     fn default() -> Self {
         Self {
-            params: Arc::new(FretCatParams::default()),
+            params: Arc::new(FretcatParams::default()),
             chain: Cell::new(Chain::default())
         }
     }
 }
 
-impl Plugin for FretCat {
-    const NAME: &'static str = "FretCat";
-    const VENDOR: &'static str = "Gato";
+impl Plugin for Fretcat {
+    const NAME: &'static str = "Fretcat";
+    const VENDOR: &'static str = "GatoImorrivel";
     const URL: &'static str = env!("CARGO_PKG_HOMEPAGE");
     const EMAIL: &'static str = "gsantos1510@gmail.com";
 
     const VERSION: &'static str = env!("CARGO_PKG_VERSION");
 
+    // The SIMD version only supports stereo
     const AUDIO_IO_LAYOUTS: &'static [AudioIOLayout] = &[AudioIOLayout {
-        main_input_channels: NonZeroU32::new(2),
-        main_output_channels: NonZeroU32::new(2),
-
-        aux_input_ports: &[],
-        aux_output_ports: &[],
-
-        names: PortNames::const_default(),
+        main_input_channels: NonZeroU32::new(NUM_INPUT_CHANNELS),
+        main_output_channels: NonZeroU32::new(NUM_OUTPUT_CHANNELS),
+        ..AudioIOLayout::const_default()
     }];
-
-    const MIDI_INPUT: MidiConfig = MidiConfig::None;
-    const MIDI_OUTPUT: MidiConfig = MidiConfig::None;
 
     const SAMPLE_ACCURATE_AUTOMATION: bool = true;
 
@@ -53,23 +56,26 @@ impl Plugin for FretCat {
         self.params.clone()
     }
 
-    fn editor(&self, _async_executor: AsyncExecutor<Self>) -> Option<Box<dyn Editor>> {
-        editor::create(self.params.editor_state.clone(), ChainPtr(self.chain.as_ptr()))
+    fn editor(&mut self, _async_executor: AsyncExecutor<Self>) -> Option<Box<dyn Editor>> {
+        editor::create(
+            editor::Data {
+                params: self.params.clone(),
+                chain: ChainPtr::new(self.chain.as_ptr())
+            },
+            self.params.editor_state.clone(),
+        )
     }
 
     fn initialize(
         &mut self,
         _audio_io_layout: &AudioIOLayout,
-        _buffer_config: &BufferConfig,
+        buffer_config: &BufferConfig,
         _context: &mut impl InitContext<Self>,
     ) -> bool {
         true
     }
 
-    fn reset(&mut self) {
-        // Reset buffers and envelopes here. This can be called from the audio thread and may not
-        // allocate. You can remove this function if you do not need it.
-    }
+    fn reset(&mut self) {}
 
     fn process(
         &mut self,
@@ -77,21 +83,17 @@ impl Plugin for FretCat {
         _aux: &mut AuxiliaryBuffers,
         _context: &mut impl ProcessContext<Self>,
     ) -> ProcessStatus {
-        for channel_samples in buffer.iter_samples() {
-            for sample in channel_samples {
-                *sample = self.chain.get_mut().process(*sample);
-            }
-        }
-
         ProcessStatus::Normal
     }
 }
 
-impl Vst3Plugin for FretCat {
-    const VST3_CLASS_ID: [u8; 16] = *b"FretCatGatoVst..";
-
-    const VST3_SUBCATEGORIES: &'static [Vst3SubCategory] =
-        &[Vst3SubCategory::Fx, Vst3SubCategory::Dynamics];
+impl Vst3Plugin for Fretcat {
+    const VST3_CLASS_ID: [u8; 16] = *b"FretcatGatoPlug.";
+    const VST3_SUBCATEGORIES: &'static [Vst3SubCategory] = &[
+        Vst3SubCategory::Fx,
+        Vst3SubCategory::Filter,
+        Vst3SubCategory::Stereo,
+    ];
 }
 
-nih_export_vst3!(FretCat);
+nih_export_vst3!(Fretcat);
