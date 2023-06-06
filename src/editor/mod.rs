@@ -35,14 +35,27 @@ pub(crate) fn create(editor_data: Data, editor_state: Arc<ViziaState>) -> Option
         ResizeHandle::new(cx);
 
         VStack::new(cx, |cx| {
+            // Top bar
             HStack::new(cx, |cx| {
                 Label::new(cx, "Bolas");
             })
-            .background_color(Color::black());
+            .height(Percentage(5.0))
+            .background_color(Color::rgb(48, 48, 48));
 
+            // Bottom Row
             HStack::new(cx, |cx| {
-                Label::new(cx, "Bolas");
-            });
+                // Sidebar
+                VStack::new(cx, |cx| {
+
+                })
+                .width(Percentage(20.0))
+                .background_color(Color::rgb(33, 33, 33));
+
+                // Effect List
+                VStack::new(cx, |cx| {
+                }).width(Percentage(80.0));
+            })
+            .background_color(Color::black());
         });
     })
 }

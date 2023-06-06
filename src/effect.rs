@@ -1,3 +1,5 @@
+use nih_plug_vizia::vizia::prelude::Handle;
+
 pub trait Effect {
     fn process(&self, _buffer: &[f32], _sample: f32) -> f32;
 }
