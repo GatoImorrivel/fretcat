@@ -1,13 +1,16 @@
-use crate::effect::Effect;
+use crate::effect::{Effect, Overdrive};
 
 pub struct Chain {
-    chain: Vec<Box<dyn Effect + Send + Sync>>
+    pub chain: Vec<Box<dyn Effect + Send + Sync>>
 }
 
 impl Default for Chain {
     fn default() -> Self {
         Self {
-            chain: vec![]
+            chain: vec![
+                Box::new(Overdrive::default()),
+                Box::new(Overdrive::default())
+            ]
         }
     }
 }
@@ -21,6 +24,12 @@ impl ChainPtr {
     pub fn new(ptr: *mut Chain) -> Self {
         Self {
             ptr
+        }
+    }
+
+    pub fn get_chain(&self) -> &Chain {
+        unsafe {
+            &*self.ptr
         }
     }
 }

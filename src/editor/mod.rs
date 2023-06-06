@@ -46,14 +46,18 @@ pub(crate) fn create(editor_data: Data, editor_state: Arc<ViziaState>) -> Option
             HStack::new(cx, |cx| {
                 // Sidebar
                 VStack::new(cx, |cx| {
-
                 })
                 .width(Percentage(20.0))
                 .background_color(Color::rgb(33, 33, 33));
 
                 // Effect List
-                VStack::new(cx, |cx| {
-                }).width(Percentage(80.0));
+                ScrollView::new(cx, 0.0, 0.0, false, true, |cx| {
+                    Data::chain.get(cx).get_chain().chain.iter().for_each(|effect| {
+                        effect.ui(cx);
+                    });
+                })
+                .width(Percentage(80.0));
+
             })
             .background_color(Color::black());
         });
