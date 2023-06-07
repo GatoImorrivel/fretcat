@@ -18,7 +18,7 @@ const EDITOR_HEIGHT: u32 = 848;
 #[derive(Lens, Clone)]
 pub(crate) struct Data {
     pub(crate) params: Arc<FretcatParams>,
-    pub(crate) chain: ChainPtr,
+    pub(crate) chain_ptr: ChainPtr,
 }
 
 impl Model for Data {}
@@ -52,8 +52,10 @@ pub(crate) fn create(editor_data: Data, editor_state: Arc<ViziaState>) -> Option
 
                 // Effect List
                 ScrollView::new(cx, 0.0, 0.0, false, true, |cx| {
-                    Data::chain.get(cx).get_chain().chain.iter().for_each(|effect| {
-                        effect.ui(cx);
+                    Binding::new(cx, Data::chain_ptr, |cx, chain| {
+                        chain.get(cx).deref_mut().chain.iter_mut().enumerate().for_each(|(i, effect)| {
+                            effect.ui(cx);
+                        });
                     });
                 })
                 .width(Percentage(80.0));

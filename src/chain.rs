@@ -1,3 +1,5 @@
+use nih_plug_vizia::vizia::state::Data;
+
 use crate::effect::{Effect, Overdrive};
 
 pub struct Chain {
@@ -27,10 +29,22 @@ impl ChainPtr {
         }
     }
 
-    pub fn get_chain(&self) -> &Chain {
+    pub fn deref(&self) -> &Chain {
         unsafe {
             &*self.ptr
         }
+    }
+
+    pub fn deref_mut(&self) -> &mut Chain {
+        unsafe {
+            &mut *self.ptr
+        }
+    }
+}
+
+impl Data for ChainPtr {
+    fn same(&self, other: &Self) -> bool {
+        self.ptr == other.ptr
     }
 }
 
