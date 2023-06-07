@@ -1,5 +1,6 @@
 use std::sync::Arc;
 
+use nih_plug::nih_log;
 use nih_plug::prelude::Editor;
 use nih_plug_vizia::vizia::prelude::*;
 use nih_plug_vizia::{
@@ -10,12 +11,13 @@ use nih_plug_vizia::{
 };
 
 use crate::chain::ChainPtr;
+use crate::effect::Effect;
 use crate::params::FretcatParams;
 
 const EDITOR_WIDTH: u32 = 1260;
 const EDITOR_HEIGHT: u32 = 848;
 
-#[derive(Lens, Clone)]
+#[derive(Lens, Clone, Debug)]
 pub(crate) struct Data {
     pub(crate) params: Arc<FretcatParams>,
     pub(crate) chain_ptr: ChainPtr,
@@ -59,7 +61,6 @@ pub(crate) fn create(editor_data: Data, editor_state: Arc<ViziaState>) -> Option
                     });
                 })
                 .width(Percentage(80.0));
-
             })
             .background_color(Color::black());
         });

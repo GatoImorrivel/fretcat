@@ -1,7 +1,10 @@
+use std::fmt::Debug;
+
 use nih_plug_vizia::vizia::state::Data;
 
 use crate::effect::{Effect, Overdrive};
 
+#[derive(Debug)]
 pub struct Chain {
     pub chain: Vec<Box<dyn Effect + Send + Sync>>
 }
@@ -17,9 +20,18 @@ impl Default for Chain {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub struct ChainPtr {
     ptr: *mut Chain
+}
+
+impl Debug for ChainPtr {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let chain = unsafe { &*self.ptr };
+        f.debug_struct("ChainPtr")
+            .field("chain", chain)
+            .finish()
+    }
 }
 
 impl ChainPtr {

@@ -83,6 +83,13 @@ impl Plugin for Fretcat {
         _aux: &mut AuxiliaryBuffers,
         _context: &mut impl ProcessContext<Self>,
     ) -> ProcessStatus {
+        for channel in buffer.iter_samples() {
+            for sample in channel {
+                for effect in &self.chain.get_mut().chain {
+                    *sample = effect.process(*sample);
+                }
+            }
+        }
         ProcessStatus::Normal
     }
 }

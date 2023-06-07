@@ -3,7 +3,7 @@ use std::sync::Arc;
 use nih_plug::{params::persist, prelude::Params};
 use nih_plug_vizia::ViziaState;
 
-#[derive(Params)]
+#[derive(Params, Debug)]
 pub struct FretcatParams {
     #[persist = "editor-state"]
     pub(crate) editor_state: Arc<ViziaState>,
