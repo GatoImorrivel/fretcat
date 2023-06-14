@@ -1,3 +1,5 @@
+pub mod common;
+
 use std::sync::Arc;
 
 use nih_plug::nih_log;
@@ -32,6 +34,7 @@ pub(crate) fn default_state() -> Arc<ViziaState> {
 
 pub(crate) fn create(editor_data: Data, editor_state: Arc<ViziaState>) -> Option<Box<dyn Editor>> {
     create_vizia_editor(editor_state, ViziaTheming::Custom, move |cx, _| {
+        cx.add_theme(include_str!("../style.css"));
         editor_data.clone().build(cx);
 
         ResizeHandle::new(cx);

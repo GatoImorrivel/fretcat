@@ -12,6 +12,8 @@ pub mod overdrive {
     use nih_plug::nih_log;
     use nih_plug_vizia::vizia::{image, prelude::*};
 
+    use crate::editor::common::tick_knob;
+
     use super::Effect;
 
     enum OverdriveMessage {
@@ -61,18 +63,10 @@ pub mod overdrive {
 
         fn ui(&self, cx: &mut Context) {
             self.build(cx, |cx| {
-                HStack::new(cx, |cx| {
-                    Binding::new(cx, Self::gain, |cx, gain| {
-                        Label::new(cx, &format!("My gain is: {}", gain.get_val(cx)))
-                            .color(Color::white());
+                HStack::new(cx, |cx: &mut Context| {
+                    tick_knob(cx, Self::gain).on_changing(move |cx, val| {
+                        cx.emit(OverdriveMessage::GainChange(val));
                     });
-                    Knob::new(cx, 1.0, Self::gain, false)
-                        .on_changing(|cx, gain| {
-                            cx.emit(OverdriveMessage::GainChange(gain));
-                        })
-                        .size(Percentage(50.0))
-                        .color(Color::red());
-                    nih_log!("REBUILDING");
                 });
             });
         }
