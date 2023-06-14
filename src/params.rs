@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use nih_plug::{params::persist, prelude::Params};
+use nih_plug::{prelude::Params};
 use nih_plug_vizia::ViziaState;
 
 #[derive(Params, Debug)]

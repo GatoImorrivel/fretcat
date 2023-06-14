@@ -4,7 +4,6 @@ mod effect;
 mod chain;
 
 use chain::{Chain, ChainPtr};
-use effect::Effect;
 pub use nih_plug::{
     nih_export_vst3,
     prelude::{
@@ -69,7 +68,7 @@ impl Plugin for Fretcat {
     fn initialize(
         &mut self,
         _audio_io_layout: &AudioIOLayout,
-        buffer_config: &BufferConfig,
+        _buffer_config: &BufferConfig,
         _context: &mut impl InitContext<Self>,
     ) -> bool {
         true
