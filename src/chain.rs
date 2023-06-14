@@ -11,7 +11,6 @@ pub struct Chain {
 
 impl Default for Chain {
     fn default() -> Self {
-        let test = vec![5];
         Self {
             chain: vec![
                 Box::new(Overdrive::default())
@@ -38,12 +37,6 @@ impl ChainPtr {
     pub fn new(ptr: *mut Chain) -> Self {
         Self {
             ptr
-        }
-    }
-
-    pub fn deref(&self) -> &Chain {
-        unsafe {
-            &*self.ptr
         }
     }
 

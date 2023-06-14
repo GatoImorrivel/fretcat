@@ -9,8 +9,9 @@ pub trait Effect: fmt::Debug {
 pub mod overdrive {
     use std::f32::consts::PI;
 
-    use nih_plug::nih_log;
-    use nih_plug_vizia::vizia::{image, prelude::*};
+    use nih_plug_vizia::vizia::{
+        prelude::*,
+    };
 
     use crate::editor::common::tick_knob;
 

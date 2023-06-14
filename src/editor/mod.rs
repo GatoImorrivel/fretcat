@@ -4,7 +4,9 @@ use std::sync::Arc;
 
 use nih_plug::nih_log;
 use nih_plug::prelude::Editor;
-use nih_plug_vizia::vizia::prelude::*;
+use nih_plug_vizia::vizia::image::ImageFormat;
+use nih_plug_vizia::vizia::resource::ImageRetentionPolicy;
+use nih_plug_vizia::vizia::{image, prelude::*};
 use nih_plug_vizia::{
     create_vizia_editor,
     vizia::{prelude::Lens, state::Model, views::VStack},
@@ -37,8 +39,6 @@ pub(crate) fn create(editor_data: Data, editor_state: Arc<ViziaState>) -> Option
         cx.add_theme(include_str!("../style.css"));
         editor_data.clone().build(cx);
 
-        ResizeHandle::new(cx);
-
         VStack::new(cx, |cx| {
             // Top bar
             HStack::new(cx, |cx| {
@@ -50,17 +50,22 @@ pub(crate) fn create(editor_data: Data, editor_state: Arc<ViziaState>) -> Option
             // Bottom Row
             HStack::new(cx, |cx| {
                 // Sidebar
-                VStack::new(cx, |cx| {
-                })
-                .width(Percentage(20.0))
-                .background_color(Color::rgb(33, 33, 33));
+                VStack::new(cx, |cx| {})
+                    .width(Percentage(20.0))
+                    .background_color(Color::rgb(33, 33, 33));
 
                 // Effect List
                 ScrollView::new(cx, 0.0, 0.0, false, true, |cx| {
                     Binding::new(cx, Data::chain_ptr, |cx, chain| {
-                        chain.get(cx).deref_mut().chain.iter_mut().enumerate().for_each(|(i, effect)| {
-                            effect.ui(cx);
-                        });
+                        chain
+                            .get(cx)
+                            .deref_mut()
+                            .chain
+                            .iter_mut()
+                            .enumerate()
+                            .for_each(|(i, effect)| {
+                                effect.ui(cx);
+                            });
                     });
                 })
                 .width(Percentage(80.0));
