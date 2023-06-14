@@ -1,0 +1,16 @@
+knob {
+    width: 100px;
+    height: 100px;
+}
+
+knob .track {
+    background-color: #ffb74d;
+}
+
+.label_knob {
+    border-width: 2px;
+    border-color: #28282b;
+    background-color: #000000;
+    col-between: 10px;
+    child-space: 1s;
+}

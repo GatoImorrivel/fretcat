@@ -2,7 +2,7 @@ use std::fmt::Debug;
 
 use nih_plug_vizia::vizia::prelude::*;
 
-use crate::effect::{Effect, overdrive::Overdrive};
+use crate::effects::{Effect, overdrive::Overdrive};
 
 #[derive(Debug)]
 pub struct Chain {

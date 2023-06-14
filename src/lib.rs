@@ -1,6 +1,6 @@
 mod editor;
 mod params;
-mod effect;
+mod effects;
 mod chain;
 
 use chain::{Chain, ChainPtr};
