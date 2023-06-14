@@ -1,8 +1,8 @@
 use std::fmt::Debug;
 
-use nih_plug_vizia::vizia::state::Data;
+use nih_plug_vizia::vizia::prelude::*;
 
-use crate::effect::{Effect, Overdrive};
+use crate::effect::{Effect, overdrive::Overdrive};
 
 #[derive(Debug)]
 pub struct Chain {
@@ -11,9 +11,9 @@ pub struct Chain {
 
 impl Default for Chain {
     fn default() -> Self {
+        let test = vec![5];
         Self {
             chain: vec![
-                Box::new(Overdrive::default()),
                 Box::new(Overdrive::default())
             ]
         }
