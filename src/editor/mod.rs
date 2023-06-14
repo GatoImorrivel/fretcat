@@ -19,6 +19,10 @@ use crate::params::FretcatParams;
 const EDITOR_WIDTH: u32 = 1260;
 const EDITOR_HEIGHT: u32 = 848;
 
+pub(crate) fn default_state() -> Arc<ViziaState> {
+    ViziaState::new(|| (EDITOR_WIDTH, EDITOR_HEIGHT))
+}
+
 #[derive(Lens, Clone, Debug)]
 pub(crate) struct Data {
     pub(crate) params: Arc<FretcatParams>,
@@ -26,11 +30,6 @@ pub(crate) struct Data {
 }
 
 impl Model for Data {}
-
-// Makes sense to also define this here, makes it a bit easier to keep track of
-pub(crate) fn default_state() -> Arc<ViziaState> {
-    ViziaState::new(|| (EDITOR_WIDTH, EDITOR_HEIGHT))
-}
 
 pub(crate) fn create(editor_data: Data, editor_state: Arc<ViziaState>) -> Option<Box<dyn Editor>> {
     create_vizia_editor(editor_state, ViziaTheming::Custom, move |cx, _| {

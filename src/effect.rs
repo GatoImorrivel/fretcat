@@ -19,6 +19,9 @@ pub mod overdrive {
 
     enum OverdriveMessage {
         GainChange(f32),
+        BlendChange(f32),
+        ThresholdChange(f32),
+        VolumeChange(f32),
     }
 
     #[derive(Debug, Clone, Copy, Lens)]
@@ -38,6 +41,15 @@ pub mod overdrive {
             event.map(|app_event, _| match app_event {
                 OverdriveMessage::GainChange(value) => {
                     self.gain = *value;
+                },
+                OverdriveMessage::BlendChange(value) => {
+                    self.blend = *value;
+                },
+                OverdriveMessage::ThresholdChange(value) => {
+                    self.threshold = *value;
+                },
+                OverdriveMessage::VolumeChange(value) => {
+                    self.volume = *value;
                 }
             });
         }
@@ -65,8 +77,29 @@ pub mod overdrive {
         fn ui(&self, cx: &mut Context) {
             self.build(cx, |cx| {
                 HStack::new(cx, |cx: &mut Context| {
-                    tick_knob(cx, Self::gain).on_changing(move |cx, val| {
-                        cx.emit(OverdriveMessage::GainChange(val));
+                    VStack::new(cx, |cx| {
+                        tick_knob(cx, Self::gain).on_changing(move |cx, val| {
+                            cx.emit(OverdriveMessage::GainChange(val));
+                        });
+                        Label::new(cx, "Gain");
+                    });
+                    VStack::new(cx, |cx| {
+                        tick_knob(cx, Self::blend).on_changing(move |cx, val| {
+                            cx.emit(OverdriveMessage::BlendChange(val));
+                        });
+                        Label::new(cx, "Blend");
+                    });
+                    VStack::new(cx, |cx| {
+                        tick_knob(cx, Self::threshold).on_changing(move |cx, val| {
+                            cx.emit(OverdriveMessage::ThresholdChange(val));
+                        });
+                        Label::new(cx, "Threshold");
+                    });
+                    VStack::new(cx, |cx| {
+                        tick_knob(cx, Self::volume).on_changing(move |cx, val| {
+                            cx.emit(OverdriveMessage::VolumeChange(val));
+                        });
+                        Label::new(cx, "Volume");
                     });
                 });
             });
