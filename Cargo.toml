@@ -14,8 +14,8 @@ crate-type = ["cdylib", "lib"]
 fundsp = "0.14.0"
 # Remove the `assert_process_allocs` feature to allow allocations on the audio
 # thread in debug builds.
-nih_plug = { git = "https://github.com/robbert-vdh/nih-plug.git", features = ["standalone", "assert_process_allocs"] }
-nih_plug_vizia = { git = "https://github.com/robbert-vdh/nih-plug.git" }
+nih_plug = { git = "https://github.com/geom3trik/nih-plug.git", branch = "vizia-update", features = ["standalone", "assert_process_allocs"] }
+nih_plug_vizia = { git = "https://github.com/geom3trik/nih-plug.git", branch = "vizia-update" }
 rand = "0.8.5"
 rustfft = "6.1.0"
 serde = "1.0.156"

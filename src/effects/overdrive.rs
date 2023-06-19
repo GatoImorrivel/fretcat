@@ -63,7 +63,7 @@ impl Effect for Overdrive {
 
     fn ui(&self, cx: &mut Context) {
         self.build(cx, |cx| {
-            cx.add_theme(include_str!("./overdrive.css"));
+            cx.add_stylesheet(include_str!("./overdrive.css")).unwrap();
             HStack::new(cx, |cx: &mut Context| {
                 VStack::new(cx, |cx| {
                     tick_knob(cx, Self::gain).on_changing(move |cx, val| {

@@ -4,7 +4,7 @@ use nih_plug::prelude::Editor;
 use nih_plug_vizia::vizia::{prelude::*};
 use nih_plug_vizia::{
     create_vizia_editor,
-    vizia::{prelude::Lens, state::Model, views::VStack},
+    vizia::{views::VStack},
     ViziaState, ViziaTheming,
 };
 
@@ -28,7 +28,7 @@ impl Model for Data {}
 
 pub(crate) fn create(editor_data: Data, editor_state: Arc<ViziaState>) -> Option<Box<dyn Editor>> {
     create_vizia_editor(editor_state, ViziaTheming::Custom, move |cx, _| {
-        cx.add_theme(include_str!("./default.css"));
+        cx.add_stylesheet(include_str!("./default.css")).unwrap();
         editor_data.clone().build(cx);
 
         VStack::new(cx, |cx| {

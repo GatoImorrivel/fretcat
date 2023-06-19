@@ -1,4 +1,7 @@
-use nih_plug_vizia::vizia::{prelude::{Context, Units::Percentage, Handle, StyleModifiers}, views::{TickKnob, Knob, KnobMode}, state::Lens};
+use nih_plug_vizia::vizia::{
+    prelude::{Context, Handle, StyleModifiers, Units::Percentage, Lens},
+    views::{Knob, KnobMode, TickKnob}
+};
 
 pub fn tick_knob<L: Lens<Target = f32>>(cx: &mut Context, lens: L) -> Handle<'_, Knob<L>> {
     Knob::custom(cx, 0.5, lens, move |cx, lens| {

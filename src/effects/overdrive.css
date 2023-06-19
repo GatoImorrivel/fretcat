@@ -1,6 +1,7 @@
 knob {
     width: 100px;
     height: 100px;
+    box-shadow: 2px 2px 2px rgb(252, 30, 30);
 }
 
 knob .track {
