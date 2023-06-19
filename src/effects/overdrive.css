@@ -1,17 +1,22 @@
-knob {
+.overdrive-knob {
     width: 100px;
     height: 100px;
-    box-shadow: 2px 2px 2px rgb(252, 30, 30);
+    background-image: linear-gradient(145deg, #a843ff, #8d39e2);
+    box-shadow:  20px 20px 60px #8536d5,
+                -20px -20px 60px #b548ff;
 }
 
-knob .track {
+.overdrive {
+    height: 200px;
+    background-image: linear-gradient(145deg, #8d39e2, #a843ff);
+    box-shadow:  20px 20px 60px #323232,
+                -20px -20px 60px #444444;
+}
+
+.overdrive > vstack {
+   col-between: 1st; 
+}
+
+.overdrive-knob .track {
     background-color: #ff4d4d;
-}
-
-.label_knob {
-    border-width: 2px;
-    border-color: #28282b;
-    background-color: #000000;
-    col-between: 10px;
-    child-space: 1s;
 }

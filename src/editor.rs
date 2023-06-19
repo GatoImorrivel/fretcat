@@ -1,12 +1,8 @@
 use std::sync::Arc;
 
 use nih_plug::prelude::Editor;
-use nih_plug_vizia::vizia::{prelude::*};
-use nih_plug_vizia::{
-    create_vizia_editor,
-    vizia::{views::VStack},
-    ViziaState, ViziaTheming,
-};
+use nih_plug_vizia::vizia::prelude::*;
+use nih_plug_vizia::{create_vizia_editor, vizia::views::VStack, ViziaState, ViziaTheming};
 
 use crate::chain::ChainPtr;
 use crate::params::FretcatParams;
@@ -36,15 +32,15 @@ pub(crate) fn create(editor_data: Data, editor_state: Arc<ViziaState>) -> Option
             HStack::new(cx, |cx| {
                 Label::new(cx, "Bolas");
             })
-            .height(Percentage(5.0))
-            .background_color(Color::rgb(48, 48, 48));
+            .class("top-bar");
 
             // Bottom Row
             HStack::new(cx, |cx| {
                 // Sidebar
-                VStack::new(cx, |_cx| {})
-                    .width(Percentage(20.0))
-                    .background_color(Color::rgb(33, 33, 33));
+                VStack::new(cx, |cx| {
+                    Label::new(cx, "Bolas");
+                }).class("sidebar");
+
 
                 // Effect List
                 ScrollView::new(cx, 0.0, 0.0, false, true, |cx| {
@@ -60,9 +56,10 @@ pub(crate) fn create(editor_data: Data, editor_state: Arc<ViziaState>) -> Option
                             });
                     });
                 })
-                .width(Percentage(80.0));
+                .class("effect-view");
             })
-            .background_color(Color::black());
+            .class("bottom-row");
+
         });
     })
 }

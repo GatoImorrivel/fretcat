@@ -68,31 +68,33 @@ impl Effect for Overdrive {
                 VStack::new(cx, |cx| {
                     tick_knob(cx, Self::gain).on_changing(move |cx, val| {
                         cx.emit(OverdriveMessage::GainChange(val));
-                    });
+                    })
+                    .class("overdrive-knob");
                     Label::new(cx, "Gain");
                 });
                 VStack::new(cx, |cx| {
                     tick_knob(cx, Self::blend).on_changing(move |cx, val| {
                         cx.emit(OverdriveMessage::BlendChange(val));
-                    });
+                    })
+                    .class("overdrive-knob");
                     Label::new(cx, "Blend");
                 });
                 VStack::new(cx, |cx| {
                     tick_knob(cx, Self::threshold).on_changing(move |cx, val| {
                         cx.emit(OverdriveMessage::ThresholdChange(val));
-                    });
+                    })
+                    .class("overdrive-knob");
                     Label::new(cx, "Threshold");
                 });
                 VStack::new(cx, |cx| {
                     tick_knob(cx, Self::volume).on_changing(move |cx, val| {
                         cx.emit(OverdriveMessage::VolumeChange(val));
-                    });
+                    })
+                    .class("overdrive-knob");
                     Label::new(cx, "Volume");
-                })
-                .background_color(Color::red())
-                .row_between(Stretch(100.0));
+                });
             })
-            .height(Pixels(200.0));
+            .class("overdrive");
         });
     }
 }
