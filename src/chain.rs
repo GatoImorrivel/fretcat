@@ -1,12 +1,17 @@
-use std::{fmt::Debug, sync::Arc};
+use std::{
+    fmt::Debug,
+    ops::{Deref, DerefMut},
+    sync::Arc,
+};
 
+use nih_plug::nih_log;
 use nih_plug_vizia::vizia::prelude::*;
 
-use crate::effects::{Effect, overdrive::Overdrive};
+use crate::effects::{overdrive::Overdrive, Effect};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Lens)]
 pub struct Chain {
-    pub chain: Vec<Arc<dyn Effect>>
+    pub chain: Vec<Arc<dyn Effect>>,
 }
 
 impl Default for Chain {
@@ -15,36 +20,52 @@ impl Default for Chain {
             chain: vec![
                 Arc::new(Overdrive::default()),
                 Arc::new(Overdrive::default()),
-            ]
+                Arc::new(Overdrive::default()),
+                Arc::new(Overdrive::default()),
+                Arc::new(Overdrive::default()),
+                Arc::new(Overdrive::default()),
+                Arc::new(Overdrive::default()),
+                Arc::new(Overdrive::default()),
+            ],
         }
     }
 }
 
 #[derive(Clone)]
 pub struct ChainPtr {
-    ptr: *mut Chain
+    ptr: *mut Chain,
+}
+
+impl ChainPtr {
+    pub fn new(ptr: *mut Chain) -> Self {
+        Self { ptr }
+    }
+
+    pub fn render<L: Lens<Target = Self>>(cx: &mut Context, lens: L) {
+        for effect in &mut lens.get(cx).deref_mut().chain {
+            effect.render(cx);
+        }
+    }
 }
 
 impl Debug for ChainPtr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let chain = unsafe { &*self.ptr };
-        f.debug_struct("ChainPtr")
-            .field("chain", chain)
-            .finish()
+        f.debug_struct("ChainPtr").field("chain", chain).finish()
     }
 }
 
-impl ChainPtr {
-    pub fn new(ptr: *mut Chain) -> Self {
-        Self {
-            ptr
-        }
-    }
+impl Deref for ChainPtr {
+    type Target = Chain;
 
-    pub fn deref_mut(&self) -> &mut Chain {
-        unsafe {
-            &mut *self.ptr
-        }
+    fn deref(&self) -> &Self::Target {
+        unsafe { &*self.ptr }
+    }
+}
+
+impl DerefMut for ChainPtr {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        unsafe { &mut *self.ptr }
     }
 }
 

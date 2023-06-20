@@ -4,7 +4,8 @@ use nih_plug_vizia::vizia::{
 };
 
 pub fn tick_knob<L: Lens<Target = f32>>(cx: &mut Context, lens: L) -> Handle<'_, Knob<L>> {
-    Knob::custom(cx, 0.5, lens, move |cx, lens| {
+    let clone = lens.clone();
+    Knob::custom(cx, 0.5, clone, move |cx, clone| {
         TickKnob::new(
             cx,
             Percentage(100.0),
@@ -13,7 +14,7 @@ pub fn tick_knob<L: Lens<Target = f32>>(cx: &mut Context, lens: L) -> Handle<'_,
             300.0,
             KnobMode::Continuous,
         )
-        .value(lens)
+        .value(clone)
         .class("track")
     })
 }

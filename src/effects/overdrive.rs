@@ -40,6 +40,7 @@ impl View for Overdrive {
                 self.volume = *value;
             }
         });
+        nih_log!("{:#?}", _cx.data::<crate::editor::Data>().unwrap());
     }
 }
 
@@ -62,7 +63,7 @@ impl Effect for Overdrive {
         blend * self.volume
     }
 
-    fn ui(&self, cx: &mut Context) {
+    fn render(&self, cx: &mut Context) {
         self.build(cx, |cx| {
             cx.add_stylesheet(include_str!("./overdrive.css")).unwrap();
             HStack::new(cx, |cx: &mut Context| {

@@ -1,3 +1,4 @@
+use std::ops::DerefMut;
 use std::sync::Arc;
 
 use nih_plug::nih_log;
@@ -5,7 +6,7 @@ use nih_plug::prelude::Editor;
 use nih_plug_vizia::vizia::prelude::*;
 use nih_plug_vizia::{create_vizia_editor, vizia::views::VStack, ViziaState, ViziaTheming};
 
-use crate::chain::ChainPtr;
+use crate::chain::{ChainPtr, Chain};
 use crate::params::FretcatParams;
 
 const EDITOR_WIDTH: u32 = 1260;
@@ -44,19 +45,10 @@ pub(crate) fn create(editor_data: Data, editor_state: Arc<ViziaState>) -> Option
                 .class("sidebar");
 
                 // Effect List
-                /*
                 ScrollView::new(cx, 0.0, 0.0, false, true, |cx| {
-                    for effect in &mut Data::chain_ptr.get(cx).deref_mut().chain {
-                        effect.ui(cx);
-                    }
+                    ChainPtr::render(cx, Data::chain_ptr);
                 })
-                .class("effect-view");
-                */
-                VStack::new(cx, |cx| {
-                    for effect in &mut Data::chain_ptr.get(cx).deref_mut().chain {
-                        effect.ui(cx);
-                    }
-                })
+                .height(Pixels(700.0))
                 .class("effect-view");
             })
             .class("bottom-row");
