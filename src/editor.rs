@@ -1,84 +1,57 @@
-use nih_plug::{
-    nih_log,
-    prelude::{Editor, GuiContext},
-};
-use nih_plug_iced::*;
+use std::ops::DerefMut;
 use std::sync::Arc;
 
-use crate::{effects::{chain::{Chain, ChainPtr}}, params};
+use nih_plug::nih_log;
+use nih_plug::prelude::Editor;
+use nih_plug_vizia::vizia::prelude::*;
+use nih_plug_vizia::{create_vizia_editor, vizia::views::VStack, ViziaState, ViziaTheming};
 
-const WINDOW_WIDTH: u32 = 1024;
-const WINDOW_HEIGHT: u32 = 848;
+use crate::chain::{ChainPtr, Chain, self};
+use crate::params::FretcatParams;
 
-pub(crate) fn default_state() -> Arc<IcedState> {
-    IcedState::from_size(WINDOW_WIDTH, WINDOW_HEIGHT)
+const EDITOR_WIDTH: u32 = 1260;
+const EDITOR_HEIGHT: u32 = 848;
+
+pub(crate) fn default_state() -> Arc<ViziaState> {
+    ViziaState::new(|| (EDITOR_WIDTH, EDITOR_HEIGHT))
 }
 
-pub(crate) fn create(editor_state: Arc<IcedState>, chain_ptr: ChainPtr) -> Option<Box<dyn Editor>> {
-    create_iced_editor::<FretCatEditor>(editor_state, chain_ptr)
+#[derive(Lens, Clone, Debug)]
+pub(crate) struct Data {
+    pub(crate) params: Arc<FretcatParams>,
 }
 
-struct FretCatEditor {
-    context: Arc<dyn GuiContext>,
-    chain_ptr: ChainPtr
-}
-impl IcedEditor for FretCatEditor {
-    type Executor = executor::Default;
-    type Message = ();
-    type InitializationFlags = ChainPtr;
+impl Model for Data {}
 
-    fn new(
-        _params: Self::InitializationFlags,
-        context: Arc<dyn GuiContext>,
-    ) -> (Self, Command<Self::Message>) {
-        let editor = FretCatEditor {
-            context,
-            chain_ptr: _params
-        };
+pub(crate) fn create(editor_data: Data, chain_ptr: ChainPtr, editor_state: Arc<ViziaState>) -> Option<Box<dyn Editor>> {
+    create_vizia_editor(editor_state, ViziaTheming::Custom, move |cx, _| {
+        cx.add_stylesheet(include_str!("./default.css")).unwrap();
+        editor_data.clone().build(cx);
+        chain_ptr.clone().build(cx);
 
-        (editor, Command::none())
-    }
+        VStack::new(cx, |cx| {
+            // Top bar
+            HStack::new(cx, |cx| {
+                Label::new(cx, "Bolas");
+            })
+            .class("top-bar");
 
-    fn context(&self) -> &dyn GuiContext {
-        self.context.as_ref()
-    }
+            // Bottom Row
+            HStack::new(cx, |cx| {
+                // Sidebar
+                VStack::new(cx, |cx| {
+                    Label::new(cx, "Bolas");
+                })
+                .class("sidebar");
 
-    fn update(
-        &mut self,
-        _window: &mut WindowQueue,
-        _message: Self::Message,
-    ) -> Command<Self::Message> {
-
-        Command::none()
-    }
-
-    fn view(&mut self) -> Element<'_, ()> {
-        let mut effect_column = Column::new().width(Length::FillPortion(4));
-        let sidebar = Column::new().width(Length::Fill);
-
-        for effect in &mut self.chain_ptr.deref_mut().effects {
-           effect_column = effect_column.push(effect.render()); 
-        }
-
-        let top_row = Row::new().height(Length::Fill);
-        let bottom_row = Row::new().height(Length::FillPortion(20));
-
-
-        Column::new()
-            .push(top_row)
-            .push(bottom_row
-                .push(sidebar)
-                .push(effect_column)
-            )
-            .into()
-    }
-
-    fn background_color(&self) -> nih_plug_iced::Color {
-        nih_plug_iced::Color {
-            r: 25. / 255.,
-            g: 25. / 255.,
-            b: 26. / 255.,
-            a: 1.0,
-        }
-    }
+                List::new(cx, ChainPtr::effects_ptr, |cx, i, item| {
+                    unsafe {
+                        item.get(cx).as_mut().unwrap().render(cx);
+                    };
+                })
+                .class("effect-view");
+            })
+            .class("bottom-row");
+        });
+    })
 }

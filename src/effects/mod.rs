@@ -1,12 +1,10 @@
-use std::fmt::Debug;
-
-use nih_plug_iced::Element;
-
-pub mod chain;
-
 pub mod overdrive;
+mod common;
 
-pub trait Effect: Debug + Send + Sync {
-    fn process(&self, sample: f32) -> f32;
-    fn render(&mut self) -> Element<()>;
+use core::fmt;
+use nih_plug_vizia::vizia::prelude::*;
+
+pub trait Effect: fmt::Debug + Send + Sync {
+    fn process(&self, _sample: f32) -> f32;
+    fn render(&self, cx: &mut Context);
 }
