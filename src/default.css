@@ -2,6 +2,7 @@
     background-color: #3b3b3b;
     height: 5%;
     box-shadow:  20px 20px 60px #323232;
+    z-index: 99999;
 }
 
 .bottom-row {
@@ -18,7 +19,7 @@
 }
 
 .effect-view {
-    width: 80%;
+    width: 79%;
 }
 
 knob {
@@ -32,12 +33,4 @@ label {
 
 knob .track {
     background-color: #ffb74d;
-}
-
-.label_knob {
-    border-width: 2px;
-    border-color: #28282b;
-    background-color: #000000;
-    col-between: 10px;
-    child-space: 1s;
 }

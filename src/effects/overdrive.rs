@@ -67,31 +67,23 @@ impl Effect for Overdrive {
             cx.add_stylesheet(include_str!("./overdrive.css")).unwrap();
             HStack::new(cx, |cx: &mut Context| {
                 VStack::new(cx, |cx| {
-                    tick_knob(cx, Self::gain).on_changing(move |cx, val| {
-                        cx.emit(OverdriveMessage::GainChange(val));
-                    })
-                    .class("overdrive-knob");
+                    Knob::new(cx, 1.0, Self::gain, false)
+                        .on_changing(|cx, val| cx.emit(OverdriveMessage::GainChange(val)));
                     Label::new(cx, "Gain");
                 });
                 VStack::new(cx, |cx| {
-                    tick_knob(cx, Self::blend).on_changing(move |cx, val| {
-                        cx.emit(OverdriveMessage::BlendChange(val));
-                    })
-                    .class("overdrive-knob");
+                    Knob::new(cx, 1.0, Self::blend, false)
+                        .on_changing(|cx, val| cx.emit(OverdriveMessage::BlendChange(val)));
                     Label::new(cx, "Blend");
                 });
                 VStack::new(cx, |cx| {
-                    tick_knob(cx, Self::threshold).on_changing(move |cx, val| {
-                        cx.emit(OverdriveMessage::ThresholdChange(val));
-                    })
-                    .class("overdrive-knob");
+                    Knob::new(cx, 1.0, Self::threshold, false)
+                        .on_changing(|cx, val| cx.emit(OverdriveMessage::ThresholdChange(val)));
                     Label::new(cx, "Threshold");
                 });
                 VStack::new(cx, |cx| {
-                    tick_knob(cx, Self::volume).on_changing(move |cx, val| {
-                        cx.emit(OverdriveMessage::VolumeChange(val));
-                    })
-                    .class("overdrive-knob");
+                    Knob::new(cx, 1.0, Self::volume, false)
+                        .on_changing(|cx, val| cx.emit(OverdriveMessage::VolumeChange(val)));
                     Label::new(cx, "Volume");
                 });
             })

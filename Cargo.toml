@@ -32,3 +32,6 @@ strip = "symbols"
 inherits = "release"
 debug = true
 strip = "none"
+
+[profile.dev.package."*"]
+opt-level = 3

@@ -14,20 +14,13 @@ pub struct Chain {
     pub chain: Vec<Box<dyn Effect>>,
 }
 
-impl Model for Chain {}
-
 impl Default for Chain {
     fn default() -> Self {
         Self {
             chain: vec![
-                Arc::new(Overdrive::default()),
-                Arc::new(Overdrive::default()),
-                Arc::new(Overdrive::default()),
-                Arc::new(Overdrive::default()),
-                Arc::new(Overdrive::default()),
-                Arc::new(Overdrive::default()),
-                Arc::new(Overdrive::default()),
-                Arc::new(Overdrive::default()),
+                Box::new(Overdrive::default()),
+                Box::new(Overdrive::default()),
+                Box::new(Overdrive::default()),
             ],
         }
     }
@@ -36,8 +29,7 @@ impl Default for Chain {
 #[derive(Clone, Lens)]
 pub struct ChainPtr {
     ptr: *mut Chain,
-    effects_ptr: Vec<*mut dyn Effect>,
-    vec: Vec<i32>
+    pub(crate) effects_ptr: Vec<*mut dyn Effect>
 }
 
 impl ChainPtr {
@@ -49,19 +41,20 @@ impl ChainPtr {
 
         Self {
             ptr,
-            effects_ptr, 
-            vec: vec![]
+            effects_ptr 
         }
     }
 }
 
-impl Model for ChainPtr {
-}
+impl Model for ChainPtr {}
 
 impl Debug for ChainPtr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let chain = unsafe { &*self.ptr };
-        f.debug_struct("ChainPtr").field("chain", chain).finish()
+        f.debug_struct("ChainPtr")
+            .field("effects_ptr", &self.effects_ptr)
+            .field("chain", chain)
+            .finish()
     }
 }
 

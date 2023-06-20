@@ -6,7 +6,7 @@ use nih_plug::prelude::Editor;
 use nih_plug_vizia::vizia::prelude::*;
 use nih_plug_vizia::{create_vizia_editor, vizia::views::VStack, ViziaState, ViziaTheming};
 
-use crate::chain::{ChainPtr, Chain};
+use crate::chain::{ChainPtr, Chain, self};
 use crate::params::FretcatParams;
 
 const EDITOR_WIDTH: u32 = 1260;
@@ -27,7 +27,7 @@ pub(crate) fn create(editor_data: Data, chain_ptr: ChainPtr, editor_state: Arc<V
     create_vizia_editor(editor_state, ViziaTheming::Custom, move |cx, _| {
         cx.add_stylesheet(include_str!("./default.css")).unwrap();
         editor_data.clone().build(cx);
-        chain_ptr.build(cx);
+        chain_ptr.clone().build(cx);
 
         VStack::new(cx, |cx| {
             // Top bar
@@ -44,7 +44,12 @@ pub(crate) fn create(editor_data: Data, chain_ptr: ChainPtr, editor_state: Arc<V
                 })
                 .class("sidebar");
 
-                // Effect List
+                List::new(cx, ChainPtr::effects_ptr, |cx, i, item| {
+                    unsafe {
+                        item.get(cx).as_mut().unwrap().render(cx);
+                    };
+                })
+                .class("effect-view");
             })
             .class("bottom-row");
         });

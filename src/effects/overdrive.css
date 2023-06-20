@@ -1,23 +1,16 @@
-.overdrive-knob {
-    width: 100px;
-    height: 100px;
-    background-image: linear-gradient(145deg, #a843ff, #8d39e2);
-    box-shadow:  20px 20px 60px #8536d5,
-                -20px -20px 60px #b548ff;
-}
-
 .overdrive {
     height: 200px;
-    background-image: linear-gradient(145deg, #8d39e2, #a843ff);
+    background-image: linear-gradient(145deg, #6d09d2, #5c07b0);
     box-shadow:  20px 20px 60px #323232,
                 -20px -20px 60px #444444;
     overflow: hidden;
 }
 
-.overdrive > vstack {
-   col-between: 1st; 
+.overdrive > vstack > knob > zstack > .knob-head {
+    background-image: linear-gradient(145deg, #5c07b0, #6d09d2);
 }
 
-.overdrive-knob .track {
-    background-color: #ff4d4d;
+.overdrive > vstack > knob {
+    box-shadow:  20px 20px 60px #5707a7,
+                -20px -20px 60px #7509e1;
 }
