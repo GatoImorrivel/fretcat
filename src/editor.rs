@@ -1,5 +1,6 @@
 use std::sync::Arc;
 
+use nih_plug::nih_log;
 use nih_plug::prelude::Editor;
 use nih_plug_vizia::vizia::prelude::*;
 use nih_plug_vizia::{create_vizia_editor, vizia::views::VStack, ViziaState, ViziaTheming};
@@ -39,27 +40,26 @@ pub(crate) fn create(editor_data: Data, editor_state: Arc<ViziaState>) -> Option
                 // Sidebar
                 VStack::new(cx, |cx| {
                     Label::new(cx, "Bolas");
-                }).class("sidebar");
-
+                })
+                .class("sidebar");
 
                 // Effect List
+                /*
                 ScrollView::new(cx, 0.0, 0.0, false, true, |cx| {
-                    Binding::new(cx, Data::chain_ptr, |cx, chain| {
-                        chain
-                            .get(cx)
-                            .deref_mut()
-                            .chain
-                            .iter_mut()
-                            .enumerate()
-                            .for_each(|(_i, effect)| {
-                                effect.ui(cx);
-                            });
-                    });
+                    for effect in &mut Data::chain_ptr.get(cx).deref_mut().chain {
+                        effect.ui(cx);
+                    }
+                })
+                .class("effect-view");
+                */
+                VStack::new(cx, |cx| {
+                    for effect in &mut Data::chain_ptr.get(cx).deref_mut().chain {
+                        effect.ui(cx);
+                    }
                 })
                 .class("effect-view");
             })
             .class("bottom-row");
-
         });
     })
 }

@@ -1,19 +1,20 @@
-use std::fmt::Debug;
+use std::{fmt::Debug, sync::Arc};
 
 use nih_plug_vizia::vizia::prelude::*;
 
 use crate::effects::{Effect, overdrive::Overdrive};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Chain {
-    pub chain: Vec<Box<dyn Effect + Send + Sync>>
+    pub chain: Vec<Arc<dyn Effect>>
 }
 
 impl Default for Chain {
     fn default() -> Self {
         Self {
             chain: vec![
-                Box::new(Overdrive::default())
+                Arc::new(Overdrive::default()),
+                Arc::new(Overdrive::default()),
             ]
         }
     }

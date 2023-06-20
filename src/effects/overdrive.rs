@@ -1,5 +1,6 @@
 use std::f32::consts::PI;
 
+use nih_plug::nih_log;
 use nih_plug_vizia::vizia::prelude::*;
 
 use super::{Effect, common::tick_knob};
