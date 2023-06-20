@@ -19,15 +19,15 @@ pub(crate) fn default_state() -> Arc<ViziaState> {
 #[derive(Lens, Clone, Debug)]
 pub(crate) struct Data {
     pub(crate) params: Arc<FretcatParams>,
-    pub(crate) chain_ptr: ChainPtr,
 }
 
 impl Model for Data {}
 
-pub(crate) fn create(editor_data: Data, editor_state: Arc<ViziaState>) -> Option<Box<dyn Editor>> {
+pub(crate) fn create(editor_data: Data, chain_ptr: ChainPtr, editor_state: Arc<ViziaState>) -> Option<Box<dyn Editor>> {
     create_vizia_editor(editor_state, ViziaTheming::Custom, move |cx, _| {
         cx.add_stylesheet(include_str!("./default.css")).unwrap();
         editor_data.clone().build(cx);
+        chain_ptr.build(cx);
 
         VStack::new(cx, |cx| {
             // Top bar
@@ -45,11 +45,6 @@ pub(crate) fn create(editor_data: Data, editor_state: Arc<ViziaState>) -> Option
                 .class("sidebar");
 
                 // Effect List
-                ScrollView::new(cx, 0.0, 0.0, false, true, |cx| {
-                    ChainPtr::render(cx, Data::chain_ptr);
-                })
-                .height(Pixels(700.0))
-                .class("effect-view");
             })
             .class("bottom-row");
         });

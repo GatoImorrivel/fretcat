@@ -9,10 +9,12 @@ use nih_plug_vizia::vizia::prelude::*;
 
 use crate::effects::{overdrive::Overdrive, Effect};
 
-#[derive(Debug, Clone, Lens)]
+#[derive(Debug)]
 pub struct Chain {
-    pub chain: Vec<Arc<dyn Effect>>,
+    pub chain: Vec<Box<dyn Effect>>,
 }
+
+impl Model for Chain {}
 
 impl Default for Chain {
     fn default() -> Self {
@@ -31,21 +33,29 @@ impl Default for Chain {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Lens)]
 pub struct ChainPtr {
     ptr: *mut Chain,
+    effects_ptr: Vec<*mut dyn Effect>,
+    vec: Vec<i32>
 }
 
 impl ChainPtr {
     pub fn new(ptr: *mut Chain) -> Self {
-        Self { ptr }
-    }
+        let chain = unsafe {&mut *ptr};
+        let effects_ptr = chain.chain.iter_mut().map(|effect| {
+            effect.as_mut() as *mut dyn Effect
+        }).collect();
 
-    pub fn render<L: Lens<Target = Self>>(cx: &mut Context, lens: L) {
-        for effect in &mut lens.get(cx).deref_mut().chain {
-            effect.render(cx);
+        Self {
+            ptr,
+            effects_ptr, 
+            vec: vec![]
         }
     }
+}
+
+impl Model for ChainPtr {
 }
 
 impl Debug for ChainPtr {
@@ -66,12 +76,6 @@ impl Deref for ChainPtr {
 impl DerefMut for ChainPtr {
     fn deref_mut(&mut self) -> &mut Self::Target {
         unsafe { &mut *self.ptr }
-    }
-}
-
-impl Data for ChainPtr {
-    fn same(&self, other: &Self) -> bool {
-        self.ptr == other.ptr
     }
 }
 

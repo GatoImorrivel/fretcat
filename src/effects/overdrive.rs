@@ -40,7 +40,6 @@ impl View for Overdrive {
                 self.volume = *value;
             }
         });
-        nih_log!("{:#?}", _cx.data::<crate::editor::Data>().unwrap());
     }
 }
 

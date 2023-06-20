@@ -59,8 +59,8 @@ impl Plugin for Fretcat {
         editor::create(
             editor::Data {
                 params: self.params.clone(),
-                chain_ptr: ChainPtr::new(self.chain.as_ptr())
             },
+            ChainPtr::new(self.chain.as_ptr()),
             self.params.editor_state.clone(),
         )
     }
