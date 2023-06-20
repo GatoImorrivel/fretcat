@@ -1,47 +1,32 @@
-
-
-use super::{Effect, ui::EffectUI, EffectUpdate, OverdriveEffect};
+use super::{Effect, overdrive::Overdrive};
 
 #[derive(Debug)]
 pub struct Chain {
-    effects: Vec<Box<dyn Effect + Send + Sync>>,
-}
-
-impl Chain {
-    pub fn process(&self, mut sample: f32) -> f32 {
-        for effect in &self.effects {
-            sample = effect.process(sample);
-        }
-
-        sample
-    }
-
-    pub fn update(&mut self, update: EffectUpdate) {
-        let (id, message) = update.take();
-
-        self.effects[id].update(message);
-    }
-
-    pub fn build_ui(&self) -> Vec<Box<dyn EffectUI + Send + Sync>> {
-        let mut uis = vec![];
-        for (id, effect) in self.effects.iter().enumerate() {
-            uis.push(effect.ui(id));
-        }
-
-        uis
-    }
+    pub(crate) effects: Vec<Box<dyn Effect>>,
 }
 
 impl Default for Chain {
     fn default() -> Self {
-        Self {
-            effects: vec![Box::new(OverdriveEffect::default())]
-        }
+        Self { effects: vec![
+            Box::new(Overdrive::default())
+        ] }
     }
 }
 
 #[derive(Debug, Clone)]
-pub struct ChainPtr(pub *mut Chain);
+pub struct ChainPtr {
+    pub(crate) ptr: *mut Chain,
+}
+
+impl ChainPtr {
+    pub fn deref(&self) -> &Chain {
+        unsafe {&*self.ptr}
+    }
+
+    pub fn deref_mut(&self) -> &mut Chain {
+        unsafe {&mut *self.ptr}
+    }
+}
 
 unsafe impl Send for ChainPtr {}
 unsafe impl Sync for ChainPtr {}
