@@ -1,36 +1,29 @@
 .top-bar {
     background-color: #3b3b3b;
     height: 5%;
-    box-shadow:  20px 20px 60px #323232;
-    z-index: 99999;
+    box-shadow: 9.91px 9.91px 15px #363636, -9.91px -9.91px 15px #404040;
 }
 
 .bottom-row {
-    background-color: #3b3b3b;
-    height: 100%;
+    width: 100%;
+    height: 95%;
     col-between: 1%;
+    background-color: #3b3b3b;
 }
 
 .sidebar {
     width: 20%;
     height: 100%;
     background-color: #3b3b3b;
-    box-shadow:  20px 20px 60px #323232;
+    box-shadow: 9.91px 9.91px 15px #363636, -9.91px -9.91px 15px #404040;
 }
 
 .effect-view {
     width: 79%;
+    height: 100%;
 }
 
 knob {
     width: 100px;
     height: 100px;
-}
-
-label {
-    color: red;
-}
-
-knob .track {
-    background-color: #ffb74d;
 }

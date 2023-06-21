@@ -7,7 +7,7 @@ use std::{
 use nih_plug::nih_log;
 use nih_plug_vizia::vizia::prelude::*;
 
-use crate::effects::{overdrive::Overdrive, Effect};
+use crate::effects::{overdrive::Overdrive, Effect, EffectHandle};
 
 #[derive(Debug)]
 pub struct Chain {
@@ -27,38 +27,38 @@ impl Default for Chain {
 }
 
 #[derive(Clone, Lens)]
-pub struct ChainPtr {
+pub struct ChainHandle {
     ptr: *mut Chain,
-    pub(crate) effects_ptr: Vec<*mut dyn Effect>
+    pub(crate) effects: Vec<EffectHandle>
 }
 
-impl ChainPtr {
+impl ChainHandle {
     pub fn new(ptr: *mut Chain) -> Self {
         let chain = unsafe {&mut *ptr};
-        let effects_ptr = chain.chain.iter_mut().map(|effect| {
-            effect.as_mut() as *mut dyn Effect
+        let effects = chain.chain.iter_mut().map(|effect| {
+            EffectHandle::from(effect)
         }).collect();
 
         Self {
             ptr,
-            effects_ptr 
+            effects
         }
     }
 }
 
-impl Model for ChainPtr {}
+impl Model for ChainHandle {}
 
-impl Debug for ChainPtr {
+impl Debug for ChainHandle {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let chain = unsafe { &*self.ptr };
         f.debug_struct("ChainPtr")
-            .field("effects_ptr", &self.effects_ptr)
+            .field("effects", &self.effects)
             .field("chain", chain)
             .finish()
     }
 }
 
-impl Deref for ChainPtr {
+impl Deref for ChainHandle {
     type Target = Chain;
 
     fn deref(&self) -> &Self::Target {
@@ -66,11 +66,11 @@ impl Deref for ChainPtr {
     }
 }
 
-impl DerefMut for ChainPtr {
+impl DerefMut for ChainHandle {
     fn deref_mut(&mut self) -> &mut Self::Target {
         unsafe { &mut *self.ptr }
     }
 }
 
-unsafe impl Send for ChainPtr {}
-unsafe impl Sync for ChainPtr {}
+unsafe impl Send for ChainHandle {}
+unsafe impl Sync for ChainHandle {}

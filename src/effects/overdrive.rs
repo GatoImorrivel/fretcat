@@ -12,7 +12,7 @@ enum OverdriveMessage {
     VolumeChange(f32),
 }
 
-#[derive(Debug, Clone, Copy, Lens)]
+#[derive(Debug, Clone, Copy, Lens, Default)]
 pub struct Overdrive {
     gain: f32,
     blend: f32,
@@ -40,17 +40,6 @@ impl View for Overdrive {
                 self.volume = *value;
             }
         });
-    }
-}
-
-impl Default for Overdrive {
-    fn default() -> Self {
-        Self {
-            gain: 0.0,
-            blend: 0.1,
-            threshold: 50.0,
-            volume: 1.0,
-        }
     }
 }
 

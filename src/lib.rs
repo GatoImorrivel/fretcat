@@ -3,7 +3,7 @@ mod editor;
 mod effects;
 mod chain;
 
-use chain::{Chain, ChainPtr};
+use chain::{Chain, ChainHandle};
 pub use nih_plug::{
     nih_export_vst3,
     prelude::{
@@ -60,7 +60,7 @@ impl Plugin for Fretcat {
             editor::Data {
                 params: self.params.clone(),
             },
-            ChainPtr::new(self.chain.as_ptr()),
+            ChainHandle::new(self.chain.as_ptr()),
             self.params.editor_state.clone(),
         )
     }
