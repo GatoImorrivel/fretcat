@@ -1,8 +1,6 @@
 .overdrive {
     height: 200px;
     background-image: linear-gradient(180deg, #6d09d2, #5c07b0);
-    box-shadow:  20px 20px 60px #323232,
-                -20px -20px 60px #444444;
     overflow: hidden;
 }
 
@@ -14,5 +12,4 @@
 
 .overdrive > vstack > knob {
     border-radius: 100%;
-    box-shadow: 9.91px 9.91px 15px #5D07B2, -9.91px -9.91px 15px #6F09D6;
 }
