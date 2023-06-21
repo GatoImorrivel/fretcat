@@ -76,7 +76,12 @@ impl Effect for Overdrive {
                     Label::new(cx, "Volume");
                 });
             })
-            .class("overdrive");
+            .class("overdrive")
+            .height(Pixels(self.height()));
         });
+    }
+
+    fn height(&self) -> f32 {
+        200.0        
     }
 }

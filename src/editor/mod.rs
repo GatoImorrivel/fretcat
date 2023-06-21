@@ -42,8 +42,7 @@ pub(crate) fn create(
         HStack::new(cx, |cx| {
             sidebar(cx)
                 .class("sidebar");
-            effect_view(cx)
-                .class("effect-view");
+            effect_view(cx);
         })
         .class("bottom-row");
     })
