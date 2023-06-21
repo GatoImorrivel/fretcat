@@ -11,14 +11,11 @@ members = ["xtask", "standalone"]
 crate-type = ["cdylib", "lib"]
 
 [dependencies]
-atomic_float = "0.1.0"
-crossbeam = "0.8.2"
-enum_derive = "0.1.7"
-fundsp = "0.12.0"
+fundsp = "0.14.0"
 # Remove the `assert_process_allocs` feature to allow allocations on the audio
 # thread in debug builds.
-nih_plug = { git = "https://github.com/robbert-vdh/nih-plug.git", features = ["standalone", "assert_process_allocs"] }
-nih_plug_iced = { git = "https://github.com/robbert-vdh/nih-plug.git" }
+nih_plug = { git = "https://github.com/geom3trik/nih-plug.git", branch = "vizia-update", features = ["standalone", "assert_process_allocs"] }
+nih_plug_vizia = { git = "https://github.com/geom3trik/nih-plug.git", branch = "vizia-update" }
 rand = "0.8.5"
 rustfft = "6.1.0"
 serde = "1.0.156"
@@ -35,3 +32,6 @@ strip = "symbols"
 inherits = "release"
 debug = true
 strip = "none"
+
+[profile.dev.package."*"]
+opt-level = 3

@@ -1,75 +1,48 @@
-use std::fmt::Debug;
+pub mod overdrive;
+mod common;
 
-use nih_plug::nih_log;
+use core::fmt;
+use std::ops::{Deref, DerefMut};
+use nih_plug_vizia::vizia::prelude::*;
 
-
-use self::ui::{EffectUI, OverdriveUI};
-
-pub mod ui;
-pub mod chain;
-
-#[macro_use]
-mod macros;
-
-messages!(
-    OverdriveMessage
-);
-
-#[derive(Debug, Clone, Copy)]
-pub struct EffectUpdate {
-    id: usize,
-    message: EffectMessage
-}
-
-impl EffectUpdate {
-    pub fn take(self) -> (usize, EffectMessage) {
-        (self.id, self.message)
-    }
-}
-
-pub trait Effect: Debug {
-    fn process(&self, sample: f32) -> f32;
-    fn update(&mut self, message: EffectMessage);
-    fn ui(&self, id: usize) -> Box<dyn EffectUI + Send + Sync>;
+pub trait Effect: fmt::Debug + Send + Sync {
+    fn process(&self, _sample: f32) -> f32;
+    fn render(&self, cx: &mut Context);
 }
 
 #[derive(Debug, Clone, Copy)]
-pub enum OverdriveMessage {
-    Gain(f32),
-    Volume(f32),
-    Threshold(f32)
+pub struct EffectHandle {
+    handle: *mut dyn Effect
 }
 
-#[derive(Debug, Default)]
-pub struct OverdriveEffect {
-    gain: f32,
-    volume: f32,
-    threshold: f32
-}
-
-impl Effect for OverdriveEffect {
-    fn process(&self, sample: f32) -> f32 {
-        let amplified = self.gain * sample;
-
-        amplified.clamp(-self.threshold, self.threshold) * self.volume
-    }
-
-    fn update(&mut self, message: EffectMessage) {
-        match message {
-            EffectMessage::OverdriveMessage(msg) => {
-                match msg {
-                    OverdriveMessage::Gain(gain) => self.gain = gain,
-                    OverdriveMessage::Volume(volume) => self.volume = volume,
-                    OverdriveMessage::Threshold(threshold) => self.threshold = threshold
-                }
-            },
-            _ => nih_log!("Overdrive received invalid message, discarding")
+impl From<&mut Box<dyn Effect>> for EffectHandle {
+    fn from(value: &mut Box<dyn Effect>) -> Self {
+        Self {
+            handle: value.as_mut() as *mut dyn Effect
         }
     }
+}
 
-    fn ui(&self, id: usize) -> Box<dyn EffectUI + Send + Sync> {
-        let effect = OverdriveUI::new(id, self.gain, self.volume, self.threshold);
+impl Deref for EffectHandle {
+    type Target = dyn Effect;
 
-        Box::new(effect)
+    fn deref(&self) -> &Self::Target {
+        unsafe {
+            &*self.handle    
+        } 
+    }
+}
+
+impl DerefMut for EffectHandle {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        unsafe {
+            &mut *self.handle
+        }
+    }
+}
+
+impl Data for EffectHandle {
+    fn same(&self, other: &Self) -> bool {
+        self.handle == other.handle
     }
 }

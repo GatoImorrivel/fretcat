@@ -7,3 +7,4 @@ edition = "2021"
 
 [dependencies]
 fretcat = { path = "../../fretcat" }
+nih_plug = { git = "https://github.com/geom3trik/nih-plug.git", branch="vizia-update", features = ["standalone", "assert_process_allocs"] }
