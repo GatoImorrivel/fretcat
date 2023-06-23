@@ -34,12 +34,10 @@ pub(crate) fn create(
         editor_data.clone().build(cx);
         chain_ptr.clone().build(cx);
 
-        top_bar(cx)
-            .class("top-bar");
+        top_bar(cx);
 
         HStack::new(cx, |cx| {
-            sidebar(cx)
-                .class("sidebar");
+            sidebar(cx);
             effect_view(cx);
         })
         .class("bottom-row");

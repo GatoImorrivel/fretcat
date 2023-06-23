@@ -33,7 +33,5 @@ pub fn effect_view(cx: &mut Context) {
                 .height(Pixels(height));
             }
         });
-    })
-    .width(Percentage(79.0))
-    .height(Percentage(100.0));
+    }).class("effect-view");
 }
