@@ -1,14 +1,13 @@
 pub mod overdrive;
-mod common;
 
 use core::fmt;
-use std::ops::{Deref, DerefMut};
+use std::{ops::{Deref, DerefMut}, any::Any};
 use nih_plug_vizia::vizia::prelude::*;
 
 pub trait Effect: fmt::Debug + Send + Sync {
     fn process(&self, _sample: f32) -> f32;
-    fn render(&self, cx: &mut Context);
-    fn height(&self) -> f32;
+    fn as_any(&self) -> &dyn Any;
+    fn as_mut_any(&mut self) -> &mut dyn Any;
 }
 
 #[derive(Debug, Clone, Copy)]

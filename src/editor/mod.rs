@@ -1,6 +1,4 @@
-mod effect_view;
-mod sidebar;
-mod top_bar;
+mod views;
 
 use std::sync::Arc;
 
@@ -12,9 +10,9 @@ use nih_plug_vizia::{create_vizia_editor, vizia::views::VStack, ViziaState, Vizi
 use crate::chain::{self, Chain, ChainHandle};
 use crate::params::FretcatParams;
 
-use self::effect_view::effect_view;
-use self::sidebar::sidebar;
-use self::top_bar::top_bar;
+use self::views::effect_view::effect_view;
+use self::views::sidebar::sidebar;
+use self::views::top_bar::top_bar;
 
 const EDITOR_WIDTH: u32 = 1260;
 const EDITOR_HEIGHT: u32 = 848;

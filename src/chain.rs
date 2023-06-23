@@ -27,7 +27,6 @@ impl Default for Chain {
                 Box::new(Overdrive::default()),
                 Box::new(Overdrive::default()),
                 Box::new(Overdrive::default()),
-                Box::new(Overdrive::default()),
             ],
         }
     }

@@ -4,6 +4,7 @@ mod effects;
 mod chain;
 
 use chain::{Chain, ChainHandle};
+use nih_plug::nih_log;
 pub use nih_plug::{
     nih_export_vst3,
     prelude::{
