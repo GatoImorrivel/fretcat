@@ -3,7 +3,7 @@ mod views;
 use std::sync::Arc;
 
 use nih_plug::nih_log;
-use nih_plug::prelude::Editor;
+use nih_plug::prelude::{Editor, AtomicF32};
 use nih_plug_vizia::vizia::{image, prelude::*};
 use nih_plug_vizia::{create_vizia_editor, vizia::views::VStack, ViziaState, ViziaTheming};
 
@@ -20,6 +20,7 @@ const EDITOR_HEIGHT: u32 = 848;
 #[derive(Lens, Clone, Debug)]
 pub(crate) struct Data {
     pub(crate) params: Arc<FretcatParams>,
+    pub(crate) noise_gate: Arc<AtomicF32>
 }
 
 impl Model for Data {}

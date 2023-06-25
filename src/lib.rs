@@ -4,7 +4,7 @@ mod effects;
 mod chain;
 
 use chain::{Chain, ChainHandle};
-use nih_plug::nih_log;
+use nih_plug::{nih_log, prelude::AtomicF32};
 pub use nih_plug::{
     nih_export_vst3,
     prelude::{
@@ -20,14 +20,16 @@ const NUM_OUTPUT_CHANNELS: u32 = 2;
 
 pub struct Fretcat {
     params: Arc<FretcatParams>,
-    chain: Cell<Chain>
+    chain: Cell<Chain>,
+    noise_gate: Arc<AtomicF32>,
 }
 
 impl Default for Fretcat {
     fn default() -> Self {
         Self {
             params: Arc::new(FretcatParams::default()),
-            chain: Cell::new(Chain::default())
+            chain: Cell::new(Chain::default()),
+            noise_gate: Arc::new(0.0.into())
         }
     }
 }
@@ -60,6 +62,7 @@ impl Plugin for Fretcat {
         editor::create(
             editor::Data {
                 params: self.params.clone(),
+                noise_gate: self.noise_gate.clone()
             },
             ChainHandle::new(self.chain.as_ptr()),
             self.params.editor_state.clone(),

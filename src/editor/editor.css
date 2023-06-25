@@ -20,7 +20,12 @@
 
 .effect-view {
     width: 79%;
-    height: 100%;
+    height: 95%;
+}
+
+.effect-view-controls {
+    width: 79%;
+    height: 5%;
 }
 
 knob {

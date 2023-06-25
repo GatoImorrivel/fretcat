@@ -49,14 +49,6 @@ pub fn overdrive(cx: &mut Context, handle: EffectHandle) {
                     .on_changing(|cx, val| cx.emit(Message::Gain(val)));
             });
             VStack::new(cx, |cx| {
-                Knob::new(cx, 1.0, OverdriveData::gain, false)
-                    .on_changing(|cx, val| cx.emit(Message::Gain(val)));
-            });
-            VStack::new(cx, |cx| {
-                Knob::new(cx, 1.0, OverdriveData::gain, false)
-                    .on_changing(|cx, val| cx.emit(Message::Gain(val)));
-            });
-            VStack::new(cx, |cx| {
                 Knob::new(cx, 1.0, OverdriveData::volume, false)
                     .on_changing(|cx, val| cx.emit(Message::Volume(val)));
             });

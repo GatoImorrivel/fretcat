@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use nih_plug::{prelude::Params};
+use nih_plug::{prelude::{Params, FloatParam, FloatRange}, params::persist};
 use nih_plug_vizia::ViziaState;
 
 #[derive(Params, Debug)]
@@ -12,7 +12,7 @@ pub struct FretcatParams {
 impl Default for FretcatParams {
     fn default() -> Self {
         Self {
-            editor_state: crate::editor::default_state()
+            editor_state: crate::editor::default_state(),
         }
     }
 }
