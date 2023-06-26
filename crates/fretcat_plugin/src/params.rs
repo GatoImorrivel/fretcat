@@ -12,7 +12,7 @@ pub struct FretcatParams {
 impl Default for FretcatParams {
     fn default() -> Self {
         Self {
-            editor_state: crate::editor::default_state(),
+            editor_state: fretcat_editor::default_state(),
         }
     }
 }

@@ -1,4 +1,4 @@
-use fretcat_audio::chain::ChainHandle;
+use fretcat_effects::chain::ChainHandle;
 use nih_plug_vizia::vizia::prelude::*;
 
 pub fn effect_view(cx: &mut Context) {

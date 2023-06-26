@@ -4,6 +4,7 @@ use nih_plug_vizia::vizia::prelude::*;
 
 pub trait Effect: fmt::Debug + Send + Sync {
     fn process(&self, _sample: f32) -> f32;
+    fn view(&mut self, handle: EffectHandle);
     fn as_any(&self) -> &dyn Any;
     fn as_mut_any(&mut self) -> &mut dyn Any;
 }

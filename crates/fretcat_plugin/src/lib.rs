@@ -1,8 +1,8 @@
 mod params;
 
+use fretcat_effects::chain::{Chain, ChainHandle};
 pub use params::FretcatParams;
 
-use chain::{Chain, ChainHandle};
 use nih_plug::{nih_log, prelude::AtomicF32};
 use nih_plug::{
     nih_export_vst3,
@@ -57,9 +57,8 @@ impl Plugin for Fretcat {
     }
 
     fn editor(&mut self, _async_executor: AsyncExecutor<Self>) -> Option<Box<dyn Editor>> {
-        editor::create(
-            editor::Data {
-                params: self.params.clone(),
+        fretcat_editor::editor::create(
+            fretcat_editor::editor::Data {
                 noise_gate: self.noise_gate.clone()
             },
             ChainHandle::new(self.chain.as_ptr()),

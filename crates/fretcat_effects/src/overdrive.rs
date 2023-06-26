@@ -1,9 +1,11 @@
 use std::f32::consts::PI;
 
-use nih_plug::nih_log;
-use nih_plug_vizia::vizia::prelude::*;
 
-use crate::effect::Effect;
+use fretcat_derive::Control;
+
+use nih_plug::nih_log;
+
+use crate::effect::{Effect, EffectHandle};
 
 
 #[derive(Debug, Clone, Copy, Default)]
@@ -20,6 +22,10 @@ impl Effect for Overdrive {
         let blend = ((dirty * self.blend) + (_sample * (1.0 / self.blend))) / 2.0;
 
         blend * self.volume
+    }
+
+    fn view(&mut self, handle: EffectHandle) {
+        
     }
 
     fn as_any(&self) -> &dyn std::any::Any {
