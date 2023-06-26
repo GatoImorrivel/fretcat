@@ -34,8 +34,8 @@ impl Default for Chain {
 
 #[derive(Clone, Lens)]
 pub struct ChainHandle {
-    ptr: *mut Chain,
-    pub(crate) effects: Vec<EffectHandle>
+    pub ptr: *mut Chain,
+    pub effects: Vec<EffectHandle>
 }
 
 impl ChainHandle {

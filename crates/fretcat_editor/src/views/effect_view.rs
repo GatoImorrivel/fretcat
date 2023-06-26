@@ -1,10 +1,5 @@
-use std::{fmt::format, ops::Range, any::TypeId};
-
 use fretcat_audio::chain::ChainHandle;
-use nih_plug::{nih_log, nih_error};
 use nih_plug_vizia::vizia::prelude::*;
-
-use super::overdrive::overdrive;
 
 pub fn effect_view(cx: &mut Context) {
     ScrollView::new(cx, 0.0, 0.0, false, true, |cx| {
