@@ -11,18 +11,10 @@ members = ["xtask", "standalone"]
 crate-type = ["cdylib", "lib"]
 
 [dependencies]
-fundsp = "0.14.0"
-# Remove the `assert_process_allocs` feature to allow allocations on the audio
-# thread in debug builds.
-nih_plug = { git = "https://github.com/geom3trik/nih-plug.git", branch = "vizia-update", features = ["standalone", "assert_process_allocs"] }
-nih_plug_vizia = { git = "https://github.com/geom3trik/nih-plug.git", branch = "vizia-update" }
-rand = "0.8.5"
-rustfft = "6.1.0"
-serde = "1.0.156"
-serde_json = "1.0.94"
-# Uncomment the below line to disable the on-by-default VST3 feature to remove
-# the GPL compatibility requirement
-# nih_plug = { git = "https://github.com/robbert-vdh/nih-plug.git", default_features = false, features = ["assert_process_allocs"] }
+fretcat_audio = {path = "./crates/fretcat_audio"}
+fretcat_editor = {path = "./crates/fretcat_editor"}
+fretcat_plugin = {path = "./crates/fretcat_plugin"}
+fretcat_derive = {path = "./crates/fretcat_derive"}
 
 [profile.release]
 lto = "thin"

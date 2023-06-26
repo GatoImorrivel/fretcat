@@ -1,6 +1,5 @@
+use fretcat_audio::{effect::EffectHandle, overdrive::Overdrive};
 use nih_plug_vizia::vizia::prelude::*;
-
-use crate::effects::{EffectHandle, overdrive::Overdrive};
 
 #[derive(Debug, Clone, Copy, Lens)]
 struct OverdriveData {

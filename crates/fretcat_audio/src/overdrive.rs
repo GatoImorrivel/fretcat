@@ -3,14 +3,15 @@ use std::f32::consts::PI;
 use nih_plug::nih_log;
 use nih_plug_vizia::vizia::prelude::*;
 
-use super::{Effect};
+use crate::effect::Effect;
+
 
 #[derive(Debug, Clone, Copy, Default)]
 pub struct Overdrive {
-    pub(crate) gain: f32,
+    gain: f32,
     blend: f32,
     threshold: f32,
-    pub(crate) volume: f32,
+    volume: f32,
 }
 
 impl Effect for Overdrive {

@@ -2,24 +2,20 @@ mod views;
 
 use std::sync::Arc;
 
+use fretcat_audio::chain::ChainHandle;
 use nih_plug::nih_log;
 use nih_plug::prelude::{Editor, AtomicF32};
 use nih_plug_vizia::vizia::{image, prelude::*};
 use nih_plug_vizia::{create_vizia_editor, vizia::views::VStack, ViziaState, ViziaTheming};
-
-use crate::chain::{self, Chain, ChainHandle};
-use crate::params::FretcatParams;
-
-use self::views::effect_view::effect_view;
-use self::views::sidebar::sidebar;
-use self::views::top_bar::top_bar;
+use views::effect_view::effect_view;
+use views::sidebar::sidebar;
+use views::top_bar::top_bar;
 
 const EDITOR_WIDTH: u32 = 1260;
 const EDITOR_HEIGHT: u32 = 848;
 
 #[derive(Lens, Clone, Debug)]
 pub(crate) struct Data {
-    pub(crate) params: Arc<FretcatParams>,
     pub(crate) noise_gate: Arc<AtomicF32>
 }
 

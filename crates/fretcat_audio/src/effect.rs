@@ -1,5 +1,3 @@
-pub mod overdrive;
-
 use core::fmt;
 use std::{ops::{Deref, DerefMut}, any::Any};
 use nih_plug_vizia::vizia::prelude::*;

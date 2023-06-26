@@ -7,7 +7,7 @@ use std::{
 use nih_plug::nih_log;
 use nih_plug_vizia::vizia::prelude::*;
 
-use crate::effects::{overdrive::Overdrive, Effect, EffectHandle};
+use crate::{effect::{Effect, EffectHandle}, overdrive::Overdrive};
 
 #[derive(Debug)]
 pub struct Chain {
