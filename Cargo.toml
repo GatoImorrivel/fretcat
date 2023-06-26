@@ -11,10 +11,11 @@ members = ["xtask", "standalone"]
 crate-type = ["cdylib", "lib"]
 
 [dependencies]
-fretcat_audio = {path = "./crates/fretcat_audio"}
+fretcat_effects = {path = "./crates/fretcat_effects"}
 fretcat_editor = {path = "./crates/fretcat_editor"}
 fretcat_plugin = {path = "./crates/fretcat_plugin"}
 fretcat_derive = {path = "./crates/fretcat_derive"}
+fretcat_tests = {path = "./crates/fretcat_tests"}
 
 [profile.release]
 lto = "thin"
