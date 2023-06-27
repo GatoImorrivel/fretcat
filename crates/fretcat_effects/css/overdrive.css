@@ -4,6 +4,11 @@
     overflow: hidden;
 }
 
+.overdrive knob {
+    width: 100px;
+    height: 100px;
+}
+
 .overdrive-knob-group > knob > zstack > .knob-head {
     background-image: linear-gradient(180deg, #110220, #31055e);
     border-width: 0px;

@@ -1,0 +1,16 @@
+.sidebar label {
+    color: white;
+    font-stretch: ultra-condensed;
+}
+
+.tabs .tabview-divider {
+    display: none;
+}
+
+.tabs tabheader {
+    background-color:red;
+}
+
+.tabs .tabview-tabheader-wrapper:first-child:first-child:first-child {
+    background-color: green;
+}

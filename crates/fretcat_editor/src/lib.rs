@@ -4,7 +4,7 @@ mod top_bar;
 mod effect_view;
 
 use std::sync::Arc;
-use nih_plug_vizia::ViziaState;
+use nih_plug_vizia::{ViziaState, vizia::{view::{View, Handle}, prelude::TextModifiers}};
 
 pub const EDITOR_WIDTH: u32 = 1260;
 pub const EDITOR_HEIGHT: u32 = 848;
