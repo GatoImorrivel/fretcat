@@ -13,8 +13,6 @@ pub fn sidebar(cx: &mut Context) {
     }
     .build(cx);
 
-    cx.add_stylesheet(include_str!("../css/sidebar.css")).unwrap();
-
     VStack::new(cx, |cx| {
         TabView::new(cx, Sidebar::tabs, |cx, tab| match tab.get(cx) {
             "Effects" => TabPair::new(

@@ -4,7 +4,7 @@ use fretcat_effects::chain::ChainHandle;
 use nih_plug::prelude::*;
 use nih_plug_vizia::{vizia::prelude::*, ViziaState, create_vizia_editor};
 
-use crate::{top_bar::top_bar, sidebar::sidebar, effect_view::effect_view};
+use crate::{top_bar::top_bar, sidebar::sidebar, effect_view::effect_view, EDITOR_HEIGHT, EDITOR_WIDTH};
 
 #[derive(Lens, Clone, Debug)]
 pub struct Data {
@@ -26,11 +26,21 @@ pub fn create(
 
         VStack::new(cx, |cx| {
             HStack::new(cx, |cx| {
-                sidebar(cx);
-                effect_view(cx);
+                top_bar(cx);
             })
-            .class("bottom-row");
-            top_bar(cx);
-        }).class("wrapper");
+            .class("topbar-wrapper");
+            HStack::new(cx, |cx| {
+                VStack::new(cx, |cx| { 
+                    sidebar(cx);
+                })
+                .class("sidebar-wrapper");
+                VStack::new(cx, |cx| { 
+                    effect_view(cx);
+                })
+                .class("list-wrapper");
+            })
+            .class("content-wrapper");
+        })
+        .class("main");
     })
 }
