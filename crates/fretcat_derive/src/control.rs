@@ -1,6 +1,6 @@
 use proc_macro2::{Ident, Span};
 use quote::quote;
-use syn::{Data, spanned::Spanned, DataStruct, Fields};
+use syn::{spanned::Spanned, Data, DataStruct, Fields};
 
 pub(crate) fn derive_control_impl(
     input: syn::DeriveInput,
@@ -22,18 +22,42 @@ fn derive_struct(
     input: &syn::DeriveInput,
     s: &DataStruct,
 ) -> Result<proc_macro2::TokenStream, syn::Error> {
-    let ident = &input.ident; 
+    let ident = &input.ident;
     let struct_name = format!("{}Control", ident.to_string());
     let new_ident = Ident::new(&struct_name, Span::call_site());
 
-    let res = quote!(
-        pub struct #new_ident {
+    let control_fields = s.fields.iter().filter(|field| {
+        field.attrs.iter().any(|attr| {
+            attr.path()
+                .segments
+                .iter()
+                .any(|segment| segment.ident == "control")
+        })
+    });
 
+    let control_fields_definitions = control_fields.map(|elem| {
+        let ident = elem.ident.as_ref().unwrap();
+        let ty = &elem.ty;
+
+        quote! {
+            pub #ident: #ty
+        }
+    });
+
+    let res = quote!(
+        #[derive(Lens)]
+        pub struct #new_ident {
+            #(#control_fields_definitions), *,
+            pub handle: EffectHandle
         }
 
         impl #new_ident {
-            fn print() {
-                println!("{}", #struct_name);
+            pub fn downcast_mut_handle(&mut self) -> &mut #ident {
+                self.handle.as_mut_any().downcast_mut::<#ident>().unwrap()
+            }
+
+            pub fn downcast_handle(&self) -> &#ident {
+                self.handle.as_any().downcast_ref::<#ident>().unwrap()
             }
         }
     );

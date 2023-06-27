@@ -24,12 +24,13 @@ pub fn create(
         editor_data.clone().build(cx);
         chain_handle.clone().build(cx);
 
-        top_bar(cx);
-
-        HStack::new(cx, |cx| {
-            sidebar(cx);
-            effect_view(cx);
-        })
-        .class("bottom-row");
+        VStack::new(cx, |cx| {
+            HStack::new(cx, |cx| {
+                sidebar(cx);
+                effect_view(cx);
+            })
+            .class("bottom-row");
+            top_bar(cx);
+        }).class("wrapper");
     })
 }

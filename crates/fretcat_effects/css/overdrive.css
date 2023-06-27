@@ -1,0 +1,15 @@
+.overdrive {
+    height: 200px;
+    background-image: linear-gradient(180deg, #6d09d2, #5c07b0);
+    overflow: hidden;
+}
+
+.overdrive-knob-group > knob > zstack > .knob-head {
+    background-image: linear-gradient(180deg, #110220, #31055e);
+    border-width: 0px;
+    background-color: transparent;
+}
+
+.overdrive-knob-group > knob {
+    border-radius: 100%;
+}

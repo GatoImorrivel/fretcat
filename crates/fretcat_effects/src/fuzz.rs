@@ -5,7 +5,7 @@ use crate::effect::{Effect, EffectHandle};
 use fretcat_derive::Control;
 
 #[derive(Debug, Clone, Copy, Default, Control)]
-pub struct Overdrive {
+pub struct Fuzz {
     #[control]
     gain: f32,
     blend: f32,
@@ -14,7 +14,7 @@ pub struct Overdrive {
     volume: f32
 }
 
-impl Effect for Overdrive {
+impl Effect for Fuzz {
     fn process(&self, _sample: f32) -> f32 {
         let dirty = (2.0 / PI) * f32::atan(_sample * self.gain * self.threshold);
         let blend = ((dirty * self.blend) + (_sample * (1.0 / self.blend))) / 2.0;
@@ -23,11 +23,11 @@ impl Effect for Overdrive {
     }
 
     fn title(&self) -> String {
-        "Drive".to_owned()
+        "Fuzz".to_owned()
     }
 
     fn height(&self) -> f32 {
-        200.0
+        400.0
     }
 
     fn as_any(&self) -> &dyn std::any::Any {
@@ -39,8 +39,8 @@ impl Effect for Overdrive {
     }
 
     fn view(&mut self, cx: &mut Context, handle: EffectHandle) {
-        let o = handle.downcast_into::<Overdrive>();
-        OverdriveControl {
+        let o = handle.downcast_into::<Fuzz>();
+        FuzzControl {
             gain: o.gain,
             volume: o.volume,
             handle: handle
@@ -48,11 +48,11 @@ impl Effect for Overdrive {
             cx.add_stylesheet(include_str!("../css/overdrive.css")).unwrap();
             HStack::new(cx, |cx| {
                 VStack::new(cx, |cx| {
-                    Knob::new(cx, 1.0, OverdriveControl::gain, false)
+                    Knob::new(cx, 1.0, FuzzControl::gain, false)
                         .on_changing(|cx, val| cx.emit(Message::Gain(val)));
                 }).class("overdrive-knob-group");
                 VStack::new(cx, |cx| {
-                    Knob::new(cx, 1.0, OverdriveControl::volume, false)
+                    Knob::new(cx, 1.0, FuzzControl::volume, false)
                         .on_changing(|cx, val| cx.emit(Message::Volume(val)));
                 }).class("overdrive-knob-group");
             })
@@ -67,9 +67,9 @@ enum Message {
     Volume(f32)
 }
 
-impl View for OverdriveControl {
+impl View for FuzzControl {
     fn element(&self) -> Option<&'static str> {
-        Some("overdrive")
+        Some("fuzz")
     }
 
     fn event(&mut self, cx: &mut EventContext, event: &mut Event) {

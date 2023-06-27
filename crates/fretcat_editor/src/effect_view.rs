@@ -2,19 +2,27 @@ use fretcat_effects::chain::ChainHandle;
 use nih_plug_vizia::vizia::prelude::*;
 
 pub fn effect_view(cx: &mut Context) {
-    ScrollView::new(cx, 0.0, 0.0, false, true, |cx| {
-        Binding::new(cx, ChainHandle::effects, |cx, effects| {
-            let effects = effects.get(cx);
+    cx.add_stylesheet(include_str!("../css/main.css")).unwrap();
+    VStack::new(cx, |cx| {
+        ScrollView::new(cx, 0.0, 0.0, false, true, |cx| {
+            Binding::new(cx, ChainHandle::effects, |cx, effects| {
+                let mut effects = effects.get(cx);
 
-            for handle in effects {
-                let effect = handle.as_any();
+                for effect in effects.iter_mut() {
+                    VStack::new(cx, |cx| {
+                        let handle = effect.clone();
+                        effect.view(cx, handle);
+                    })
+                    .width(Percentage(100.0))
+                    .height(Pixels(effect.height()));
+                }
+            });
+        }).class("effect-list");
 
-                let mut height = 0.0;
-                VStack::new(cx, |cx| {
-                })
-                .width(Percentage(100.0))
-                .height(Pixels(height));
-            }
-        });
-    }).class("effect-view");
+        HStack::new(cx, |cx| {
+            Label::new(cx, "Unnamed Preset");
+            Label::new(cx, "Save Preset");
+            Label::new(cx, "Delete Preset");
+        }).class("preset-controls");
+    }).class("main");
 }

@@ -15,20 +15,26 @@ pub fn sidebar(cx: &mut Context) {
 
     cx.add_stylesheet(include_str!("../css/sidebar.css")).unwrap();
 
-    TabView::new(cx, Sidebar::tabs, |cx, tab| match tab.get(cx) {
-        "Effects" => TabPair::new(
-            move |cx| {
-                Label::new(cx, tab);
-            },
-            |cx| {},
-        ),
+    VStack::new(cx, |cx| {
+        TabView::new(cx, Sidebar::tabs, |cx, tab| match tab.get(cx) {
+            "Effects" => TabPair::new(
+                move |cx| {
+                    Label::new(cx, tab);
+                },
+                |cx| {
+                    Label::new(cx, "effects");
+                },
+            ),
 
-        "Presets" => TabPair::new(
-            move |cx| {
-                Label::new(cx, tab);
-            },
-            |cx| {},
-        ),
-        _ => unreachable!(),
+            "Presets" => TabPair::new(
+                move |cx| {
+                    Label::new(cx, tab);
+                },
+                |cx| {
+                    Label::new(cx, "presets");
+                },
+            ),
+            _ => unreachable!(),
+        }).class("tabs");
     }).class("sidebar");
 }

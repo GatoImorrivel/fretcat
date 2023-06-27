@@ -1,34 +1,40 @@
 .top-bar {
-    background-color: #3b3b3b;
     height: 5%;
-    box-shadow: 9.91px 9.91px 15px #363636, -9.91px -9.91px 15px #404040;
+    position-type: self-directed;
+    background-color: #2b2b2b;
 }
 
 .bottom-row {
     width: 100%;
-    height: 95%;
-    col-between: 1%;
-    background-color: #3b3b3b;
+    height: 94.5%;
+    col-between: 0.5%;
+    background-color: transparent;
+    position-type: self-directed;
+    top: 5.5%;
+}
+
+.wrapper {
+    background-color: #181818;
 }
 
 .sidebar {
-    width: 20%;
+    width: 20.5%;
     height: 100%;
-    background-color: #3b3b3b;
-    box-shadow: 9.91px 9.91px 15px #363636, -9.91px -9.91px 15px #404040;
+    background-color: #2b2b2b;
+    box-shadow:  6px 6px 12px #121212,
+                -6px -6px 12px #1e1e1e;
 }
 
-.effect-view {
+.main {
     width: 79%;
-    height: 95%;
-}
-
-.effect-view-controls {
-    width: 79%;
-    height: 5%;
+    height: 100%;
 }
 
 knob {
     width: 100px;
     height: 100px;
+}
+
+label {
+    color: whitesmoke;
 }

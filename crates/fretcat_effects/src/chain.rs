@@ -7,7 +7,7 @@ use std::{
 use nih_plug::nih_log;
 use nih_plug_vizia::vizia::prelude::*;
 
-use crate::{effect::{Effect, EffectHandle}, overdrive::Overdrive};
+use crate::{effect::{Effect, EffectHandle}, overdrive::Overdrive, fuzz::Fuzz};
 
 #[derive(Debug)]
 pub struct Chain {
@@ -19,14 +19,10 @@ impl Default for Chain {
         Self {
             chain: vec![
                 Box::new(Overdrive::default()),
+                Box::new(Fuzz::default()),
                 Box::new(Overdrive::default()),
                 Box::new(Overdrive::default()),
-                Box::new(Overdrive::default()),
-                Box::new(Overdrive::default()),
-                Box::new(Overdrive::default()),
-                Box::new(Overdrive::default()),
-                Box::new(Overdrive::default()),
-                Box::new(Overdrive::default()),
+                Box::new(Fuzz::default()),
             ],
         }
     }
