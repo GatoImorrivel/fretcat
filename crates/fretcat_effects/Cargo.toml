@@ -10,3 +10,4 @@ nih_plug = { git = "https://github.com/geom3trik/nih-plug.git", branch = "vizia-
 nih_plug_vizia = { git = "https://github.com/geom3trik/nih-plug.git", branch = "vizia-update" }
 
 fretcat_derive = {path = "../fretcat_derive"}
+strum = { version = "0.25.0", features = ["derive"]}

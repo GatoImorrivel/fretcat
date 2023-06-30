@@ -14,3 +14,13 @@
 .tabs .tabview-tabheader-wrapper:first-child:first-child:first-child {
     background-color: green;
 }
+
+.kind-btn {
+    width: 50%;
+    background-color: black;
+}
+
+.selected-kind {
+    width: 50%;
+    background-color: red;
+}

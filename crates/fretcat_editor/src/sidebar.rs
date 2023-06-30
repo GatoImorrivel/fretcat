@@ -1,19 +1,44 @@
+use std::usize;
+
+mod effect_tab;
+
+use fretcat_effects::EffectKind;
+use nih_plug::nih_log;
 use nih_plug_vizia::vizia::prelude::*;
+
+use self::effect_tab::effect_tab;
 
 #[derive(Debug, Lens, Clone)]
 struct Sidebar {
     tabs: Vec<&'static str>,
+    effect_kinds: Vec<EffectKind>,
+    selected_kind: usize,
 }
 
-impl Model for Sidebar {}
+enum Message {
+    KindChange(usize),
+}
+
+impl Model for Sidebar {
+    fn event(&mut self, cx: &mut EventContext, event: &mut Event) {
+        event.map(|event, _| match event {
+            Message::KindChange(i) => {
+                self.selected_kind = *i;
+            }
+        })
+    }
+}
 
 pub fn sidebar(cx: &mut Context) {
     Sidebar {
         tabs: vec!["Effects", "Presets"],
+        effect_kinds: EffectKind::variants(),
+        selected_kind: 0,
     }
     .build(cx);
 
-    cx.add_stylesheet(include_str!("../css/sidebar.css")).unwrap();
+    cx.add_stylesheet(include_str!("../css/sidebar.css"))
+        .unwrap();
 
     VStack::new(cx, |cx| {
         TabView::new(cx, Sidebar::tabs, |cx, tab| match tab.get(cx) {
@@ -22,7 +47,7 @@ pub fn sidebar(cx: &mut Context) {
                     Label::new(cx, tab);
                 },
                 |cx| {
-                    Label::new(cx, "effects");
+                    effect_tab(cx);
                 },
             ),
 
@@ -31,10 +56,15 @@ pub fn sidebar(cx: &mut Context) {
                     Label::new(cx, tab);
                 },
                 |cx| {
-                    Label::new(cx, "presets");
+                    preset_tab(cx);
                 },
             ),
             _ => unreachable!(),
-        }).class("tabs");
-    }).class("sidebar");
+        })
+        .class("tabs");
+    })
+    .class("sidebar");
 }
+
+
+fn preset_tab(cx: &mut Context) {}
