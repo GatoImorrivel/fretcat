@@ -44,10 +44,9 @@ fn kind_picker(cx: &mut Context) {
                     });
                     cont += 1;
                 }
-            });
+            })
+            .class("picker-row");
         }
     })
-    .height(Percentage(20.0))
-    .background_color(Color::red());
-
+    .class("picker-wrapper");
 }

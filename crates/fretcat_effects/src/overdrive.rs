@@ -1,3 +1,4 @@
+use nih_plug::{util::db_to_gain, nih_log};
 use nih_plug_vizia::vizia::prelude::*;
 use std::f32::consts::PI;
 
@@ -8,7 +9,9 @@ use fretcat_derive::Control;
 pub struct Overdrive {
     #[control]
     gain: f32,
+    #[control]
     blend: f32,
+    #[control]
     threshold: f32,
     #[control]
     volume: f32
@@ -16,10 +19,14 @@ pub struct Overdrive {
 
 impl Effect for Overdrive {
     fn process(&self, _sample: f32) -> f32 {
-        let dirty = (2.0 / PI) * f32::atan(_sample * self.gain * self.threshold);
-        let blend = ((dirty * self.blend) + (_sample * (1.0 / self.blend))) / 2.0;
+        let clean = _sample;
+        let threshold = self.threshold * 100.0;
+        let amplified = _sample * db_to_gain(self.gain * threshold);
+        let distorted = (2.0 / PI) * f32::atan(amplified);
 
-        blend * self.volume
+        let output_gain = db_to_gain(self.volume * 10.0);
+
+        ((distorted * self.blend) + (clean * (1.0 - self.blend))) * output_gain
     }
 
     fn title(&self) -> String {
@@ -43,6 +50,8 @@ impl Effect for Overdrive {
         OverdriveControl {
             gain: o.gain,
             volume: o.volume,
+            blend: o.blend,
+            threshold: o.threshold,
             handle: handle
         }.build(cx, |cx| {
             cx.add_stylesheet(include_str!("../css/overdrive.css")).unwrap();
@@ -50,10 +59,22 @@ impl Effect for Overdrive {
                 VStack::new(cx, |cx| {
                     Knob::new(cx, 1.0, OverdriveControl::gain, false)
                         .on_changing(|cx, val| cx.emit(Message::Gain(val)));
+                    Label::new(cx, "Gain");
+                }).class("overdrive-knob-group");
+                VStack::new(cx, |cx| {
+                    Knob::new(cx, 1.0, OverdriveControl::threshold, false)
+                        .on_changing(|cx, val| cx.emit(Message::Threshold(val)));
+                    Label::new(cx, "Threshold");
+                }).class("overdrive-knob-group");
+                VStack::new(cx, |cx| {
+                    Knob::new(cx, 1.0, OverdriveControl::blend, false)
+                        .on_changing(|cx, val| cx.emit(Message::Blend(val)));
+                    Label::new(cx, "Blend");
                 }).class("overdrive-knob-group");
                 VStack::new(cx, |cx| {
                     Knob::new(cx, 1.0, OverdriveControl::volume, false)
                         .on_changing(|cx, val| cx.emit(Message::Volume(val)));
+                    Label::new(cx, "Volume");
                 }).class("overdrive-knob-group");
             })
             .class("overdrive")
@@ -64,6 +85,8 @@ impl Effect for Overdrive {
 
 enum Message {
     Gain(f32), 
+    Blend(f32), 
+    Threshold(f32), 
     Volume(f32)
 }
 
@@ -81,6 +104,14 @@ impl View for OverdriveControl {
             Message::Volume(val) => {
                 self.volume = *val;
                 self.downcast_mut_handle().volume = *val;
+            },
+            Message::Threshold(val) => {
+                self.threshold = *val;
+                self.downcast_mut_handle().threshold = *val;
+            },
+            Message::Blend(val) => {
+                self.blend = *val;
+                self.downcast_mut_handle().blend = *val;
             },
         });
     }

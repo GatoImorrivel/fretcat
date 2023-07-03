@@ -13,7 +13,7 @@ use nih_plug::{
 };
 use std::{num::NonZeroU32, sync::Arc, cell::Cell};
 
-const NUM_INPUT_CHANNELS: u32 = 1;
+const NUM_INPUT_CHANNELS: u32 = 2;
 const NUM_OUTPUT_CHANNELS: u32 = 2;
 
 pub struct Fretcat {

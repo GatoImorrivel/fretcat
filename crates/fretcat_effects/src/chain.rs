@@ -19,10 +19,6 @@ impl Default for Chain {
         Self {
             chain: vec![
                 Box::new(Overdrive::default()),
-                Box::new(Fuzz::default()),
-                Box::new(Overdrive::default()),
-                Box::new(Overdrive::default()),
-                Box::new(Fuzz::default()),
             ],
         }
     }
