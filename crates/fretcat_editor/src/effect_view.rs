@@ -1,7 +1,27 @@
-use fretcat_effects::chain::ChainHandle;
+use std::sync::Arc;
+
+use fretcat_effects::{chain::ChainHandle, effect::Effect};
+use nih_plug::nih_log;
 use nih_plug_vizia::vizia::prelude::*;
 
+use crate::card::CardData;
+
+#[derive(Debug, Lens, Clone)]
+pub struct ChainView {
+}
+
+impl Model for ChainView {
+    fn event(&mut self, cx: &mut EventContext, event: &mut Event) {
+    }
+}
+
+pub enum ChainEvent {
+    ChangeDrag(Arc<dyn Effect + Send + Sync>),
+}
+
 pub fn effect_view(cx: &mut Context) {
+    ChainView {}.build(cx);
+
     VStack::new(cx, |cx| {
         ScrollView::new(cx, 0.0, 0.0, false, true, |cx| {
             Binding::new(cx, ChainHandle::effects, |cx, effects| {
@@ -16,6 +36,16 @@ pub fn effect_view(cx: &mut Context) {
                     .height(Pixels(effect.height()));
                 }
             });
+        })
+        .on_drop(|ex, data| {
+            let effect = CardData::dragging.get(ex);
+
+            nih_log!("Dropped {:#?}", effect);
+
+            if let Some(effect) = effect {
+                nih_log!("{:#?}", effect);
+            }
         });
-    }).class("list");
+    })
+    .class("list");
 }

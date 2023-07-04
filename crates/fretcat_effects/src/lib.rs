@@ -1,4 +1,4 @@
-use nih_plug_vizia::vizia::prelude::Data;
+use nih_plug_vizia::vizia::prelude::*;
 use strum::{EnumIter, IntoEnumIterator};
 
 pub mod chain;
@@ -7,7 +7,8 @@ pub mod effect;
 pub mod fuzz;
 pub mod overdrive;
 
-#[derive(Debug, EnumIter, Clone, Copy, PartialEq)]
+
+#[derive(Debug, EnumIter, Clone, Copy, PartialEq, Hash, Eq)]
 pub enum EffectKind {
     Distortion,
     Delay,

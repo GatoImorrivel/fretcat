@@ -7,10 +7,12 @@
     display: none;
 }
 
-.tabs tabheader {
-}
-
-.tabs .tabview-tabheader-wrapper:first-child:first-child:first-child {
+.cards-wrapper {
+    child-space: 8px;
+    row-between: 8px;
+    background-color: transparent;
+    width: 100%;
+    height: 1s;
 }
 
 .picker-wrapper {

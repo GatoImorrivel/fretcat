@@ -1,10 +1,25 @@
 use fretcat_effects::EffectKind;
 use nih_plug_vizia::vizia::prelude::*;
 
-use super::{Sidebar, Message};
+use crate::EFFECT_CARDS;
+
+use super::{Sidebar, SidebarEvent};
 
 pub fn effect_tab(cx: &mut Context) {
     kind_picker(cx);
+    Binding::new(cx, Sidebar::selected_kind, |cx, bind| {
+        let index = bind.get(cx);
+        let kinds = Sidebar::effect_kinds.get(cx);
+        let kind = kinds.get(index).unwrap();
+
+        let cards = EFFECT_CARDS.get(kind).unwrap();
+
+        VStack::new(cx, |cx| {
+            cards.iter().for_each(|card| {
+                (card)(cx);
+            });
+        }).class("cards-wrapper");
+    });
 }
 
 fn kind_picker(cx: &mut Context) {
@@ -37,7 +52,7 @@ fn kind_picker(cx: &mut Context) {
                         };
                         Button::new(
                             cx,
-                            move |e| e.emit(Message::KindChange(cont2)),
+                            move |e| e.emit(SidebarEvent::KindChange(cont2)),
                             |cx| Label::new(cx, &kind2.to_string()),
                         )
                         .class(class);

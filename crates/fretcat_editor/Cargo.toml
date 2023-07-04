@@ -11,3 +11,5 @@ nih_plug_vizia = { git = "https://github.com/geom3trik/nih-plug.git", branch = "
 
 fretcat_effects = {path = "../fretcat_effects"}
 strum = { version = "0.25.0", features = ["derive"]}
+
+lazy_static = "1.4.0"
