@@ -7,7 +7,11 @@ use std::{
 use nih_plug::nih_log;
 use nih_plug_vizia::vizia::prelude::*;
 
-use crate::{effect::{Effect, EffectHandle}, overdrive::Overdrive, fuzz::Fuzz};
+use crate::{
+    effect::{Effect, EffectHandle},
+    fuzz::Fuzz,
+    overdrive::Overdrive,
+};
 
 #[derive(Debug)]
 pub struct Chain {
@@ -17,9 +21,7 @@ pub struct Chain {
 impl Default for Chain {
     fn default() -> Self {
         Self {
-            chain: vec![
-                Box::new(Overdrive::default()),
-            ],
+            chain: vec![Box::new(Overdrive::default())],
         }
     }
 }
@@ -27,24 +29,35 @@ impl Default for Chain {
 #[derive(Clone, Lens)]
 pub struct ChainHandle {
     pub ptr: *mut Chain,
-    pub effects: Vec<EffectHandle>
+    pub effects: Vec<EffectHandle>,
 }
 
 impl ChainHandle {
     pub fn new(ptr: *mut Chain) -> Self {
-        let chain = unsafe {&mut *ptr};
-        let effects = chain.chain.iter_mut().map(|effect| {
-            EffectHandle::from(effect)
-        }).collect();
+        let chain = unsafe { &mut *ptr };
+        let effects = chain
+            .chain
+            .iter_mut()
+            .map(|effect| EffectHandle::from(effect))
+            .collect();
 
-        Self {
-            ptr,
-            effects
-        }
+        Self { ptr, effects }
     }
 }
 
-impl Model for ChainHandle {}
+pub enum ChainEvent {
+    AddEffect(Arc<dyn Effect + Send + Sync>),
+}
+
+impl Model for ChainHandle {
+    fn event(&mut self, cx: &mut EventContext, event: &mut Event) {
+        event.map(|event, _| match event {
+            ChainEvent::AddEffect(effect) => {
+                self.chain.push(effect.into());
+            }
+        });
+    }
+}
 
 impl Debug for ChainHandle {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
