@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{sync::Arc, cell::Cell};
 
 use fretcat_effects::chain::ChainHandle;
 use nih_plug::prelude::*;
@@ -25,8 +25,9 @@ pub fn create(
         chain_handle.clone().build(cx);
 
         CardData {
-            dragging: None
+            dragging: Arc::new(Cell::new(None))
         }.build(cx);
+        cx.add_stylesheet(include_str!("../css/cards.css")).unwrap();
 
         VStack::new(cx, |cx| {
             HStack::new(cx, |cx| {

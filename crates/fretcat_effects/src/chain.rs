@@ -43,19 +43,38 @@ impl ChainHandle {
 
         Self { ptr, effects }
     }
+
+    pub fn push_effect(&mut self, mut effect: Box<dyn Effect>) {
+        let handle = EffectHandle::from(&mut effect);
+        self.effects.push(handle);
+        self.chain.push(effect);
+    }
+
+    pub fn insert_effect(&mut self, index: usize, mut effect: Box<dyn Effect>) {
+        let handle = EffectHandle::from(&mut effect);
+        self.effects.insert(index, handle);
+        self.chain.insert(index, effect);
+    }
 }
 
 pub enum ChainEvent {
-    AddEffect(Arc<dyn Effect + Send + Sync>),
+    PushEffect(Box<dyn Effect>),
+    InsertEffect(usize, Box<dyn Effect>)
 }
 
 impl Model for ChainHandle {
     fn event(&mut self, cx: &mut EventContext, event: &mut Event) {
-        event.map(|event, _| match event {
-            ChainEvent::AddEffect(effect) => {
-                self.chain.push(effect.into());
+        let e = event.take();
+        if let Some(e) = e {
+            match e {
+                ChainEvent::PushEffect(effect) => {
+                    self.push_effect(effect);
+                },
+                ChainEvent::InsertEffect(index, effect) => {
+                    self.insert_effect(index, effect);
+                }
             }
-        });
+        }
     }
 }
 
