@@ -16,7 +16,7 @@ pub fn effect_tab(cx: &mut Context) {
 
         VStack::new(cx, |cx| {
             cards.iter().for_each(|card| {
-                (card)(cx);
+                card.render(cx);
             });
         }).class("cards-wrapper");
     });

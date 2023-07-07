@@ -8,15 +8,17 @@ use std::{sync::Arc, collections::HashMap};
 use fretcat_effects::EffectKind;
 use nih_plug_vizia::{ViziaState, vizia::{view::{View, Handle}, prelude::{TextModifiers, Context}}};
 
+use card::*;
+
 pub const EDITOR_WIDTH: u32 = 1260;
 pub const EDITOR_HEIGHT: u32 = 848;
 
 lazy_static::lazy_static! {
-    pub static ref EFFECT_CARDS: HashMap<EffectKind, Vec<fn(&mut Context)>> = {
-        let mut hashmap: HashMap<EffectKind, Vec<fn(&mut Context)>> = HashMap::new();
+    pub static ref EFFECT_CARDS: HashMap<EffectKind, Vec<Card>> = {
+        let mut hashmap: HashMap<EffectKind, Vec<Card>> = HashMap::new();
         hashmap.insert(EffectKind::Distortion, vec![
-            card::overdrive_card,
-            card::fuzz_card
+            OVERDRIVE_CARD,
+            FUZZ_CARD
         ]);
         hashmap
     };

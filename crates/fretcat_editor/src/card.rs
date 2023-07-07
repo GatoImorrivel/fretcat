@@ -1,16 +1,16 @@
-use std::{sync::Arc, cell::Cell};
+use std::{cell::Cell, sync::Arc};
 
-use fretcat_effects::{effect::Effect, overdrive::Overdrive, fuzz::Fuzz};
+use fretcat_effects::{effect::Effect, fuzz::Fuzz, overdrive::Overdrive};
 use nih_plug::nih_log;
 use nih_plug_vizia::vizia::prelude::*;
 
 #[derive(Lens)]
 pub struct CardData {
-    pub(crate) dragging: Arc<Cell<Option<Box<dyn Effect + Send + Sync>>>>
+    pub(crate) dragging: Arc<Cell<Option<Box<dyn Effect + Send + Sync>>>>,
 }
 
 enum CardEvent {
-    DragChange(Option<Box<dyn Effect + Send + Sync>>)
+    DragChange(Option<Box<dyn Effect + Send + Sync>>),
 }
 
 impl Model for CardData {
@@ -26,36 +26,40 @@ impl Model for CardData {
     }
 }
 
-/*
-fn card_base(cx: &mut Context, spawn: Box<dyn Effect + Send + Sync>, content: fn(&mut Context)) {
-    cx.add_stylesheet(include_str!("../css/cards.css")).unwrap();
-    VStack::new(cx, content)
-    .class("card-base")
-    .on_drag(move |ex| {
-        ex.emit(CardEvent::DragChange(Some(spawn)));
-    });
-}*/
+pub struct Card {
+    pub(crate) content: fn(&mut Context),
+    pub(crate) drag: fn(&mut EventContext),
+}
 
-pub fn overdrive_card(cx: &mut Context) {
-    VStack::new(cx, |cx| {
+impl Card {
+    pub fn render(&self, cx: &mut Context) {
+        VStack::new(cx, self.content).on_drag(self.drag)
+        .class("card-base");
+    }
+
+    pub fn content(&self, cx: &mut Context) {
+        VStack::new(cx, self.content).class("card-base");
+    }
+}
+
+pub const OVERDRIVE_CARD: Card = Card {
+    content: |cx| {
         Label::new(cx, "Overdrive");
-    }).on_drag(|ex| {
-        nih_log!("DRAGGING");
+    },
+    drag: |ex| {
         let o = Box::new(Overdrive::default());
         ex.emit(CardEvent::DragChange(Some(o)));
         ex.set_drop_data(ex.current());
-    })
-    .class("card-base");
-}
+    }
+};
 
-pub fn fuzz_card(cx: &mut Context) {
-    VStack::new(cx, |cx| {
-        Label::new(cx, "Overdrive");
-    }).on_drag(|ex| {
-        nih_log!("DRAGGING");
-        let o = Box::new(Overdrive::default());
+pub const FUZZ_CARD: Card = Card {
+    content: |cx| {
+        Label::new(cx, "Fuzz");
+    },
+    drag: |ex| {
+        let o = Box::new(Fuzz::default());
         ex.emit(CardEvent::DragChange(Some(o)));
         ex.set_drop_data(ex.current());
-    })
-    .class("card-base");
-}
+    }
+};
