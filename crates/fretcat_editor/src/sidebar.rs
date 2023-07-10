@@ -1,8 +1,8 @@
-use std::{usize, rc::Rc, sync::Arc};
+use std::{usize};
 
 mod effect_tab;
 
-use fretcat_effects::{EffectKind, effect::Effect};
+use fretcat_effects::{EffectKind};
 use nih_plug_vizia::vizia::prelude::*;
 
 use self::effect_tab::effect_tab;
@@ -19,7 +19,7 @@ enum SidebarEvent {
 }
 
 impl Model for Sidebar {
-    fn event(&mut self, cx: &mut EventContext, event: &mut Event) {
+    fn event(&mut self, _cx: &mut EventContext, event: &mut Event) {
         event.map(|event, _| match event {
             SidebarEvent::KindChange(i) => {
                 self.selected_kind = *i;
@@ -66,4 +66,4 @@ pub fn sidebar(cx: &mut Context) {
 }
 
 
-fn preset_tab(cx: &mut Context) {}
+fn preset_tab(_cx: &mut Context) {}

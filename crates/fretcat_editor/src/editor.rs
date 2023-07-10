@@ -1,15 +1,14 @@
-use std::{cell::Cell, sync::Arc};
+use std::{sync::Arc};
 
 use fretcat_effects::chain::ChainHandle;
 use nih_plug::prelude::*;
 use nih_plug_vizia::{create_vizia_editor, vizia::prelude::*, ViziaState};
 
 use crate::{
-    card::{Card, CardData},
+    card::{CardData},
     effect_view::effect_view,
     sidebar::sidebar,
     top_bar::top_bar,
-    EDITOR_HEIGHT, EDITOR_WIDTH,
 };
 
 #[derive(Lens, Clone, Debug)]

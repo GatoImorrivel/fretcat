@@ -1,7 +1,7 @@
-use std::{cell::Cell, sync::Arc};
+
 
 use fretcat_effects::{effect::Effect, fuzz::Fuzz, overdrive::Overdrive};
-use nih_plug::nih_log;
+
 use nih_plug_vizia::vizia::prelude::*;
 
 #[derive(Lens)]
@@ -15,7 +15,7 @@ pub enum CardEvent {
 }
 
 impl Model for CardData {
-    fn event(&mut self, cx: &mut EventContext, event: &mut Event) {
+    fn event(&mut self, _cx: &mut EventContext, event: &mut Event) {
         event.map(|e, _| match e {
             WindowEvent::MouseMove(x, y) => {
                 self.cursor = (*x, *y);

@@ -1,10 +1,9 @@
-use std::sync::Arc;
+
 
 use fretcat_effects::{
-    chain::{Chain, ChainEvent, ChainHandle},
-    effect::{self, Effect},
+    chain::{ChainEvent, ChainHandle},
 };
-use nih_plug::nih_log;
+
 use nih_plug_vizia::vizia::{input::MouseState, prelude::*};
 
 use crate::card::{CardData, CardEvent};

@@ -11,10 +11,6 @@ exclude = ["sandbox"]
 [lib]
 crate-type = ["cdylib", "lib"]
 
-[[bin]]
-name = "sandbox"
-path = "sandbox/src/main.rs"
-
 [dependencies]
 fretcat_effects = {path = "./crates/fretcat_effects"}
 fretcat_editor = {path = "./crates/fretcat_editor"}

@@ -1,4 +1,4 @@
-use nih_plug::{util::db_to_gain, nih_log};
+use nih_plug::{util::db_to_gain};
 use nih_plug_vizia::vizia::prelude::*;
 use std::f32::consts::PI;
 
@@ -95,7 +95,7 @@ impl View for OverdriveControl {
         Some("overdrive")
     }
 
-    fn event(&mut self, cx: &mut EventContext, event: &mut Event) {
+    fn event(&mut self, _cx: &mut EventContext, event: &mut Event) {
         event.map(|event, _| match event {
             Message::Gain(val) => {
                 self.gain = *val;

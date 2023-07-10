@@ -38,7 +38,7 @@ fn kind_picker(cx: &mut Context) {
 
     VStack::new(cx, |cx| {
         let mut cont = 0;
-        for (i, row) in kind_rows.iter().enumerate() {
+        for (_i, row) in kind_rows.iter().enumerate() {
             HStack::new(cx, |cx| {
                 for kind in row {
                     let cont2 = cont.clone();

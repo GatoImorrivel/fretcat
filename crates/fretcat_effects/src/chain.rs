@@ -1,15 +1,13 @@
 use std::{
     fmt::Debug,
     ops::{Deref, DerefMut},
-    sync::Arc,
 };
 
-use nih_plug::nih_log;
+
 use nih_plug_vizia::vizia::prelude::*;
 
 use crate::{
     effect::{Effect, EffectHandle},
-    fuzz::Fuzz,
     overdrive::Overdrive,
 };
 
@@ -69,7 +67,7 @@ pub enum ChainEvent {
 }
 
 impl Model for ChainHandle {
-    fn event(&mut self, cx: &mut EventContext, event: &mut Event) {
+    fn event(&mut self, _cx: &mut EventContext, event: &mut Event) {
         let e = event.take();
         if let Some(e) = e {
             match e {

@@ -6,7 +6,7 @@ mod card;
 
 use std::{sync::Arc, collections::HashMap};
 use fretcat_effects::EffectKind;
-use nih_plug_vizia::{ViziaState, vizia::{view::{View, Handle}, prelude::{TextModifiers, Context}}};
+use nih_plug_vizia::{ViziaState};
 
 use card::*;
 
