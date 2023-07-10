@@ -55,11 +55,17 @@ impl ChainHandle {
         self.effects.insert(index, handle);
         self.chain.insert(index, effect);
     }
+
+    pub fn remove_effect(&mut self, index: usize) {
+        self.chain.remove(index);
+        self.effects.remove(index);
+    }
 }
 
 pub enum ChainEvent {
     PushEffect(Box<dyn Effect>),
-    InsertEffect(usize, Box<dyn Effect>)
+    InsertEffect(usize, Box<dyn Effect>),
+    RemoveEffect(usize)
 }
 
 impl Model for ChainHandle {
@@ -72,6 +78,9 @@ impl Model for ChainHandle {
                 },
                 ChainEvent::InsertEffect(index, effect) => {
                     self.insert_effect(index, effect);
+                },
+                ChainEvent::RemoveEffect(index) => {
+                    self.remove_effect(index);
                 }
             }
         }

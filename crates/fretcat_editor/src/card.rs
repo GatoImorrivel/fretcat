@@ -6,29 +6,44 @@ use nih_plug_vizia::vizia::prelude::*;
 
 #[derive(Lens)]
 pub struct CardData {
-    pub(crate) dragging: Arc<Cell<Option<Box<dyn Effect + Send + Sync>>>>,
+    pub(crate) dragging: Option<Card>,
+    pub(crate) cursor: (f32, f32)
 }
 
-enum CardEvent {
-    DragChange(Option<Box<dyn Effect + Send + Sync>>),
+pub enum CardEvent {
+    DragChange(Option<Card>),
 }
 
 impl Model for CardData {
     fn event(&mut self, cx: &mut EventContext, event: &mut Event) {
-        let e = event.take();
-        if let Some(e) = e {
-            match e {
-                CardEvent::DragChange(item) => {
-                    self.dragging = Arc::new(Cell::new(item));
+        event.map(|e, _| match e {
+            WindowEvent::MouseMove(x, y) => {
+                self.cursor = (*x, *y);
+            },
+            WindowEvent::MouseUp(btn) => {
+                match btn {
+                    MouseButton::Left => {
+                        self.dragging = None;
+                    },
+                    _ => {}
                 }
             }
-        }
+            _ => {}
+        });
+
+        event.map(|e, _| match e {
+            CardEvent::DragChange(card) => {
+                self.dragging = card.clone();
+            }
+        });
     }
 }
 
+#[derive(Clone, Copy)]
 pub struct Card {
     pub(crate) content: fn(&mut Context),
     pub(crate) drag: fn(&mut EventContext),
+    pub(crate) spawn: fn() -> Box<dyn Effect>
 }
 
 impl Card {
@@ -40,6 +55,21 @@ impl Card {
     pub fn content(&self, cx: &mut Context) {
         VStack::new(cx, self.content).class("card-base");
     }
+
+    pub fn spawn(&self) -> Box<dyn Effect> {
+        (self.spawn)()
+    }
+}
+
+impl Data for Card {
+    fn same(&self, other: &Self) -> bool {
+        let b1 = self.spawn();
+        let b2 = other.spawn();
+
+        let left = b1.as_ref() as *const _;
+        let right = b2.as_ref() as *const _;
+        left == right
+    }
 }
 
 pub const OVERDRIVE_CARD: Card = Card {
@@ -47,9 +77,11 @@ pub const OVERDRIVE_CARD: Card = Card {
         Label::new(cx, "Overdrive");
     },
     drag: |ex| {
-        let o = Box::new(Overdrive::default());
-        ex.emit(CardEvent::DragChange(Some(o)));
+        ex.emit(CardEvent::DragChange(Some(OVERDRIVE_CARD)));
         ex.set_drop_data(ex.current());
+    },
+    spawn: || {
+        Box::new(Overdrive::default())
     }
 };
 
@@ -58,8 +90,10 @@ pub const FUZZ_CARD: Card = Card {
         Label::new(cx, "Fuzz");
     },
     drag: |ex| {
-        let o = Box::new(Fuzz::default());
-        ex.emit(CardEvent::DragChange(Some(o)));
+        ex.emit(CardEvent::DragChange(Some(FUZZ_CARD)));
         ex.set_drop_data(ex.current());
+    },
+    spawn: || {
+        Box::new(Fuzz::default())
     }
 };
