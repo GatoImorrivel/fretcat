@@ -1,8 +1,9 @@
 pub mod editor;
 mod sidebar;
-mod top_bar;
+mod left_bar;
 mod effect_view;
 mod card;
+mod assets;
 
 use std::{sync::Arc, collections::HashMap};
 use fretcat_effects::EffectKind;
@@ -20,6 +21,12 @@ lazy_static::lazy_static! {
             OVERDRIVE_CARD,
             FUZZ_CARD
         ]);
+
+        hashmap.insert(EffectKind::Delay, vec![]);
+        hashmap.insert(EffectKind::Dynamics, vec![]);
+        hashmap.insert(EffectKind::Echo, vec![]);
+        hashmap.insert(EffectKind::Reverb, vec![]);
+
         hashmap
     };
 }

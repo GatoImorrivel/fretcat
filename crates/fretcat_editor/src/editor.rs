@@ -1,14 +1,13 @@
 use std::{sync::Arc};
 
-use fretcat_effects::chain::ChainHandle;
+use fretcat_effects::{chain::ChainHandle, EffectKind};
 use nih_plug::prelude::*;
 use nih_plug_vizia::{create_vizia_editor, vizia::prelude::*, ViziaState};
 
 use crate::{
-    card::{CardData},
+    card::{CardData, card_drag},
     effect_view::effect_view,
-    sidebar::sidebar,
-    top_bar::top_bar,
+    sidebar::{sidebar, SidebarData, SidebarTab}, left_bar::left_bar,
 };
 
 #[derive(Lens, Clone, Debug)]
@@ -36,45 +35,34 @@ pub fn create(
             CardData {
                 dragging: None,
                 cursor: (0.0, 0.0),
+                effect_kinds: EffectKind::variants(),
+                selected_kind: 0
             }
             .build(cx);
+
+            SidebarData {
+                current_tab: SidebarTab::Component
+            }.build(cx);
+
             cx.add_stylesheet(include_str!("../css/cards.css")).unwrap();
 
-            VStack::new(cx, |cx| {
-                HStack::new(cx, |cx| {
-                    top_bar(cx);
+            HStack::new(cx, |cx| {
+                VStack::new(cx, |cx| {
+                    left_bar(cx);
                 })
-                .class("topbar-wrapper");
-                HStack::new(cx, |cx| {
-                    VStack::new(cx, |cx| {
-                        sidebar(cx);
-                    })
-                    .class("sidebar-wrapper");
-                    VStack::new(cx, |cx| {
-                        effect_view(cx);
-                    })
-                    .class("list-wrapper");
+                .class("leftbar-wrapper");
+                VStack::new(cx, |cx| {
+                    sidebar(cx);
                 })
-                .class("content-wrapper");
+                .class("sidebar-wrapper");
+                VStack::new(cx, |cx| {
+                    effect_view(cx);
+                })
+                .class("list-wrapper");
             })
             .class("main");
 
-            Binding::new(cx, CardData::dragging, |cx, bind| {
-                let dragging = bind.get(cx);
-                if let Some(dragging) = dragging {
-                    Binding::new(cx, CardData::cursor, move |cx, bind| {
-                        let cursor = bind.get(cx);
-                        VStack::new(cx, |cx| {
-                            (dragging.content)(cx);
-                        })
-                        .class("card-base")
-                        .width(Pixels(300.0))
-                        .position_type(PositionType::SelfDirected)
-                        .left(Pixels(cursor.0))
-                        .top(Pixels(cursor.1));
-                    });
-                }
-            });
+            card_drag(cx);
         },
     )
 }

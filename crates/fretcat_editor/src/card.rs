@@ -1,17 +1,20 @@
 
 
-use fretcat_effects::{effect::Effect, fuzz::Fuzz, overdrive::Overdrive};
+use fretcat_effects::{effect::Effect, fuzz::Fuzz, overdrive::Overdrive, EffectKind};
 
 use nih_plug_vizia::vizia::prelude::*;
 
 #[derive(Lens)]
 pub struct CardData {
     pub(crate) dragging: Option<Card>,
-    pub(crate) cursor: (f32, f32)
+    pub(crate) cursor: (f32, f32),
+    pub(crate) effect_kinds: Vec<EffectKind>,
+    pub(crate) selected_kind: usize
 }
 
 pub enum CardEvent {
     DragChange(Option<Card>),
+    KindChange(usize)
 }
 
 impl Model for CardData {
@@ -34,6 +37,9 @@ impl Model for CardData {
         event.map(|e, _| match e {
             CardEvent::DragChange(card) => {
                 self.dragging = card.clone();
+            },
+            CardEvent::KindChange(index) => {
+                self.selected_kind = *index;
             }
         });
     }
@@ -70,6 +76,25 @@ impl Data for Card {
         let right = b2.as_ref() as *const _;
         left == right
     }
+}
+
+pub fn card_drag(cx: &mut Context) {
+    Binding::new(cx, CardData::dragging, |cx, bind| {
+        let dragging = bind.get(cx);
+        if let Some(dragging) = dragging {
+            Binding::new(cx, CardData::cursor, move |cx, bind| {
+                let cursor = bind.get(cx);
+                VStack::new(cx, |cx| {
+                    (dragging.content)(cx);
+                })
+                .class("card-base")
+                .width(Pixels(300.0))
+                .position_type(PositionType::SelfDirected)
+                .left(Pixels(cursor.0))
+                .top(Pixels(cursor.1));
+            });
+        }
+    });
 }
 
 pub const OVERDRIVE_CARD: Card = Card {

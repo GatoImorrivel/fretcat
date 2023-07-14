@@ -1,66 +1,61 @@
 use std::{usize};
 
-mod effect_tab;
+mod components_tab;
 
 use fretcat_effects::{EffectKind};
 use nih_plug_vizia::vizia::prelude::*;
 
-use self::effect_tab::effect_tab;
+use self::components_tab::components_tab;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SidebarTab {
+    Preset,
+    Component
+}
+
+impl Data for SidebarTab {
+    fn same(&self, other: &Self) -> bool {
+        self == other
+    }
+}
 
 #[derive(Debug, Lens, Clone)]
-struct Sidebar {
-    tabs: Vec<&'static str>,
-    effect_kinds: Vec<EffectKind>,
-    selected_kind: usize,
+pub struct SidebarData {
+    pub(crate) current_tab: SidebarTab
 }
 
-enum SidebarEvent {
-    KindChange(usize),
+pub enum SidebarMessage {
+    ChangeTab(SidebarTab)
 }
 
-impl Model for Sidebar {
-    fn event(&mut self, _cx: &mut EventContext, event: &mut Event) {
-        event.map(|event, _| match event {
-            SidebarEvent::KindChange(i) => {
-                self.selected_kind = *i;
+impl Model for SidebarData {
+    fn event(&mut self, cx: &mut EventContext, event: &mut Event) {
+        event.map(|e, _| match e {
+            SidebarMessage::ChangeTab(tab) => {
+                self.current_tab = *tab;
             }
-        })
+        });
     }
 }
+
 
 pub fn sidebar(cx: &mut Context) {
-    Sidebar {
-        tabs: vec!["Effects", "Presets"],
-        effect_kinds: EffectKind::variants(),
-        selected_kind: 0,
-    }
-    .build(cx);
-
     cx.add_stylesheet(include_str!("../css/sidebar.css"))
         .unwrap();
 
     VStack::new(cx, |cx| {
-        TabView::new(cx, Sidebar::tabs, |cx, tab| match tab.get(cx) {
-            "Effects" => TabPair::new(
-                move |cx| {
-                    Label::new(cx, tab);
-                },
-                |cx| {
-                    effect_tab(cx);
-                },
-            ),
+        Binding::new(cx, SidebarData::current_tab, |cx, bind| {
+            let tab = bind.get(cx);
 
-            "Presets" => TabPair::new(
-                move |cx| {
-                    Label::new(cx, tab);
+            match tab {
+                SidebarTab::Component => {
+                    components_tab(cx);
                 },
-                |cx| {
-                    preset_tab(cx);
-                },
-            ),
-            _ => unreachable!(),
-        })
-        .class("tabs");
+                SidebarTab::Preset => {
+                    Label::new(cx, "Bolas");
+                }
+            }
+        });
     })
     .class("sidebar");
 }

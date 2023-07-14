@@ -3,10 +3,6 @@
     font-stretch: ultra-condensed;
 }
 
-.tabs .tabview-divider {
-    display: none;
-}
-
 .cards-wrapper {
     child-space: 8px;
     row-between: 8px;
@@ -28,10 +24,16 @@
 
 .kind-btn {
     width: 1s;
-    background-color: black;
+    background-color: #0f0f0f;
+    border-width: 0px;
+    border-color: transparent;
+    border-radius: 0px;
 }
 
 .selected-kind {
     width: 1s;
-    background-color: red;
+    background-color: #1f1f1f;
+    border-width: 0px;
+    border-color: transparent;
+    border-radius: 0px;
 }

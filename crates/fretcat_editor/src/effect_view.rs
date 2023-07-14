@@ -8,7 +8,7 @@ use nih_plug_vizia::vizia::{input::MouseState, prelude::*};
 
 use crate::card::{CardData, CardEvent};
 
-const EFFECT_BAR_HEIGHT: f32 = 20.0;
+const EFFECT_BAR_HEIGHT: f32 = 0.0;
 
 pub fn effect_view(cx: &mut Context) {
     VStack::new(cx, |cx| {
@@ -19,6 +19,7 @@ pub fn effect_view(cx: &mut Context) {
                 for (i, effect) in effects.iter_mut().enumerate() {
                     VStack::new(cx, |cx| {
                         let handle = effect.clone();
+                        /* 
                         HStack::new(cx, |cx| {
                             Label::new(cx, &effect.title());
                             Button::new(
@@ -30,9 +31,10 @@ pub fn effect_view(cx: &mut Context) {
                             );
                         })
                         .height(Pixels(EFFECT_BAR_HEIGHT));
+                        */
                         effect.view(cx, handle);
                     })
-                    .width(Percentage(100.0))
+                    .width(Stretch(1.0))
                     .on_drop(move |ex, _| {
                         let index = calculate_effect_index(i, ex.mouse(), ex.bounds());
 
@@ -47,7 +49,7 @@ pub fn effect_view(cx: &mut Context) {
                 }
                 Element::new(cx)
                     .height(Stretch(1.0))
-                    .width(Percentage(100.0))
+                    .width(Stretch(1.0))
                     .on_drop(|ex, _| {
                         let card = CardData::dragging.get(ex);
 
