@@ -45,6 +45,7 @@ pub fn create(
             }.build(cx);
 
             cx.add_stylesheet(include_str!("../css/cards.css")).unwrap();
+            cx.add_font_mem(include_bytes!("./res/SymbolsNerdFontMono-Regular.ttf"));
 
             HStack::new(cx, |cx| {
                 VStack::new(cx, |cx| {
