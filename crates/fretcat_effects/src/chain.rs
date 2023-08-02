@@ -1,5 +1,4 @@
 use std::{
-    cell::Cell,
     collections::HashMap,
     fmt::Debug,
     ops::{Deref, DerefMut},
@@ -35,7 +34,7 @@ impl Chain {
     }
 
     pub fn remove(&mut self, effect: &Effect) {
-        let fetch = self.effects.clone().into_iter().enumerate().find(|(i, e)| {
+        let fetch = self.effects.clone().into_iter().enumerate().find(|(_i, e)| {
             e == effect
         });
 
@@ -114,7 +113,7 @@ pub struct ChainHandle {
 }
 
 impl Model for ChainHandle {
-    fn event(&mut self, cx: &mut EventContext, event: &mut Event) {
+    fn event(&mut self, _cx: &mut EventContext, event: &mut Event) {
         let e = event.take();
         if let Some(e) = e {
             match e {

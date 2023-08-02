@@ -1,11 +1,10 @@
-use std::{usize};
-
 mod components_tab;
+mod presets_tab;
 
-use fretcat_effects::{EffectKind};
 use nih_plug_vizia::vizia::prelude::*;
 
 use self::components_tab::components_tab;
+use self::presets_tab::presets_tab;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SidebarTab {
@@ -29,7 +28,7 @@ pub enum SidebarMessage {
 }
 
 impl Model for SidebarData {
-    fn event(&mut self, cx: &mut EventContext, event: &mut Event) {
+    fn event(&mut self, _cx: &mut EventContext, event: &mut Event) {
         event.map(|e, _| match e {
             SidebarMessage::ChangeTab(tab) => {
                 self.current_tab = *tab;
@@ -52,13 +51,10 @@ pub fn sidebar(cx: &mut Context) {
                     components_tab(cx);
                 },
                 SidebarTab::Preset => {
-                    Label::new(cx, "Bolas");
+                    presets_tab(cx);
                 }
             }
         });
     })
     .class("sidebar");
 }
-
-
-fn preset_tab(_cx: &mut Context) {}

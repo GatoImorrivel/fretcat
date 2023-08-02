@@ -1,15 +1,13 @@
 mod params;
 
-use fretcat_effects::chain::{Chain, ChainHandle};
-use nih_plug::nih_log;
+use fretcat_effects::chain::Chain;
 pub use params::FretcatParams;
 
-use nih_plug::{prelude::AtomicF32};
 use nih_plug::{
     nih_export_vst3,
     prelude::{
         AsyncExecutor, AudioIOLayout, AuxiliaryBuffers, Buffer, BufferConfig, InitContext, Params,
-        Plugin, ProcessContext, ProcessStatus, Vst3Plugin, Vst3SubCategory, Editor,
+        Plugin, ProcessContext, ProcessStatus, Vst3Plugin, Vst3SubCategory, Editor, AtomicF32,
     },
 };
 use std::{num::NonZeroU32, sync::Arc, cell::Cell};

@@ -3,7 +3,6 @@ use std::f32::consts::PI;
 
 use crate::effect::{Effect, AudioEffect};
 use crate::chain::ChainHandle;
-use crate::overdrive::OverdriveControl;
 use fretcat_derive::Control;
 
 #[derive(Debug, Clone, Copy, Default, Control)]

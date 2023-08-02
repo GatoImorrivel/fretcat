@@ -1,4 +1,4 @@
-use fretcat_effects::{chain::{ChainHandle, ChainEvent}, effect};
+use fretcat_effects::chain::{ChainHandle, ChainEvent};
 use nih_plug_vizia::vizia::{input::MouseState, prelude::*};
 
 use crate::card::{CardData, CardEvent};

@@ -1,7 +1,4 @@
-use nih_plug_vizia::vizia::{
-    image::{self, ImageFormat},
-    prelude::*,
-};
+use nih_plug_vizia::vizia::prelude::*;
 
 use crate::sidebar::{SidebarData, SidebarMessage, SidebarTab};
 

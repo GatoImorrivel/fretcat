@@ -1,6 +1,6 @@
-use std::{sync::Arc};
+use std::sync::Arc;
 
-use fretcat_effects::{chain::{ChainHandle, Chain}, EffectKind};
+use fretcat_effects::{chain::ChainHandle, EffectKind};
 use nih_plug::prelude::*;
 use nih_plug_vizia::{create_vizia_editor, vizia::prelude::*, ViziaState};
 

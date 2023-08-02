@@ -1,6 +1,6 @@
 
 
-use fretcat_effects::{effect::{Effect, AudioEffect}, fuzz::Fuzz, overdrive::Overdrive, EffectKind};
+use fretcat_effects::{effect::AudioEffect, fuzz::Fuzz, overdrive::Overdrive, EffectKind};
 
 use nih_plug_vizia::vizia::prelude::*;
 
