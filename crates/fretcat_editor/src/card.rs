@@ -1,6 +1,6 @@
 
 
-use fretcat_effects::{effect::Effect, fuzz::Fuzz, overdrive::Overdrive, EffectKind};
+use fretcat_effects::{effect::{Effect, AudioEffect}, fuzz::Fuzz, overdrive::Overdrive, EffectKind};
 
 use nih_plug_vizia::vizia::prelude::*;
 
@@ -49,7 +49,7 @@ impl Model for CardData {
 pub struct Card {
     pub(crate) content: fn(&mut Context),
     pub(crate) drag: fn(&mut EventContext),
-    pub(crate) spawn: fn() -> Box<dyn Effect>
+    pub(crate) spawn: fn() -> Box<dyn AudioEffect>
 }
 
 impl Card {
@@ -62,7 +62,7 @@ impl Card {
         VStack::new(cx, self.content).class("card-base");
     }
 
-    pub fn spawn(&self) -> Box<dyn Effect> {
+    pub fn spawn(&self) -> Box<dyn AudioEffect> {
         (self.spawn)()
     }
 }

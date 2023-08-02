@@ -25,6 +25,7 @@ fn derive_struct(
     let ident = &input.ident;
     let struct_name = format!("{}Control", ident.to_string());
     let new_ident = Ident::new(&struct_name, Span::call_site());
+    let queried_init = Ident::new("data", Span::call_site());
 
     let control_fields = s.fields.iter().filter(|field| {
         field.attrs.iter().any(|attr| {
@@ -35,7 +36,7 @@ fn derive_struct(
         })
     });
 
-    let control_fields_definitions = control_fields.map(|elem| {
+    let control_fields_definitions = control_fields.clone().map(|elem| {
         let ident = elem.ident.as_ref().unwrap();
         let ty = &elem.ty;
 
@@ -44,20 +45,79 @@ fn derive_struct(
         }
     });
 
+    let control_fields_inits = control_fields.clone().map(|elem| {
+        let ident = elem.ident.as_ref().unwrap();
+        let source = queried_init.clone();
+
+        quote! {
+            #ident: #source.#ident
+        }
+    });
+
+    let message_definitions = control_fields.clone().map(|elem| {
+        let name = elem.ident.as_ref().unwrap().to_string();
+        let mut v: Vec<char> = name.chars().collect();
+        v[0] = v[0].to_uppercase().nth(0).unwrap();
+        let s2: String = v.into_iter().collect();
+        let ident = Ident::new(&s2, Span::call_site());
+        let ty = &elem.ty;
+
+        quote! {
+            #ident(#ty)
+        }
+    });
+
+    let arms_definitions = control_fields.clone().map(|elem| {
+        let original_field_ident = elem.ident.as_ref().unwrap();
+        let name = elem.ident.as_ref().unwrap().to_string();
+        let mut v: Vec<char> = name.chars().collect();
+        v[0] = v[0].to_uppercase().nth(0).unwrap();
+        let s2: String = v.into_iter().collect();
+        let arm_ident = Ident::new(&s2, Span::call_site());
+
+        quote! {
+            Message::#arm_ident(val) => {
+                self.#original_field_ident = *val;
+                let mut chain = ChainHandle::root.get(_cx);
+
+                let e = chain.query_cast_mut::<#ident>(&self.handle).unwrap();
+                e.#original_field_ident = *val;
+            }
+        }
+    });
+
+    let new_ident_string = new_ident.clone().to_string();
+
     let res = quote!(
         #[derive(Lens)]
         pub struct #new_ident {
             #(#control_fields_definitions), *,
-            pub handle: EffectHandle
+            pub handle: Effect
         }
 
-        impl #new_ident {
-            pub fn downcast_mut_handle(&mut self) -> &mut #ident {
-                self.handle.as_mut_any().downcast_mut::<#ident>().unwrap()
+        fn create_control<F: FnOnce(&mut Context)>(cx: &mut Context, handle: &Effect, content: F) {
+            let chain = ChainHandle::root.get(cx);
+            let #queried_init = chain.query_cast::<#ident>(handle).unwrap();
+
+            #new_ident {
+                #(#control_fields_inits), *,
+                handle: handle.clone()
+            }.build(cx, content);
+        }
+
+        enum Message {
+            #(#message_definitions), *,
+        }
+
+        impl View for #new_ident {
+            fn element(&self) -> Option<&'static str> {
+                Some(#new_ident_string)
             }
 
-            pub fn downcast_handle(&self) -> &#ident {
-                self.handle.as_any().downcast_ref::<#ident>().unwrap()
+            fn event(&mut self, _cx: &mut EventContext, event: &mut Event) {
+                event.map(|event, _| match event {
+                    #(#arms_definitions), *,
+                });
             }
         }
     );

@@ -1,7 +1,9 @@
 use nih_plug_vizia::vizia::prelude::*;
 use std::f32::consts::PI;
 
-use crate::effect::{Effect, EffectHandle};
+use crate::effect::{Effect, AudioEffect};
+use crate::chain::ChainHandle;
+use crate::overdrive::OverdriveControl;
 use fretcat_derive::Control;
 
 #[derive(Debug, Clone, Copy, Default, Control)]
@@ -14,7 +16,7 @@ pub struct Fuzz {
     volume: f32
 }
 
-impl Effect for Fuzz {
+impl AudioEffect for Fuzz {
     fn process(&self, _sample: f32) -> f32 {
         let dirty = (2.0 / PI) * f32::atan(_sample * self.gain * self.threshold);
         let blend = ((dirty * self.blend) + (_sample * (1.0 / self.blend))) / 2.0;
@@ -38,13 +40,8 @@ impl Effect for Fuzz {
         self
     }
 
-    fn view(&mut self, cx: &mut Context, handle: EffectHandle) {
-        let o = handle.downcast_into::<Fuzz>();
-        FuzzControl {
-            gain: o.gain,
-            volume: o.volume,
-            handle: handle
-        }.build(cx, |cx| {
+    fn view(&self, cx: &mut Context, handle: &Effect) {
+        create_control(cx, handle, |cx| {
             cx.add_stylesheet(include_str!("../css/overdrive.css")).unwrap();
             HStack::new(cx, |cx| {
                 VStack::new(cx, |cx| {
@@ -58,30 +55,6 @@ impl Effect for Fuzz {
             })
             .class("overdrive")
             .height(Pixels(self.height()));
-        });
-    }
-}
-
-enum Message {
-    Gain(f32), 
-    Volume(f32)
-}
-
-impl View for FuzzControl {
-    fn element(&self) -> Option<&'static str> {
-        Some("fuzz")
-    }
-
-    fn event(&mut self, _cx: &mut EventContext, event: &mut Event) {
-        event.map(|event, _| match event {
-            Message::Gain(val) => {
-                self.gain = *val;
-                self.downcast_mut_handle().gain = *val;
-            },
-            Message::Volume(val) => {
-                self.volume = *val;
-                self.downcast_mut_handle().volume = *val;
-            },
         });
     }
 }

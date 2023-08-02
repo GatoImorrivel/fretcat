@@ -1,6 +1,7 @@
 mod params;
 
 use fretcat_effects::chain::{Chain, ChainHandle};
+use nih_plug::nih_log;
 pub use params::FretcatParams;
 
 use nih_plug::{prelude::AtomicF32};
@@ -59,9 +60,9 @@ impl Plugin for Fretcat {
     fn editor(&mut self, _async_executor: AsyncExecutor<Self>) -> Option<Box<dyn Editor>> {
         fretcat_editor::editor::create(
             fretcat_editor::editor::Data {
-                noise_gate: self.noise_gate.clone()
+                noise_gate: self.noise_gate.clone(),
+                chain_handle: self.chain.get_mut().handle()
             },
-            ChainHandle::new(self.chain.as_ptr()),
             self.params.editor_state.clone(),
         )
     }
@@ -83,10 +84,11 @@ impl Plugin for Fretcat {
         _aux: &mut AuxiliaryBuffers,
         _context: &mut impl ProcessContext<Self>,
     ) -> ProcessStatus {
+        let chain = self.chain.get_mut();
         for channel in buffer.iter_samples() {
             for sample in channel {
-                for effect in &self.chain.get_mut().chain {
-                    *sample = effect.process(*sample);
+                for effect in chain.effects.iter() {
+                    *sample = chain.query(effect).unwrap().process(*sample);
                 }
             }
         }

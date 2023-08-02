@@ -1,9 +1,4 @@
-
-
-use fretcat_effects::{
-    chain::{ChainEvent, ChainHandle},
-};
-
+use fretcat_effects::{chain::{ChainHandle, ChainEvent}, effect};
 use nih_plug_vizia::vizia::{input::MouseState, prelude::*};
 
 use crate::card::{CardData, CardEvent};
@@ -11,55 +6,32 @@ use crate::card::{CardData, CardEvent};
 const EFFECT_BAR_HEIGHT: f32 = 0.0;
 
 pub fn effect_view(cx: &mut Context) {
-    VStack::new(cx, |cx| {
-        ScrollView::new(cx, 0.0, 0.0, false, true, |cx| {
-            Binding::new(cx, ChainHandle::effects, |cx, effects| {
-                let mut effects = effects.get(cx);
+    cx.add_stylesheet(include_str!("../css/list.css")).unwrap();
+    VStack::new(cx, |cx| {}).class("preset-control");
 
-                for (i, effect) in effects.iter_mut().enumerate() {
-                    VStack::new(cx, |cx| {
-                        let handle = effect.clone();
-                        /* 
-                        HStack::new(cx, |cx| {
-                            Label::new(cx, &effect.title());
-                            Button::new(
-                                cx,
-                                move |ex| {
-                                    ex.emit(ChainEvent::RemoveEffect(i));
-                                },
-                                |cx| Label::new(cx, "Delete"),
-                            );
-                        })
-                        .height(Pixels(EFFECT_BAR_HEIGHT));
-                        */
-                        effect.view(cx, handle);
-                    })
-                    .width(Stretch(1.0))
-                    .on_drop(move |ex, _| {
-                        let index = calculate_effect_index(i, ex.mouse(), ex.bounds());
+    ScrollView::new(cx, 0.0, 0.0, false, true, |cx| {
+        Binding::new(cx, ChainHandle::redraw, |cx, _| {
+        let chain = ChainHandle::root.get(cx);
 
-                        let card = CardData::dragging.get(ex);
+        for (i, effect) in chain.effects.iter().enumerate() {
+            let data = chain.query(effect).unwrap();
+            VStack::new(cx, |cx| {
+                data.view(cx, effect);
+            })
+                .on_drop(move |ex, _| {
+                    let index = calculate_effect_index(i, ex.mouse(), ex.bounds());
 
-                        if let Some(card) = card {
-                            ex.emit(ChainEvent::InsertEffect(index, card.spawn()));
-                            ex.emit(CardEvent::DragChange(None));
-                        }
-                    })
-                    .height(Pixels(effect.height() + EFFECT_BAR_HEIGHT));
-                }
-                Element::new(cx)
-                    .height(Stretch(1.0))
-                    .width(Stretch(1.0))
-                    .on_drop(|ex, _| {
-                        let card = CardData::dragging.get(ex);
+                    let card = CardData::dragging.get(ex);
 
-                        if let Some(card) = card {
-                            ex.emit(ChainEvent::PushEffect(card.spawn()));
-                            ex.emit(CardEvent::DragChange(None));
-                        }
-                    });
-            });
-        });
+                    if let Some(card) = card {
+                        ex.emit(ChainEvent::Insert(card.spawn(), index));
+                        ex.emit(CardEvent::DragChange(None));
+                    }
+                })
+                .width(Percentage(100.0))
+                .height(Pixels(data.height()));
+        }
+        })
     })
     .class("list");
 }

@@ -1,6 +1,6 @@
 use std::{sync::Arc};
 
-use fretcat_effects::{chain::ChainHandle, EffectKind};
+use fretcat_effects::{chain::{ChainHandle, Chain}, EffectKind};
 use nih_plug::prelude::*;
 use nih_plug_vizia::{create_vizia_editor, vizia::prelude::*, ViziaState};
 
@@ -13,13 +13,13 @@ use crate::{
 #[derive(Lens, Clone, Debug)]
 pub struct Data {
     pub noise_gate: Arc<AtomicF32>,
+    pub chain_handle: ChainHandle
 }
 
 impl Model for Data {}
 
 pub fn create(
     editor_data: Data,
-    chain_handle: ChainHandle,
     editor_state: Arc<ViziaState>,
 ) -> Option<Box<dyn Editor>> {
     create_vizia_editor(
@@ -30,7 +30,7 @@ pub fn create(
                 .unwrap();
 
             editor_data.clone().build(cx);
-            chain_handle.clone().build(cx);
+            Data::chain_handle.get(cx).build(cx);
 
             CardData {
                 dragging: None,
