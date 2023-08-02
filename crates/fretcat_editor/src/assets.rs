@@ -1,1 +1,0 @@
-pub const NERD_FONT: &str = "Symbols Nerd Font";

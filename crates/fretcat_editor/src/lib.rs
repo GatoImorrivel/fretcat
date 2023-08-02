@@ -3,7 +3,6 @@ mod sidebar;
 mod left_bar;
 mod effect_view;
 mod card;
-mod assets;
 
 use std::{sync::Arc, collections::HashMap};
 use fretcat_effects::EffectKind;

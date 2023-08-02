@@ -37,5 +37,5 @@
     border-width: 0px;
     border-color: transparent;
     border-radius: 0px;
-    box-shadow:  2px 2px 8px #0b0b0b;
+    box-shadow: 4px 4px 8px #0b0b0b inset;
 }
