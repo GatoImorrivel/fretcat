@@ -8,7 +8,7 @@ use nih_plug::{
     prelude::{
         AsyncExecutor, AudioIOLayout, AuxiliaryBuffers, Buffer, BufferConfig, InitContext, Params,
         Plugin, ProcessContext, ProcessStatus, Vst3Plugin, Vst3SubCategory, Editor, AtomicF32,
-    },
+    }, nih_log,
 };
 use std::{num::NonZeroU32, sync::Arc, cell::Cell};
 
@@ -83,6 +83,7 @@ impl Plugin for Fretcat {
         _context: &mut impl ProcessContext<Self>,
     ) -> ProcessStatus {
         let chain = self.chain.get_mut();
+        //nih_log!("{:#?}", chain);
         for channel in buffer.iter_samples() {
             for sample in channel {
                 for effect in chain.effects.iter() {

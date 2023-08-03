@@ -67,13 +67,15 @@ impl AudioEffect for Overdrive {
                 .class("overdrive-knob-group");
                 VStack::new(cx, |cx| {
                     Knob::new(cx, 1.0, OverdriveControl::blend, false)
-                        .on_changing(|cx, val| cx.emit(Message::Blend(val)));
+                        .on_changing(|cx, val| cx.emit(Message::Blend(val)))
+                        .needs_redraw();
                     Label::new(cx, "Blend");
                 })
                 .class("overdrive-knob-group");
                 VStack::new(cx, |cx| {
                     Knob::new(cx, 1.0, OverdriveControl::volume, false)
-                        .on_changing(|cx, val| cx.emit(Message::Volume(val)));
+                        .on_changing(|cx, val| cx.emit(Message::Volume(val)))
+                        .needs_redraw();
                     Label::new(cx, "Volume");
                 })
                 .class("overdrive-knob-group");

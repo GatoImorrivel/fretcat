@@ -82,6 +82,9 @@ fn derive_struct(
 
                 let e = chain.query_cast_mut::<#ident>(&self.handle).unwrap();
                 e.#original_field_ident = *val;
+
+                nih_log!("CHAIN: {:#?}", e);
+                nih_log!("CONROL: {:#?}", self);
             }
         }
     });
@@ -89,7 +92,9 @@ fn derive_struct(
     let new_ident_string = new_ident.clone().to_string();
 
     let res = quote!(
-        #[derive(Lens)]
+        use nih_plug::nih_log;
+
+        #[derive(Lens, Debug)]
         pub struct #new_ident {
             #(#control_fields_definitions), *,
             pub handle: Effect

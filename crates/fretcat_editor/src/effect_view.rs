@@ -6,7 +6,7 @@ use crate::{
     effect_list::EffectList,
 };
 
-const EFFECT_BAR_HEIGHT: f32 = 0.0;
+const EFFECT_BAR_HEIGHT: f32 = 30.0;
 
 pub fn effect_view(cx: &mut Context) {
     cx.add_stylesheet(include_str!("../css/list.css")).unwrap();
@@ -15,20 +15,21 @@ pub fn effect_view(cx: &mut Context) {
     ScrollView::new(cx, 0.0, 0.0, false, true, |cx| {
         EffectList::new(
             cx,
+            EFFECT_BAR_HEIGHT,
             move |cx, i, effect, data| {
                 VStack::new(cx, |cx| {
+                    HStack::new(cx, |cx| {
+                        Button::new(cx, move |ex| ex.emit(ChainEvent::Remove(effect)), |cx| {
+                            Label::new(cx, "Deletar")
+                        });
+                        Button::new(cx, move |ex| ex.emit(ChainEvent::Remove(effect)), |cx| {
+                            Label::new(cx, "Disable")
+                        });
+                    })
+                    .width(Percentage(100.0))
+                    .height(Pixels(EFFECT_BAR_HEIGHT));
                     data.view(cx, &effect);
-                })
-                .on_drop(move |ex, _| {
-                    let index = calculate_effect_index(i, ex.mouse(), ex.bounds());
-
-                    let card = CardData::dragging.get(ex);
-
-                    if let Some(card) = card {
-                        ex.emit(ChainEvent::Insert(card.spawn(), index));
-                        ex.emit(CardEvent::DragChange(None));
-                    }
-                });
+                }).needs_redraw();
             },
         )
         .width(Percentage(100.0));
@@ -36,16 +37,4 @@ pub fn effect_view(cx: &mut Context) {
     .class("list");
 }
 
-fn calculate_effect_index(i: usize, mouse: &MouseState<Entity>, bounds: BoundingBox) -> usize {
-    let middle_point = (bounds.y + bounds.h) / 2.0;
 
-    if mouse.cursory < middle_point {
-        if !i <= 0 {
-            i - 1
-        } else {
-            i
-        }
-    } else {
-        i + 1
-    }
-}
