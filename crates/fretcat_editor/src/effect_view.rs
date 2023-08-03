@@ -1,7 +1,10 @@
-use fretcat_effects::chain::{ChainHandle, ChainEvent};
+use fretcat_effects::chain::{ChainEvent, ChainHandle};
 use nih_plug_vizia::vizia::{input::MouseState, prelude::*};
 
-use crate::card::{CardData, CardEvent};
+use crate::{
+    card::{CardData, CardEvent},
+    effect_list::EffectList,
+};
 
 const EFFECT_BAR_HEIGHT: f32 = 0.0;
 
@@ -10,14 +13,12 @@ pub fn effect_view(cx: &mut Context) {
     VStack::new(cx, |cx| {}).class("preset-control");
 
     ScrollView::new(cx, 0.0, 0.0, false, true, |cx| {
-        Binding::new(cx, ChainHandle::redraw, |cx, _| {
-        let chain = ChainHandle::root.get(cx);
-
-        for (i, effect) in chain.effects.iter().enumerate() {
-            let data = chain.query(effect).unwrap();
-            VStack::new(cx, |cx| {
-                data.view(cx, effect);
-            })
+        EffectList::new(
+            cx,
+            move |cx, i, effect, data| {
+                VStack::new(cx, |cx| {
+                    data.view(cx, &effect);
+                })
                 .on_drop(move |ex, _| {
                     let index = calculate_effect_index(i, ex.mouse(), ex.bounds());
 
@@ -27,11 +28,10 @@ pub fn effect_view(cx: &mut Context) {
                         ex.emit(ChainEvent::Insert(card.spawn(), index));
                         ex.emit(CardEvent::DragChange(None));
                     }
-                })
-                .width(Percentage(100.0))
-                .height(Pixels(data.height()));
-        }
-        })
+                });
+            },
+        )
+        .width(Percentage(100.0));
     })
     .class("list");
 }

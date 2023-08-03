@@ -6,7 +6,7 @@ use std::{
 
 use crate::{
     effect::{AudioEffect, Effect},
-    overdrive::Overdrive,
+    overdrive::Overdrive, fuzz::Fuzz,
 };
 
 use nih_plug::nih_log;
@@ -119,12 +119,9 @@ impl Model for ChainHandle {
             match e {
                 ChainEvent::Insert(data, pos) => {
                     self.insert_at(pos, data);
-
-                    nih_log!("{:#?}", self);
                 }
                 ChainEvent::Remove(effect) => {
                     self.remove(&effect);
-                    nih_log!("{:#?}", self);
                 }
             }
 

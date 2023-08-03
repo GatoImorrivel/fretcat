@@ -86,7 +86,7 @@ impl Plugin for Fretcat {
         for channel in buffer.iter_samples() {
             for sample in channel {
                 for effect in chain.effects.iter() {
-                    *sample = chain.query(effect).unwrap().process(*sample);
+                    *sample = chain.query(effect).expect("ERROR").process(*sample);
                 }
             }
         }
