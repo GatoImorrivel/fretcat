@@ -1,12 +1,18 @@
-use nih_plug_vizia::vizia::prelude::*;
 use strum::{EnumIter, IntoEnumIterator};
 
-pub mod chain;
-pub mod effect;
+mod chain;
+mod effect;
 
-pub mod fuzz;
-pub mod overdrive;
+mod fuzz;
+mod overdrive;
 
+pub use atomic_refcell::*;
+
+pub use fuzz::Fuzz;
+pub use overdrive::Overdrive;
+pub use chain::Chain;
+pub use effect::{Effect, AudioEffect};
+pub use dyn_clone;
 
 #[derive(Debug, EnumIter, Clone, Copy, PartialEq, Hash, Eq)]
 pub enum EffectKind {
@@ -29,11 +35,5 @@ impl EffectKind {
 impl ToString for EffectKind {
     fn to_string(&self) -> String {
         format!("{:?}", self)
-    }
-}
-
-impl Data for EffectKind {
-    fn same(&self, other: &Self) -> bool {
-        self == other
     }
 }

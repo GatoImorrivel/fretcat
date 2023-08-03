@@ -1,30 +1,5 @@
-.main {
-    width: 100%;
-    height: 100%;
-}
-
-.leftbar-wrapper {
-    width: 1s;
-    background-color: #0f0f0f;
-    box-shadow:  10px 10px 20px #181818;
-    z-index: 3;
-}
-
-.sidebar-wrapper {
-    width: 5s;
-    background-color: #1f1f1f;
-    box-shadow: 11px 11px 22px #191919 inset,
-                -11px -11px 22px #191919 inset;
-    z-index: 2;
-}
-
-.list-wrapper {
-    width: 12s;
-    background-color: #1f1f1f;
-    box-shadow:  10px 10px 20px #181818;
-    z-index: 1;
-}
-
-button:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+knob {
+    width: 100px;
+    height: 100px;
+    background-image: linear-gradient(180deg, #110220, #31055e);
 }

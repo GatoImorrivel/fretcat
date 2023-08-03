@@ -1,35 +1,33 @@
-use std::{
-    collections::HashMap,
-    fmt::Debug,
-    ops::{Deref, DerefMut},
-};
+use std::{collections::HashMap, hash::Hash, any::TypeId};
 
-use crate::{
-    effect::{AudioEffect, Effect},
-    overdrive::Overdrive,
-};
+use crate::{effect::{Effect, AudioEffect}, overdrive::Overdrive};
 
-use nih_plug::nih_log;
-use nih_plug_vizia::vizia::prelude::*;
+pub type Query<'a> = (TypeId, &'a Box<dyn AudioEffect>);
+pub type QueryMut<'a> = (TypeId, &'a mut Box<dyn AudioEffect>);
 
-#[derive(Debug, Lens)]
+#[derive(Debug, Clone)]
 pub struct Chain {
     pub effects: Vec<Effect>,
-    cache: HashMap<Effect, Box<dyn AudioEffect>>,
+    data_cache: HashMap<Effect, Box<dyn AudioEffect>>,
+    type_cache: HashMap<Effect, TypeId>
 }
 
 impl Chain {
-    pub fn insert(&mut self, audio_effect: Box<dyn AudioEffect>) -> (usize, Effect) {
+    pub fn insert(&mut self, audio_effect: impl AudioEffect) -> (usize, Effect) {
+        let audio_effect = Box::new(audio_effect);
+        let type_id = audio_effect.type_id();
         let e = Effect::new();
         self.effects.push(e);
-        self.cache.insert(e, audio_effect);
+        self.data_cache.insert(e, audio_effect);
+        self.type_cache.insert(e, type_id);
         self.effects.clone().into_iter().enumerate().last().unwrap()
     }
 
     pub fn insert_at(&mut self, index: usize, audio_effect: Box<dyn AudioEffect>) -> Effect {
         let e = Effect::new();
         self.effects.insert(index, e);
-        self.cache.insert(e, audio_effect);
+        self.type_cache.insert(e, audio_effect.type_id());
+        self.data_cache.insert(e, audio_effect);
         self.effects.clone()[index]
     }
 
@@ -40,34 +38,37 @@ impl Chain {
 
         if let Some((index, effect)) = fetch {
             self.effects.remove(index);
-            self.cache.remove(&effect);
+            self.data_cache.remove(&effect);
+            self.type_cache.remove(&effect);
         }
     }
 
-    pub fn query(&self, effect: &Effect) -> Option<&Box<dyn AudioEffect>> {
-        let c = match self.cache.get(&effect) {
-            Some(c) => c,
-            None => return None,
-        };
-
-        Some(c)
+    pub fn get(&self, effect: &Effect) -> Option<&Box<dyn AudioEffect>> { 
+        self.data_cache.get(effect)
     }
 
-    pub fn query_mut(&mut self, effect: &Effect) -> Option<&mut Box<dyn AudioEffect>> {
-        let c = match self.cache.get_mut(&effect) {
-            Some(c) => c,
-            None => return None,
-        };
+    pub fn get_mut(&mut self, effect: &Effect) -> Option<&mut Box<dyn AudioEffect>> { 
+        self.data_cache.get_mut(effect)
+    }
 
-        Some(c)
+    pub fn query(&self, effect: &Effect) -> Option<Query> {
+        let c = self.get(&effect)?;
+
+        Some((self.type_cache.get(effect)?.clone(), c))
+    }
+
+    pub fn query_mut(&mut self, effect: &Effect) -> Option<QueryMut> {
+        let t = self.type_cache.get(effect)?.clone();
+        let c = self.get_mut(effect)?;
+        Some((t, c))
     }
 
     pub fn query_cast<T: AudioEffect + 'static>(&self, effect: &Effect) -> Option<&T> {
-        self.query(effect)?.as_any().downcast_ref::<T>()
+        self.get(effect)?.as_any().downcast_ref::<T>()
     }
 
     pub fn query_cast_mut<T: AudioEffect + 'static>(&mut self, effect: &Effect) -> Option<&mut T> {
-        self.query_mut(effect)?.as_mut_any().downcast_mut::<T>()
+        self.get_mut(effect)?.as_any_mut().downcast_mut::<T>()
     }
 
     pub fn query_index(&self, index: usize) -> Option<(Effect, &Box<dyn AudioEffect>)> {
@@ -76,86 +77,22 @@ impl Chain {
             None => return None,
         };
 
-        let data = self.cache.get(e).unwrap();
+        let data = self.data_cache.get(e).unwrap();
         Some((*e, data))
     }
 
-    pub fn handle(&mut self) -> ChainHandle {
-        ChainHandle {
-            ptr: self as *mut _,
-            redraw: 0
-        }
-    }
 }
 
 impl Default for Chain {
     fn default() -> Self {
-        let mut chain = Self {
+        let mut chain = Chain {
             effects: vec![],
-            cache: HashMap::new(),
+            data_cache: HashMap::new(),
+            type_cache: HashMap::new()
         };
 
-        chain.insert(Box::new(Overdrive::default()));
+        chain.insert(Overdrive::default());
 
         chain
     }
 }
-
-pub enum ChainEvent {
-    Insert(Box<dyn AudioEffect>, usize),
-    Remove(Effect),
-}
-
-#[derive(Clone, Lens)]
-pub struct ChainHandle {
-    ptr: *mut Chain,
-    pub redraw: u32
-}
-
-impl Model for ChainHandle {
-    fn event(&mut self, _cx: &mut EventContext, event: &mut Event) {
-        let e = event.take();
-        if let Some(e) = e {
-            match e {
-                ChainEvent::Insert(data, pos) => {
-                    self.insert_at(pos, data);
-
-                    nih_log!("{:#?}", self);
-                }
-                ChainEvent::Remove(effect) => {
-                    self.remove(&effect);
-                    nih_log!("{:#?}", self);
-                }
-            }
-
-            self.redraw += 1;
-        }
-    }
-}
-
-impl Debug for ChainHandle {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let chain = unsafe { &*self.ptr };
-        f.debug_struct("ChainPtr")
-            .field("ptr", &self.ptr)
-            .field("chain", chain)
-            .finish()
-    }
-}
-
-impl Deref for ChainHandle {
-    type Target = Chain;
-
-    fn deref(&self) -> &Self::Target {
-        unsafe { &*self.ptr }
-    }
-}
-
-impl DerefMut for ChainHandle {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        unsafe { &mut *self.ptr }
-    }
-}
-
-unsafe impl Send for ChainHandle {}
-unsafe impl Sync for ChainHandle {}
