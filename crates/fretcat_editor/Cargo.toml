@@ -6,8 +6,8 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-nih_plug = { git = "https://github.com/robbert-vdh/nih-plug.git", features = ["standalone", "assert_process_allocs"] }
-nih_plug_vizia = { git = "https://github.com/robbert-vdh/nih-plug.git" }
+nih_plug = { git = "https://github.com/geom3trik/nih-plug.git", branch = "vizia-update", features = ["standalone", "assert_process_allocs"] }
+nih_plug_vizia = { git = "https://github.com/geom3trik/nih-plug.git", branch = "vizia-update" }
 
 fretcat_effects = {path = "../fretcat_effects"}
-paste = "1.0.14"
+strum = { version = "0.25.0", features = ["derive"]}

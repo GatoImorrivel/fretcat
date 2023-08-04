@@ -1,5 +1,22 @@
-knob {
-    width: 100px;
-    height: 100px;
-    background-image: linear-gradient(180deg, #110220, #31055e);
+.main {
+    width: 100%;
+    height: 100%;
+}
+
+.sidebar-wrapper {
+    width: 5s;
+    background-color: #1f1f1f;
+
+    z-index: 3;
+}
+
+.list-wrapper {
+    width: 12s;
+    background-color: #1f1f1f;
+    box-shadow:  10px 10px 20px #181818;
+    z-index: 2;
+}
+
+button:hover {
+    background-color: rgba(255, 255, 255, 0.1);
 }

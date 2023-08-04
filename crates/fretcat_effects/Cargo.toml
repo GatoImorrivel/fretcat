@@ -11,3 +11,4 @@ rand = "0.8.5"
 atomic_refcell = "0.1.10"
 downcast-rs = "1.2.0"
 dyn-clone = "1.0.12"
+crossbeam = { version = "0.8.2", features = ["crossbeam-queue"] }

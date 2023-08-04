@@ -42,32 +42,27 @@ impl EffectHandle<Overdrive> {
         effect: &Effect,
         data: &Overdrive,
     ) {
-        OverdriveControl {
-            gain: data.gain,
-            threshold: data.threshold,
-        }
-        .build(cx);
-
         Self {
             chain: chain.clone(),
             effect: effect.clone(),
             p: PhantomData,
         }
         .build(cx, |cx| {
+            OverdriveControl {
+                gain: data.gain,
+                threshold: data.threshold,
+            }
+            .build(cx);
+            let entity = cx.current();
+
             VStack::new(cx, |cx| {
-                Knob::new(cx, 0.0, OverdriveControl::threshold, false)
-                    .on_changing(|ex, val| ex.emit(Message::Threshold(val)));
-                Knob::custom(cx, 0.0, OverdriveControl::gain, |cx, val| {
-                    TickKnob::new(
-                        cx,
-                        Pixels(100.0),
-                        Pixels(10.0),
-                        Pixels(5.0),
-                        10.0,
-                        KnobMode::Continuous,
-                    )
-                })
-                .on_changing(|ex, val| ex.emit(Message::Gain(val)));
+                Knob::new(cx, 0.0, OverdriveControl::threshold, false).on_changing(move |ex, val| {
+                    ex.emit_custom({
+                        Event::new(Message::Threshold(val)).propagate(Propagation::Direct).target(entity)
+                    })
+                });
+                Knob::new(cx, 0.0, OverdriveControl::gain, false)
+                    .on_changing(|ex, val| ex.emit(Message::Gain(val)));
             })
             .height(Pixels(200.0))
             .width(Percentage(100.0));
@@ -82,8 +77,27 @@ impl View for EffectHandle<Overdrive> {
 
     fn event(&mut self, cx: &mut EventContext, event: &mut Event) {
         event.map(|event, _| match event {
-            Message::Gain(val) => {}
-            Message::Threshold(val) => {}
+            Message::Gain(val) => {
+                let ptr = self.chain.as_ptr();
+                unsafe {
+                    ptr.as_mut()
+                        .unwrap()
+                        .query_cast_mut::<Overdrive>(&self.effect)
+                        .unwrap()
+                        .gain = *val;
+                }
+            }
+            Message::Threshold(val) => {
+                let ptr = self.chain.as_ptr();
+
+                unsafe {
+                    ptr.as_mut()
+                        .unwrap()
+                        .query_cast_mut::<Overdrive>(&self.effect)
+                        .unwrap()
+                        .threshold = *val;
+                }
+            }
         });
     }
 }

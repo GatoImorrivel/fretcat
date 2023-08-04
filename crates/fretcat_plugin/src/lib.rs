@@ -1,9 +1,9 @@
 mod params;
 
-use nih_plug::prelude::*;
 pub use nih_plug;
+use nih_plug::prelude::*;
 
-use fretcat_effects::{Chain, AtomicRefCell};
+use fretcat_effects::{AtomicRefCell, Chain};
 use params::FretcatParams;
 
 use std::{num::NonZeroU32, sync::Arc};
@@ -12,14 +12,14 @@ const NUM_INPUT_CHANNELS: u32 = 2;
 const NUM_OUTPUT_CHANNELS: u32 = 2;
 pub struct Fretcat {
     params: Arc<FretcatParams>,
-    chain: Arc<AtomicRefCell<Chain>>
+    chain: Arc<AtomicRefCell<Chain>>,
 }
 
 impl Default for Fretcat {
     fn default() -> Self {
         Self {
             params: Arc::new(FretcatParams::default()),
-            chain: Arc::new(AtomicRefCell::new(Chain::default()))
+            chain: Arc::new(AtomicRefCell::new(Chain::default())),
         }
     }
 }
@@ -42,7 +42,7 @@ impl Plugin for Fretcat {
     const SAMPLE_ACCURATE_AUTOMATION: bool = true;
 
     type SysExMessage = ();
-    type BackgroundTask = ();
+    type BackgroundTask = Arc<AtomicRefCell<Chain>>;
 
     fn params(&self) -> Arc<dyn Params> {
         self.params.clone()
@@ -64,6 +64,21 @@ impl Plugin for Fretcat {
 
     fn reset(&mut self) {}
 
+    fn task_executor(&mut self) -> TaskExecutor<Self> {
+        Box::new(|chain| {
+             match chain.borrow().update_queue.pop() {
+                Some(command) => {
+                    unsafe {
+                        nih_dbg!("{:#?}", &command);
+                        chain.as_ptr().as_mut().unwrap().handle_command(command);
+                        nih_dbg!("{:#?}", chain.borrow());
+                    }
+                },
+                None => ()
+            }
+        })
+    }
+
     fn process(
         &mut self,
         buffer: &mut Buffer,
@@ -73,10 +88,11 @@ impl Plugin for Fretcat {
         for channel in buffer.iter_samples() {
             for sample in channel {
                 for effect in self.chain.borrow().effects.iter() {
-                    *sample = self.chain.borrow().get(effect).unwrap().process(*sample);
+                    *sample = self.chain.borrow().query(effect).unwrap().process(*sample);
                 }
             }
         }
+        _context.execute_background(self.chain.clone());
         ProcessStatus::Normal
     }
 }

@@ -1,20 +1,14 @@
-use strum::{EnumIter, IntoEnumIterator};
+mod card;
+mod effect_list;
+mod sidebar;
 
-mod chain;
-mod effect;
+use nih_plug_vizia::vizia::prelude::Data;
+use strum::{IntoEnumIterator, EnumIter};
 
-mod fuzz;
-mod overdrive;
+pub use effect_list::{EffectList, EffectListMessage};
+pub use sidebar::Sidebar;
 
-pub use atomic_refcell::*;
-
-pub use fuzz::Fuzz;
-pub use overdrive::Overdrive;
-pub use chain::{Chain, ChainCommand};
-pub use effect::{Effect, AudioEffect};
-pub use dyn_clone;
-
-#[derive(Debug, EnumIter, Clone, Copy, PartialEq, Hash, Eq)]
+#[derive(Debug, EnumIter, Clone, Copy, PartialEq, Hash, Eq, Data)]
 pub enum EffectKind {
     Distortion,
     Delay,

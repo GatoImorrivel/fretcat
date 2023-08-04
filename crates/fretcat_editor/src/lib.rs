@@ -1,17 +1,19 @@
 mod effects;
+mod components;
+mod keymap;
 
-use std::any::TypeId;
 use std::sync::Arc;
 
-use effects::EffectHandle;
-use fretcat_effects::{AtomicRefCell, Chain, Overdrive};
+use components::{EffectList, Sidebar};
+use keymap::make_keymap;
 use nih_plug::prelude::Editor;
 use nih_plug_vizia::{create_vizia_editor, ViziaState, ViziaTheming};
-
 use nih_plug_vizia::vizia::prelude::*;
 
 pub use nih_plug;
 pub use nih_plug_vizia;
+
+use fretcat_effects::{AtomicRefCell, Chain, Overdrive, ChainCommand};
 
 pub type EditorState = ViziaState;
 
@@ -41,21 +43,29 @@ pub fn create(
             chain: chain.clone(),
         }
         .build(cx);
+        make_keymap().build(cx);
 
-        cx.add_theme(include_str!("../css/editor.css"));
-
-        VStack::new(cx, |cx| {
-            let chain = EditorData::chain.get(cx);
-            for effect in chain.borrow().effects.iter() {
-                let borrow = chain.borrow();
-                let (type_id, data) = borrow.query(effect).unwrap();
-
-                if type_id == TypeId::of::<Overdrive>() {
-                    let data = data.downcast_ref::<Overdrive>().unwrap();
-
-                    EffectHandle::<Overdrive>::new(cx, chain.clone(), effect, data);
-                }
-            }
+        cx.add_stylesheet(include_str!("../css/editor.css"))
+            .unwrap();
+        cx.add_font_mem(include_bytes!("../res/SymbolsNerdFontMono-Regular.ttf"));
+        Button::new(cx, |ex| {
+            let chain = EditorData::chain.get(ex);
+            chain.borrow().add_to_queue(ChainCommand::Insert(Box::new(Overdrive::default())));
+        }, |cx| {
+            Label::new(cx, "Insert")
         });
+
+        HStack::new(cx, |cx| {
+            VStack::new(cx, |cx| {
+                Sidebar::new(cx);
+            })
+            .class("sidebar-wrapper");
+            VStack::new(cx, |cx| {
+                EffectList::new(cx);
+            })
+            .class("list-wrapper");
+        })
+        .class("main");
+
     })
 }
