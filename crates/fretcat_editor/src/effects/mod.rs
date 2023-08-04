@@ -1,5 +1,6 @@
 use std::{marker::PhantomData, sync::Arc};
 
+use editor_derive::Control;
 use fretcat_effects::{AtomicRefCell, AudioEffect, Chain, Effect, Overdrive};
 use nih_plug::nih_log;
 use nih_plug_vizia::vizia::prelude::*;
@@ -11,15 +12,10 @@ pub struct EffectHandle<T: AudioEffect> {
     p: PhantomData<T>,
 }
 
-#[derive(Debug, Lens)]
+#[derive(Debug, Lens, Control)]
 struct OverdriveControl {
     pub gain: f32,
     pub threshold: f32,
-}
-
-enum Message {
-    Gain(f32),
-    Threshold(f32),
 }
 
 impl Model for OverdriveControl {
@@ -53,7 +49,6 @@ impl EffectHandle<Overdrive> {
                 threshold: data.threshold,
             }
             .build(cx);
-            let entity = cx.current();
 
             VStack::new(cx, |cx| {
                 Knob::new(cx, 0.0, OverdriveControl::threshold, false)

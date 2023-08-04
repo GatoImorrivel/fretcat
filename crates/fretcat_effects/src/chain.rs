@@ -9,7 +9,9 @@ pub type QueryMut<'a> =  &'a mut Box<dyn AudioEffect>;
 
 #[derive(Debug, Clone)]
 pub enum ChainCommand {
-    Insert(Box<dyn AudioEffect>)
+    Insert(Box<dyn AudioEffect>),
+    InsertAt(usize, Box<dyn AudioEffect>),
+    Remove(Effect),
 }
 
 #[derive(Debug, Clone)]
@@ -28,6 +30,12 @@ impl Chain {
         match command {
             ChainCommand::Insert(audio_effect) => {
                 self.insert(audio_effect);
+            }
+            ChainCommand::InsertAt(pos, audio_effect) => {
+                self.insert_at(pos, audio_effect);
+            }
+            ChainCommand::Remove(effect) => {
+                self.remove(&effect);
             }
         }
     }
