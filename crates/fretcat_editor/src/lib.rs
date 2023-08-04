@@ -1,10 +1,17 @@
-pub mod editor;
-mod sidebar;
-mod left_bar;
-mod effect_view;
-mod card;
+mod effects;
+mod components;
+mod keymap;
+
+use std::sync::Arc;
 
 use fretcat_effects::{AtomicRefCell, Chain, Overdrive, ChainCommand};
+
+use keymap::make_keymap;
+use nih_plug_vizia::{ViziaState, create_vizia_editor, ViziaTheming};
+use nih_plug_vizia::vizia::prelude::*;
+use nih_plug::prelude::*;
+
+use components::*;
 
 pub type EditorState = ViziaState;
 
