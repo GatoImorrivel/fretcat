@@ -46,12 +46,6 @@ pub fn create(
         cx.add_stylesheet(include_str!("../css/editor.css"))
             .unwrap();
         cx.add_font_mem(include_bytes!("../res/SymbolsNerdFontMono-Regular.ttf"));
-        Button::new(cx, |ex| {
-            let chain = EditorData::chain.get(ex);
-            chain.borrow().add_to_queue(ChainCommand::Insert(Box::new(Overdrive::default())));
-        }, |cx| {
-            Label::new(cx, "Insert")
-        });
 
         HStack::new(cx, |cx| {
             VStack::new(cx, |cx| {
