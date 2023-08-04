@@ -78,3 +78,11 @@
 .kind-selected-btn label {
     color: #0f0f0f;
 }
+
+.cards-wrapper {
+    child-space: 8px;
+    row-between: 8px;
+    background-color: transparent;
+    width: 100%;
+    height: 1s;
+}

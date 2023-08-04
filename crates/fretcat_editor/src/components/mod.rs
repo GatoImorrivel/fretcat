@@ -5,8 +5,9 @@ mod sidebar;
 use nih_plug_vizia::vizia::prelude::Data;
 use strum::{IntoEnumIterator, EnumIter};
 
-pub use effect_list::{EffectList, EffectListMessage};
+pub use effect_list::EffectList;
 pub use sidebar::Sidebar;
+pub use card::*;
 
 #[derive(Debug, EnumIter, Clone, Copy, PartialEq, Hash, Eq, Data)]
 pub enum EffectKind {

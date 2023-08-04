@@ -1,38 +1,64 @@
-use fretcat_effects::{AudioEffect, Effect, Overdrive};
-use nih_plug::nih_log;
-use nih_plug_vizia::vizia::prelude::*;
+use fretcat_effects:: Overdrive;
+use nih_plug_vizia::vizia::{input::MouseState, prelude::*};
 
-use crate::{EditorData, effects::EffectHandle};
+use crate::{effects::EffectHandle, EditorData};
 
+use super::{CardData, CardEvent};
 
 pub struct EffectList;
-
-pub enum EffectListMessage {
-    Insert(usize, Box<dyn AudioEffect>),
-    Remove(Effect),
-}
 
 impl EffectList {
     pub fn new(cx: &mut Context) {
         Self {}.build(cx, |cx| {
-            Binding::new(
-                cx,
-                EditorData::chain.map(|c| c.borrow().effects.len()),
-                |cx, len| {
-                    let chain = EditorData::chain.get(cx);
-                    let borrow = chain.borrow();
+            ScrollView::new(cx, 0.0, 0.0, false, true, |cx| {
+                Binding::new(
+                    cx,
+                    EditorData::chain.map(|c| c.borrow().effects.len()),
+                    |cx, len| {
+                        let chain = EditorData::chain.get(cx);
+                        let borrow = chain.borrow();
 
-                    for effect in borrow.effects.iter() {
-                        let data = borrow.query(effect).unwrap();
+                        for (i, effect) in borrow.effects.iter().enumerate() {
+                            let data = borrow.query(effect).unwrap();
 
-                        if data.is::<Overdrive>() {
-                            let data = *data.clone().downcast_ref::<Overdrive>().unwrap();
+                            // default
+                            let mut height = 200.0;
 
-                            EffectHandle::<Overdrive>::new(cx, chain.clone(), effect, &data);
+                            VStack::new(cx, |cx| {
+
+                                if data.is::<Overdrive>() {
+                                    let data = *data.clone().downcast_ref::<Overdrive>().unwrap();
+                                    height = 200.0;
+
+                                    EffectHandle::<Overdrive>::new(
+                                        cx,
+                                        chain.clone(),
+                                        effect,
+                                        &data,
+                                    );
+                                }
+                            })
+                            .width(Percentage(100.0))
+                            .height(Pixels(height))
+                            .on_drop(move |ex, _| {
+                                let index = calculate_effect_index(i, ex.mouse(), ex.bounds());
+
+                                let card = CardData::dragging.get(ex);
+
+                                if let Some(card) = card {
+                                    EditorData::chain.get(ex).borrow().add_to_queue(
+                                        fretcat_effects::ChainCommand::InsertAt(
+                                            index,
+                                            card.spawn()
+                                        ),
+                                    );
+                                    ex.emit(CardEvent::DragChange(None));
+                                }
+                            });
                         }
-                    }
-                },
-            );
+                    },
+                );
+            });
         });
     }
 }
@@ -47,6 +73,19 @@ impl View for EffectList {
         cx: &mut nih_plug_vizia::vizia::prelude::EventContext,
         event: &mut nih_plug_vizia::vizia::prelude::Event,
     ) {
+    }
+}
 
+fn calculate_effect_index(i: usize, mouse: &MouseState<Entity>, bounds: BoundingBox) -> usize {
+    let middle_point = (bounds.y + bounds.h) / 2.0;
+
+    if mouse.cursory < middle_point {
+        if !i <= 0 {
+            i - 1
+        } else {
+            i
+        }
+    } else {
+        i + 1
     }
 }

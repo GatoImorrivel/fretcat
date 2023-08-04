@@ -65,5 +65,6 @@ pub fn create(
         })
         .class("main");
 
+        card_system_init(cx);
     })
 }

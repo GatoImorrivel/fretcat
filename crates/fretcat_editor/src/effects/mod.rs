@@ -56,16 +56,12 @@ impl EffectHandle<Overdrive> {
             let entity = cx.current();
 
             VStack::new(cx, |cx| {
-                Knob::new(cx, 0.0, OverdriveControl::threshold, false).on_changing(move |ex, val| {
-                    ex.emit_custom({
-                        Event::new(Message::Threshold(val)).propagate(Propagation::Direct).target(entity)
-                    })
-                });
+                Knob::new(cx, 0.0, OverdriveControl::threshold, false)
+                    .on_changing(|ex, val| ex.emit(Message::Threshold(val)));
                 Knob::new(cx, 0.0, OverdriveControl::gain, false)
                     .on_changing(|ex, val| ex.emit(Message::Gain(val)));
             })
-            .height(Pixels(200.0))
-            .width(Percentage(100.0));
+            .background_color(Color::red());
         });
     }
 }

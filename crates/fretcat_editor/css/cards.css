@@ -1,0 +1,6 @@
+.card-base {
+    width: 1s;
+    height: 100px;
+    background-color: transparent;
+    box-shadow:  2px 2px 8px #0b0b0b;
+}

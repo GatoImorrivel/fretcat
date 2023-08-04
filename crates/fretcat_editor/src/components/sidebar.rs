@@ -1,6 +1,6 @@
 use nih_plug_vizia::vizia::prelude::*;
 
-use super::EffectKind;
+use super::{card::card_system_init, EffectKind, EFFECT_CARDS};
 
 const KIND_PER_ROW: usize = 2;
 
@@ -52,8 +52,8 @@ impl Sidebar {
                     .class("bar");
                     VStack::new(cx, |cx| match current_tab {
                         SidebarTab::Effect => {
-                            VStack::new(cx, |cx| {
-                                Binding::new(cx, Sidebar::selected_kind, |cx, bind| {
+                            Binding::new(cx, Sidebar::selected_kind, |cx, bind| {
+                                VStack::new(cx, |cx| {
                                     let selection = bind.get(cx);
                                     let kinds = EffectKind::variants();
                                     let kind_rows: Vec<Vec<EffectKind>> = kinds
@@ -81,10 +81,18 @@ impl Sidebar {
                                         })
                                         .class("picker-row");
                                     }
+                                })
+                                .class("picker-wrapper");
+                                VStack::new(cx, |cx| {
+                                    let cards = EFFECT_CARDS.get(&bind.get(cx)).unwrap();
+                                    VStack::new(cx, |cx| {
+                                        cards.iter().for_each(|card| {
+                                            card.render(cx);
+                                        });
+                                    })
+                                    .class("cards-wrapper");
                                 });
-                            })
-                            .class("picker-wrapper");
-                            VStack::new(cx, |cx| {});
+                            });
                         }
                         SidebarTab::Preset => {
                             Label::new(cx, "tetas");
