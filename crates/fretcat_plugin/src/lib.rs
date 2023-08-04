@@ -1,32 +1,25 @@
 mod params;
 
-use fretcat_effects::chain::Chain;
-pub use params::FretcatParams;
+pub use nih_plug;
+use nih_plug::prelude::*;
 
-use nih_plug::{
-    nih_export_vst3,
-    prelude::{
-        AsyncExecutor, AudioIOLayout, AuxiliaryBuffers, Buffer, BufferConfig, InitContext, Params,
-        Plugin, ProcessContext, ProcessStatus, Vst3Plugin, Vst3SubCategory, Editor, AtomicF32,
-    }, nih_log,
-};
-use std::{num::NonZeroU32, sync::Arc, cell::Cell};
+use fretcat_effects::{AtomicRefCell, Chain};
+use params::FretcatParams;
+
+use std::{num::NonZeroU32, sync::Arc};
 
 const NUM_INPUT_CHANNELS: u32 = 2;
 const NUM_OUTPUT_CHANNELS: u32 = 2;
-
 pub struct Fretcat {
     params: Arc<FretcatParams>,
-    chain: Cell<Chain>,
-    noise_gate: Arc<AtomicF32>,
+    chain: Arc<AtomicRefCell<Chain>>,
 }
 
 impl Default for Fretcat {
     fn default() -> Self {
         Self {
             params: Arc::new(FretcatParams::default()),
-            chain: Cell::new(Chain::default()),
-            noise_gate: Arc::new(0.0.into())
+            chain: Arc::new(AtomicRefCell::new(Chain::default())),
         }
     }
 }
@@ -49,20 +42,15 @@ impl Plugin for Fretcat {
     const SAMPLE_ACCURATE_AUTOMATION: bool = true;
 
     type SysExMessage = ();
-    type BackgroundTask = ();
+    type BackgroundTask = Arc<AtomicRefCell<Chain>>;
 
     fn params(&self) -> Arc<dyn Params> {
         self.params.clone()
     }
 
     fn editor(&mut self, _async_executor: AsyncExecutor<Self>) -> Option<Box<dyn Editor>> {
-        fretcat_editor::editor::create(
-            fretcat_editor::editor::Data {
-                noise_gate: self.noise_gate.clone(),
-                chain_handle: self.chain.get_mut().handle()
-            },
-            self.params.editor_state.clone(),
-        )
+        #[allow(unused_parens)]
+        fretcat_editor::create((self.chain.clone()), self.params.editor_state.clone())
     }
 
     fn initialize(
@@ -76,21 +64,35 @@ impl Plugin for Fretcat {
 
     fn reset(&mut self) {}
 
+    fn task_executor(&mut self) -> TaskExecutor<Self> {
+        Box::new(|chain| {
+             match chain.borrow().update_queue.pop() {
+                Some(command) => {
+                    unsafe {
+                        nih_dbg!("{:#?}", &command);
+                        chain.as_ptr().as_mut().unwrap().handle_command(command);
+                        nih_dbg!("{:#?}", chain.borrow());
+                    }
+                },
+                None => ()
+            }
+        })
+    }
+
     fn process(
         &mut self,
         buffer: &mut Buffer,
         _aux: &mut AuxiliaryBuffers,
         _context: &mut impl ProcessContext<Self>,
     ) -> ProcessStatus {
-        let chain = self.chain.get_mut();
-        //nih_log!("{:#?}", chain);
         for channel in buffer.iter_samples() {
             for sample in channel {
-                for effect in chain.effects.iter() {
-                    *sample = chain.query(effect).expect("ERROR").process(*sample);
+                for effect in self.chain.borrow().effects.iter() {
+                    *sample = self.chain.borrow().query(effect).unwrap().process(*sample);
                 }
             }
         }
+        _context.execute_background(self.chain.clone());
         ProcessStatus::Normal
     }
 }

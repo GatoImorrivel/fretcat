@@ -6,9 +6,9 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-nih_plug = { git = "https://github.com/geom3trik/nih-plug.git", branch = "vizia-update", features = ["standalone", "assert_process_allocs"] }
-nih_plug_vizia = { git = "https://github.com/geom3trik/nih-plug.git", branch = "vizia-update" }
-
-fretcat_derive = {path = "../fretcat_derive"}
 strum = { version = "0.25.0", features = ["derive"]}
 rand = "0.8.5"
+atomic_refcell = "0.1.10"
+downcast-rs = "1.2.0"
+dyn-clone = "1.0.12"
+crossbeam = { version = "0.8.2", features = ["crossbeam-queue"] }

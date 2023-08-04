@@ -3,34 +3,60 @@ mod sidebar;
 mod left_bar;
 mod effect_view;
 mod card;
-mod effect_list;
 
-use std::{sync::Arc, collections::HashMap};
-use fretcat_effects::EffectKind;
-use nih_plug_vizia::ViziaState;
+use fretcat_effects::{AtomicRefCell, Chain, Overdrive, ChainCommand};
 
-use card::*;
+pub type EditorState = ViziaState;
 
-pub const EDITOR_WIDTH: u32 = 1260;
-pub const EDITOR_HEIGHT: u32 = 848;
+const EDITOR_WIDTH: u32 = 1260;
+const EDITOR_HEIGHT: u32 = 848;
 
-lazy_static::lazy_static! {
-    pub static ref EFFECT_CARDS: HashMap<EffectKind, Vec<Card>> = {
-        let mut hashmap: HashMap<EffectKind, Vec<Card>> = HashMap::new();
-        hashmap.insert(EffectKind::Distortion, vec![
-            OVERDRIVE_CARD,
-            FUZZ_CARD
-        ]);
-
-        hashmap.insert(EffectKind::Delay, vec![]);
-        hashmap.insert(EffectKind::Dynamics, vec![]);
-        hashmap.insert(EffectKind::Echo, vec![]);
-        hashmap.insert(EffectKind::Reverb, vec![]);
-
-        hashmap
-    };
+pub fn default_state() -> Arc<EditorState> {
+    EditorState::new(|| (EDITOR_WIDTH, EDITOR_HEIGHT))
 }
 
-pub fn default_state() -> Arc<ViziaState> {
-    ViziaState::new(|| (EDITOR_WIDTH, EDITOR_HEIGHT))
+#[allow(unused_parens)]
+pub type InitFlags = (Arc<AtomicRefCell<Chain>>);
+
+#[derive(Lens)]
+struct EditorData {
+    chain: Arc<AtomicRefCell<Chain>>,
+}
+
+impl Model for EditorData {}
+
+pub fn create(
+    #[allow(unused_parens)] (chain): InitFlags,
+    editor_state: Arc<ViziaState>,
+) -> Option<Box<dyn Editor>> {
+    create_vizia_editor(editor_state, ViziaTheming::Custom, move |cx, _| {
+        EditorData {
+            chain: chain.clone(),
+        }
+        .build(cx);
+        make_keymap().build(cx);
+
+        cx.add_stylesheet(include_str!("../css/editor.css"))
+            .unwrap();
+        cx.add_font_mem(include_bytes!("../res/SymbolsNerdFontMono-Regular.ttf"));
+        Button::new(cx, |ex| {
+            let chain = EditorData::chain.get(ex);
+            chain.borrow().add_to_queue(ChainCommand::Insert(Box::new(Overdrive::default())));
+        }, |cx| {
+            Label::new(cx, "Insert")
+        });
+
+        HStack::new(cx, |cx| {
+            VStack::new(cx, |cx| {
+                Sidebar::new(cx);
+            })
+            .class("sidebar-wrapper");
+            VStack::new(cx, |cx| {
+                EffectList::new(cx);
+            })
+            .class("list-wrapper");
+        })
+        .class("main");
+
+    })
 }

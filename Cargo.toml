@@ -5,18 +5,14 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [workspace]
-members = ["xtask", "standalone"]
+members = ["xtask", "standalone", "crates/fretcat_editor", "crates/fretcat_effects", "crates/fretcat_plugin"]
 exclude = ["sandbox"]
+
+[dependencies]
+fretcat_plugin = {path = "./crates/fretcat_plugin"}
 
 [lib]
 crate-type = ["cdylib", "lib"]
-
-[dependencies]
-fretcat_effects = {path = "./crates/fretcat_effects"}
-fretcat_editor = {path = "./crates/fretcat_editor"}
-fretcat_plugin = {path = "./crates/fretcat_plugin"}
-fretcat_derive = {path = "./crates/fretcat_derive"}
-fretcat_tests = {path = "./crates/fretcat_tests"}
 
 [profile.release]
 lto = "thin"
