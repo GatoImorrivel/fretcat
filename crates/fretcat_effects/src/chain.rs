@@ -94,6 +94,11 @@ impl Chain {
         Some((*e, data))
     }
 
+    pub fn get_position(&self, effect: &Effect) -> Option<usize> {
+        self.effects.clone().into_iter().position(|e| {
+            e == *effect
+        })
+    }
 }
 
 impl Default for Chain {

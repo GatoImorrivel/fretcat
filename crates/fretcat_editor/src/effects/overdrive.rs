@@ -1,22 +1,22 @@
-use std::{marker::PhantomData, sync::Arc};
-
-use editor_derive::Control;
-use fretcat_effects::{AtomicRefCell, Chain, Effect, Overdrive};
+use fretcat_effects::Overdrive;
 use nih_plug_vizia::vizia::prelude::*;
 
-use super::{Control, EffectHandle};
+use super::Control;
 
-use nih_plug::nih_log;
-
-#[derive(Debug, Lens, Control)]
+#[derive(Debug, Lens)]
 pub struct OverdriveControl {
     pub gain: f32,
     pub threshold: f32,
 }
 
+pub enum Message {
+    Gain(f32),
+    Threshold(f32),
+}
+
 impl View for OverdriveControl {
     fn element(&self) -> Option<&'static str> {
-        Some("overdrivecontrol")
+        Some("overdrive")
     }
 
     fn event(&mut self, cx: &mut EventContext, event: &mut Event) {

@@ -1,7 +1,10 @@
 use fretcat_effects::{AtomicRefCell, AudioEffect, Chain, Effect, Overdrive};
 use nih_plug_vizia::vizia::{input::MouseState, prelude::*};
 
-use crate::{effects::{EffectHandle, OverdriveControl}, EditorData};
+use crate::{
+    effects::{EffectHandle, OverdriveControl},
+    EditorData,
+};
 
 use super::{CardData, CardEvent};
 
@@ -14,35 +17,20 @@ impl EffectList {
                 Binding::new(
                     cx,
                     EditorData::chain.map(|c| c.borrow().effects.len()),
-                    |cx, len| {
+                    |cx, _len| {
                         let chain = EditorData::chain.get(cx);
                         let borrow = chain.borrow();
 
-                        for (i, effect) in borrow.effects.iter().enumerate() {
+                        for effect in borrow.effects.iter() {
                             let data = borrow.query(effect).unwrap();
 
-                            VStack::new(cx, |cx| {
-                                if data.is::<Overdrive>() {
-                                    EffectHandle::<Overdrive, OverdriveControl>::new(cx, effect.clone(), chain.clone());
-                                }
-                            })
-                                .width(Percentage(100.0))
-                                .height(Pixels(200.0))
-                                .on_drop(move |ex, _| {
-                                    let index = calculate_effect_index(i, ex.mouse(), ex.bounds());
-
-                                    let card = CardData::dragging.get(ex);
-
-                                    if let Some(card) = card {
-                                        EditorData::chain.get(ex).borrow().add_to_queue(
-                                            fretcat_effects::ChainCommand::InsertAt(
-                                                index,
-                                                card.spawn(),
-                                            ),
-                                        );
-                                        ex.emit(CardEvent::DragChange(None));
-                                    }
-                                });
+                            if data.is::<Overdrive>() {
+                                EffectHandle::<Overdrive, OverdriveControl>::new(
+                                    cx,
+                                    effect.clone(),
+                                    chain.clone(),
+                                );
+                            }
                         }
                     },
                 );
@@ -61,19 +49,5 @@ impl View for EffectList {
         cx: &mut nih_plug_vizia::vizia::prelude::EventContext,
         event: &mut nih_plug_vizia::vizia::prelude::Event,
     ) {
-    }
-}
-
-fn calculate_effect_index(i: usize, mouse: &MouseState<Entity>, bounds: BoundingBox) -> usize {
-    let middle_point = (bounds.y + bounds.h) / 2.0;
-
-    if mouse.cursory < middle_point {
-        if !i <= 0 {
-            i - 1
-        } else {
-            i
-        }
-    } else {
-        i + 1
     }
 }

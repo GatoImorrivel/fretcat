@@ -1,22 +1,22 @@
-overdrivecontrol {
+overdrive {
     height: 200px;
     background-image: linear-gradient(180deg, #6d09d2, #5c07b0);
     overflow: hidden;
     width: 1s;
 }
 
-overdrivecontrol knob {
+overdrive knob {
     width: 100px;
     height: 100px;
 }
 
-overdrivecontrol knob > zstack > .knob-head {
+overdrive knob > zstack > .knob-head {
     background-image: linear-gradient(180deg, #110220, #31055e);
     border-width: 0px;
     background-color: transparent;
     box-shadow: 2px 2px 8px black;
 }
 
-overdrivecontrol > knob {
+overdrive > knob {
     border-radius: 100%;
 }
