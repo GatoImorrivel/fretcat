@@ -69,4 +69,8 @@ impl Control<Overdrive> for OverdriveControl {
             threshold: data.threshold,
         }
     }
+
+    fn height() -> f32 {
+        200.0
+    }
 }

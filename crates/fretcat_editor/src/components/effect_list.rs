@@ -1,5 +1,5 @@
-use fretcat_effects::{AtomicRefCell, AudioEffect, Chain, Effect, Overdrive};
-use nih_plug_vizia::vizia::{input::MouseState, prelude::*};
+use fretcat_effects::{AtomicRefCell, AudioEffect, Chain, ChainCommand, Effect, Overdrive};
+use nih_plug_vizia::vizia::{input::MouseState, prelude::*, image::Pixel};
 
 use crate::{
     effects::{EffectHandle, OverdriveControl},
@@ -32,6 +32,30 @@ impl EffectList {
                                 );
                             }
                         }
+                        VStack::new(cx, |cx| {
+                            Label::new(cx, "");
+                        })
+                            .height(Pixels(200.0))
+                            .width(Percentage(100.0))
+                            .on_drop(|ex, _| {
+                                let card = CardData::dragging.get(ex);
+
+                                if let Some(card) = card {
+                                    ex.emit(ChainCommand::Insert(card.spawn()));
+                                    ex.emit(CardEvent::DragChange(None));
+                                }
+                            });
+                        Element::new(cx)
+                            .height(Stretch(1.0))
+                            .width(Percentage(100.0))
+                            .on_drop(|ex, _| {
+                                let card = CardData::dragging.get(ex);
+
+                                if let Some(card) = card {
+                                    ex.emit(ChainCommand::Insert(card.spawn()));
+                                    ex.emit(CardEvent::DragChange(None));
+                                }
+                            });
                     },
                 );
             });
@@ -49,5 +73,22 @@ impl View for EffectList {
         cx: &mut nih_plug_vizia::vizia::prelude::EventContext,
         event: &mut nih_plug_vizia::vizia::prelude::Event,
     ) {
+        let chain = EditorData::chain.get(cx);
+        let event = event.take();
+        if let Some(e) = event {
+            match e {
+                ChainCommand::Insert(data) => {
+                    chain.borrow().add_to_queue(ChainCommand::Insert(data));
+                }
+                ChainCommand::InsertAt(index, data) => {
+                    chain
+                        .borrow()
+                        .add_to_queue(ChainCommand::InsertAt(index, data));
+                }
+                ChainCommand::Remove(effect) => {
+                    chain.borrow().add_to_queue(ChainCommand::Remove(effect));
+                }
+            }
+        }
     }
 }

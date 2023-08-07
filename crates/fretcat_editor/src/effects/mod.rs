@@ -3,19 +3,25 @@ use std::{
     sync::{Arc, Condvar},
 };
 
-use fretcat_effects::{AtomicRefCell, AudioEffect, Chain, Effect};
-use nih_plug_vizia::vizia::{prelude::*, input::MouseState};
+use fretcat_effects::{AtomicRefCell, AudioEffect, Chain, ChainCommand, Effect};
+use nih_plug_vizia::vizia::{input::MouseState, prelude::*};
 
 mod overdrive;
 pub use overdrive::OverdriveControl;
 
-use crate::{EditorData, components::{CardData, CardEvent}};
+use crate::{
+    components::{CardData, CardEvent},
+    EditorData,
+};
+
+const EFFECT_BAR_HEIGHT: f32 = 30.0;
 
 pub trait Control<T: AudioEffect>: View {
     type Message;
     fn init(data: &T) -> Self;
     fn view(cx: &mut Context);
     fn update(event: &Self::Message, data: &mut T);
+    fn height() -> f32;
 }
 
 #[derive(Debug, Clone)]
@@ -39,31 +45,38 @@ where
         let index = borrow.get_position(&effect).unwrap();
         let handle = Self {
             chain: chain.clone(),
-            effect: effect,
+            effect: effect.clone(),
             p: PhantomData,
             c: PhantomData,
         };
 
+        HStack::new(cx, move |cx| {
+            Button::new(
+                cx,
+                move |ex| ex.emit(ChainCommand::Remove(effect.clone())),
+                |cx| Label::new(cx, "deletar"),
+            );
+        })
+        .width(Percentage(100.0))
+        .height(Pixels(EFFECT_BAR_HEIGHT));
         control.build(cx, |cx| {
             handle.build(cx);
 
-            VStack::new(cx, |cx| {
+            VStack::new(cx, move |cx| {
                 C::view(cx);
             })
-                .width(Percentage(100.0))
-                .height(Pixels(200.0))
-                .on_drop(move |ex, _| {
-                    let index = calculate_effect_index(index, ex.mouse(), ex.bounds());
+            .width(Percentage(100.0))
+            .height(Pixels(C::height()))
+            .on_drop(move |ex, _| {
+                let index = calculate_effect_index(index, ex.mouse(), ex.bounds());
 
-                    let card = CardData::dragging.get(ex);
+                let card = CardData::dragging.get(ex);
 
-                    if let Some(card) = card {
-                        EditorData::chain.get(ex).borrow().add_to_queue(
-                            fretcat_effects::ChainCommand::InsertAt(index, card.spawn()),
-                        );
-                        ex.emit(CardEvent::DragChange(None));
-                    }
-                });
+                if let Some(card) = card {
+                    ex.emit(ChainCommand::InsertAt(index, card.spawn()));
+                    ex.emit(CardEvent::DragChange(None));
+                }
+            });
         });
     }
 }
