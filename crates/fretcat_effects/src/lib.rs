@@ -1,6 +1,9 @@
 mod chain;
 mod effect;
 
+#[cfg(test)]
+mod tests;
+
 mod fuzz;
 mod overdrive;
 

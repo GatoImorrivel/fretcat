@@ -18,7 +18,7 @@ pub enum ChainCommand {
 pub struct Chain {
     pub effects: Vec<Effect>,
     pub update_queue: ArrayQueue<ChainCommand>,
-    data_cache: HashMap<Effect, Box<dyn AudioEffect>>,
+    pub(crate) data_cache: HashMap<Effect, Box<dyn AudioEffect>>,
 }
 
 impl Chain {
