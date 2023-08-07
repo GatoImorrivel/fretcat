@@ -1,7 +1,7 @@
-use fretcat_effects:: Overdrive;
+use fretcat_effects::{AtomicRefCell, AudioEffect, Chain, Effect, Overdrive};
 use nih_plug_vizia::vizia::{input::MouseState, prelude::*};
 
-use crate::{effects::EffectHandle, EditorData};
+use crate::{effects::{EffectHandle, OverdriveControl}, EditorData};
 
 use super::{CardData, CardEvent};
 
@@ -21,40 +21,28 @@ impl EffectList {
                         for (i, effect) in borrow.effects.iter().enumerate() {
                             let data = borrow.query(effect).unwrap();
 
-                            // default
-                            let mut height = 200.0;
-
                             VStack::new(cx, |cx| {
-
                                 if data.is::<Overdrive>() {
-                                    let data = *data.clone().downcast_ref::<Overdrive>().unwrap();
-                                    height = 200.0;
-
-                                    EffectHandle::<Overdrive>::new(
-                                        cx,
-                                        chain.clone(),
-                                        effect,
-                                        &data,
-                                    );
+                                    EffectHandle::<Overdrive, OverdriveControl>::new(cx, effect.clone(), chain.clone());
                                 }
                             })
-                            .width(Percentage(100.0))
-                            .height(Pixels(height))
-                            .on_drop(move |ex, _| {
-                                let index = calculate_effect_index(i, ex.mouse(), ex.bounds());
+                                .width(Percentage(100.0))
+                                .height(Pixels(200.0))
+                                .on_drop(move |ex, _| {
+                                    let index = calculate_effect_index(i, ex.mouse(), ex.bounds());
 
-                                let card = CardData::dragging.get(ex);
+                                    let card = CardData::dragging.get(ex);
 
-                                if let Some(card) = card {
-                                    EditorData::chain.get(ex).borrow().add_to_queue(
-                                        fretcat_effects::ChainCommand::InsertAt(
-                                            index,
-                                            card.spawn()
-                                        ),
-                                    );
-                                    ex.emit(CardEvent::DragChange(None));
-                                }
-                            });
+                                    if let Some(card) = card {
+                                        EditorData::chain.get(ex).borrow().add_to_queue(
+                                            fretcat_effects::ChainCommand::InsertAt(
+                                                index,
+                                                card.spawn(),
+                                            ),
+                                        );
+                                        ex.emit(CardEvent::DragChange(None));
+                                    }
+                                });
                         }
                     },
                 );

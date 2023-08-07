@@ -14,10 +14,10 @@ pub enum ChainCommand {
     Remove(Effect),
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct Chain {
     pub effects: Vec<Effect>,
-    pub update_queue: Arc<ArrayQueue<ChainCommand>>,
+    pub update_queue: ArrayQueue<ChainCommand>,
     data_cache: HashMap<Effect, Box<dyn AudioEffect>>,
 }
 
@@ -101,7 +101,7 @@ impl Default for Chain {
         let mut chain = Chain {
             effects: vec![],
             data_cache: HashMap::new(),
-            update_queue: Arc::new(ArrayQueue::new(20).into())
+            update_queue: ArrayQueue::new(20).into()
         };
 
         chain.insert(Box::new(Overdrive::default()));
