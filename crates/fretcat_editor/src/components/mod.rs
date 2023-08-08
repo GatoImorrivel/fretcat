@@ -5,7 +5,7 @@ mod sidebar;
 use nih_plug_vizia::vizia::prelude::Data;
 use strum::{IntoEnumIterator, EnumIter};
 
-pub use effect_list::EffectList;
+pub use effect_list::{EffectList, EffectListEvent};
 pub use sidebar::Sidebar;
 pub use card::*;
 

@@ -69,9 +69,7 @@ impl Plugin for Fretcat {
              match chain.borrow().update_queue.pop() {
                 Some(command) => {
                     unsafe {
-                        nih_dbg!("{:#?}", &command);
                         chain.as_ptr().as_mut().unwrap().handle_command(command);
-                        nih_dbg!("{:#?}", chain.borrow());
                     }
                 },
                 None => ()
@@ -92,7 +90,10 @@ impl Plugin for Fretcat {
                 }
             }
         }
-        _context.execute_background(self.chain.clone());
+
+        if !self.chain.borrow().update_queue.is_empty() {
+            _context.execute_background(self.chain.clone());
+        }
         ProcessStatus::Normal
     }
 }

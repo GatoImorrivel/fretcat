@@ -28,7 +28,9 @@ pub fn card_system_init(cx: &mut Context) {
         cursor: (0.0, 0.0),
     }
     .build(cx);
+}
 
+pub fn card_system_view(cx: &mut Context) {
     cx.add_stylesheet(include_str!("../../css/cards.css")).unwrap();
 
     Binding::new(cx, CardData::dragging, |cx, bind| {

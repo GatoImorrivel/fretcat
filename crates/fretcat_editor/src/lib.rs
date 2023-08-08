@@ -47,6 +47,8 @@ pub fn create(
             .unwrap();
         cx.add_font_mem(include_bytes!("../res/SymbolsNerdFontMono-Regular.ttf"));
 
+        card_system_init(cx);
+
         HStack::new(cx, |cx| {
             VStack::new(cx, |cx| {
                 Sidebar::new(cx);
@@ -59,6 +61,6 @@ pub fn create(
         })
         .class("main");
 
-        card_system_init(cx);
+        card_system_view(cx);
     })
 }

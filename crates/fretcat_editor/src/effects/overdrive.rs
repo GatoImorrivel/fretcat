@@ -31,8 +31,9 @@ impl View for OverdriveControl {
     }
 }
 
-impl Control<Overdrive> for OverdriveControl {
+impl Control for OverdriveControl {
     type Message = Message;
+    type Target = Overdrive;
     fn view(cx: &mut Context) {
         cx.add_stylesheet(include_str!("./overdrive.css")).unwrap();
 

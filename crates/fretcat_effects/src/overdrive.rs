@@ -1,14 +1,25 @@
-use std::f32::consts::PI;
+use std::{f32::consts::PI, default};
 
 use crate::effect::AudioEffect;
 
 
-#[derive(Debug, Clone, Copy, Default)]
+#[derive(Debug, Clone, Copy)]
 pub struct Overdrive {
     pub gain: f32,
     pub blend: f32,
     pub threshold: f32,
     pub volume: f32,
+}
+
+impl Default for Overdrive {
+    fn default() -> Self {
+        Self {
+            gain: 1.0,
+            blend: 1.0,
+            threshold: 1.0,
+            volume: 1.0,
+        }
+    }
 }
 
 impl AudioEffect for Overdrive {

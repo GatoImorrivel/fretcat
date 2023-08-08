@@ -1,17 +1,21 @@
-use std::{collections::HashMap, hash::Hash, any::TypeId, sync::Arc};
+use std::{any::TypeId, collections::HashMap, hash::Hash, sync::Arc};
 
 use crossbeam::queue::ArrayQueue;
 
-use crate::{effect::{Effect, AudioEffect}, overdrive::Overdrive};
+use crate::{
+    effect::{AudioEffect, Effect},
+    overdrive::Overdrive,
+};
 
 pub type Query<'a> = &'a Box<dyn AudioEffect>;
-pub type QueryMut<'a> =  &'a mut Box<dyn AudioEffect>;
+pub type QueryMut<'a> = &'a mut Box<dyn AudioEffect>;
 
 #[derive(Debug, Clone)]
 pub enum ChainCommand {
     Insert(Box<dyn AudioEffect>),
     InsertAt(usize, Box<dyn AudioEffect>),
     Remove(Effect),
+    Swap(Effect, Effect),
 }
 
 #[derive(Debug)]
@@ -37,7 +41,27 @@ impl Chain {
             ChainCommand::Remove(effect) => {
                 self.remove(&effect);
             }
+            ChainCommand::Swap(e1, e2) => {
+                let i1 = self.index_of(&e1);
+                let i2 = self.index_of(&e2);
+
+                if let Some(i1) = i1 {
+                    if let Some(i2) = i2 {
+                        self.effects.swap(i1, i2);
+                    }
+                }
+            }
         }
+    }
+
+    fn index_of(&self, effect: &Effect) -> Option<usize> {
+        let (index, _) = self
+            .effects
+            .iter()
+            .enumerate()
+            .find(|(_, e)| **e == *effect)?;
+
+        Some(index)
     }
 
     pub fn insert(&mut self, audio_effect: Box<dyn AudioEffect>) -> (usize, Effect) {
@@ -55,9 +79,12 @@ impl Chain {
     }
 
     pub fn remove(&mut self, effect: &Effect) {
-        let fetch = self.effects.clone().into_iter().enumerate().find(|(_i, e)| {
-            e == effect
-        });
+        let fetch = self
+            .effects
+            .clone()
+            .into_iter()
+            .enumerate()
+            .find(|(_i, e)| e == effect);
 
         if let Some((index, effect)) = fetch {
             self.effects.remove(index);
@@ -81,7 +108,10 @@ impl Chain {
     }
 
     pub fn query_cast_mut<T: AudioEffect + 'static>(&mut self, effect: &Effect) -> Option<&mut T> {
-        self.data_cache.get_mut(effect)?.as_any_mut().downcast_mut::<T>()
+        self.data_cache
+            .get_mut(effect)?
+            .as_any_mut()
+            .downcast_mut::<T>()
     }
 
     pub fn query_index(&self, index: usize) -> Option<(Effect, &Box<dyn AudioEffect>)> {
@@ -95,9 +125,7 @@ impl Chain {
     }
 
     pub fn get_position(&self, effect: &Effect) -> Option<usize> {
-        self.effects.clone().into_iter().position(|e| {
-            e == *effect
-        })
+        self.effects.clone().into_iter().position(|e| e == *effect)
     }
 }
 
@@ -106,7 +134,7 @@ impl Default for Chain {
         let mut chain = Chain {
             effects: vec![],
             data_cache: HashMap::new(),
-            update_queue: ArrayQueue::new(20).into()
+            update_queue: ArrayQueue::new(20).into(),
         };
 
         chain.insert(Box::new(Overdrive::default()));

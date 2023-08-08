@@ -1,0 +1,10 @@
+.effect-bar {
+    background-color: #2f2f2f;
+    col-between: 1s;
+    cursor: grab;
+}
+
+.drag-indicator {
+    color: white;
+    font-size: 20;
+}

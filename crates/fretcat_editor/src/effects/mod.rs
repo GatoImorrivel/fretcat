@@ -4,28 +4,28 @@ use std::{
 };
 
 use fretcat_effects::{AtomicRefCell, AudioEffect, Chain, ChainCommand, Effect};
+use nih_plug::nih_log;
 use nih_plug_vizia::vizia::{input::MouseState, prelude::*};
 
 mod overdrive;
 pub use overdrive::OverdriveControl;
 
 use crate::{
-    components::{CardData, CardEvent},
+    components::{CardData, CardEvent, EffectList, EffectListEvent},
     EditorData,
 };
 
-const EFFECT_BAR_HEIGHT: f32 = 30.0;
-
-pub trait Control<T: AudioEffect>: View {
+pub trait Control: View {
     type Message;
-    fn init(data: &T) -> Self;
+    type Target: AudioEffect;
+    fn init(data: &Self::Target) -> Self;
     fn view(cx: &mut Context);
-    fn update(event: &Self::Message, data: &mut T);
+    fn update(event: &Self::Message, data: &mut Self::Target);
     fn height() -> f32;
 }
 
 #[derive(Debug, Clone)]
-pub struct EffectHandle<T: AudioEffect, C: Control<T>> {
+pub struct EffectHandle<T: AudioEffect, C: Control<Target = T>> {
     effect: Effect,
     chain: Arc<AtomicRefCell<Chain>>,
     p: PhantomData<T>,
@@ -35,7 +35,7 @@ pub struct EffectHandle<T: AudioEffect, C: Control<T>> {
 impl<T, C> EffectHandle<T, C>
 where
     T: AudioEffect,
-    C: Control<T>,
+    C: Control<Target = T>,
     C::Message: Send,
 {
     pub fn new(cx: &mut Context, effect: Effect, chain: Arc<AtomicRefCell<Chain>>) {
@@ -51,40 +51,81 @@ where
         };
 
         HStack::new(cx, move |cx| {
-            Button::new(
+            VStack::new(cx, move |cx| {
+                Button::new(
+                    cx,
+                    move |ex| ex.emit(ChainCommand::Remove(effect.clone())),
+                    |cx| Label::new(cx, ""),
+                )
+                .class("delete-effect-btn");
+                Element::new(cx);
+            })
+            .on_drag(move |ex| {
+                ex.emit(EffectListEvent::DragChange(Some(effect.clone())));
+                ex.set_drop_data(ex.current());
+            })
+            .class("effect-bar")
+            .width(Stretch(3.0));
+
+            control
+                .build(cx, |cx| {
+                    handle.build(cx);
+                    VStack::new(cx, move |cx| {
+                        C::view(cx);
+                    });
+                })
+                .width(Stretch(100.0));
+
+            Binding::new(
                 cx,
-                move |ex| ex.emit(ChainCommand::Remove(effect.clone())),
-                |cx| Label::new(cx, "deletar"),
+                CardData::dragging.map(|drag| drag.is_some()),
+                move |cx, bind| {
+                    let is_dragging = bind.get(cx);
+
+                    if is_dragging {
+                        Element::new(cx)
+                            .position_type(PositionType::SelfDirected)
+                            .width(Stretch(1.0))
+                            .height(Percentage(50.0))
+                            .on_drop(move |ex, _| on_drop(ex, index as i32 - 1, effect.clone()));
+                        Element::new(cx)
+                            .position_type(PositionType::SelfDirected)
+                            .width(Stretch(1.0))
+                            .height(Percentage(50.0))
+                            .top(Percentage(50.0))
+                            .on_drop(move |ex, _| on_drop(ex, index as i32 + 1, effect.clone()));
+                    }
+                },
             );
         })
-        .width(Percentage(100.0))
-        .height(Pixels(EFFECT_BAR_HEIGHT));
-        control.build(cx, |cx| {
-            handle.build(cx);
+        .width(Stretch(1.0))
+        .height(Pixels(C::height()));
+    }
+}
 
-            VStack::new(cx, move |cx| {
-                C::view(cx);
-            })
-            .width(Percentage(100.0))
-            .height(Pixels(C::height()))
-            .on_drop(move |ex, _| {
-                let index = calculate_effect_index(index, ex.mouse(), ex.bounds());
+fn on_drop(ex: &mut EventContext, mut index: i32, effect: Effect) {
+    let card = CardData::dragging.get(ex);
+    let drag_effect = EffectList::dragging.get(ex);
 
-                let card = CardData::dragging.get(ex);
+    if index < 0 {
+        index = 0;
+    }
 
-                if let Some(card) = card {
-                    ex.emit(ChainCommand::InsertAt(index, card.spawn()));
-                    ex.emit(CardEvent::DragChange(None));
-                }
-            });
-        });
+    if let Some(card) = card {
+        ex.emit(ChainCommand::InsertAt(index as usize, card.spawn()));
+        ex.emit(CardEvent::DragChange(None));
+    }
+
+    if let Some(drag_effect) = drag_effect {
+        ex.emit(ChainCommand::Swap(effect, drag_effect));
+        ex.emit(EffectListEvent::DragChange(None));
     }
 }
 
 impl<T, C> Model for EffectHandle<T, C>
 where
     T: AudioEffect,
-    C: Control<T>,
+    C: Control<Target = T>,
     C::Message: Send,
 {
     fn event(&mut self, cx: &mut EventContext, event: &mut Event) {
@@ -93,19 +134,5 @@ where
             let data = chain.query_cast_mut::<T>(&self.effect).unwrap();
             C::update(event, data);
         });
-    }
-}
-
-fn calculate_effect_index(i: usize, mouse: &MouseState<Entity>, bounds: BoundingBox) -> usize {
-    let middle_point = (bounds.y + bounds.h) / 2.0;
-
-    if mouse.cursory < middle_point {
-        if !i <= 0 {
-            i - 1
-        } else {
-            i
-        }
-    } else {
-        i + 1
     }
 }
