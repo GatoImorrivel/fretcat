@@ -1,6 +1,10 @@
-use std::f32::consts::PI;
+use std::{f32::consts::PI, sync::Arc};
 
-use crate::effect::AudioEffect;
+use atomic_refcell::AtomicRefCell;
+
+use nih_plug_vizia::vizia::prelude::*;
+
+use crate::{effect::AudioEffect, Chain, Effect, chain::ChainHandle};
 #[derive(Debug, Clone, Copy)]
 pub struct Fuzz {
     gain: f32,
@@ -26,5 +30,13 @@ impl AudioEffect for Fuzz {
         let blend = ((dirty * self.blend) + (_sample * (1.0 / self.blend))) / 2.0;
 
         blend * self.volume
+    }
+
+    fn view(&self, cx: &mut Context, effect: Effect, chain: ChainHandle) {
+        
+    }
+
+    fn update(&self, event: &mut Event, effect: Effect, chain: ChainHandle) {
+        
     }
 }

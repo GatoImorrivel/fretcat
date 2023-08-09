@@ -1,9 +1,8 @@
-use fretcat_effects::{AtomicRefCell, AudioEffect, Chain, ChainCommand, Effect, Overdrive};
+use fretcat_effects::{AtomicRefCell, AudioEffect, Chain, ChainCommand, Effect, Overdrive, ChainData};
 use nih_plug::nih_log;
 use nih_plug_vizia::vizia::{image::Pixel, input::MouseState, prelude::*};
 
 use crate::{
-    effects::{EffectHandle, OverdriveControl},
     EditorData,
 };
 
@@ -28,24 +27,13 @@ impl EffectList {
             ScrollView::new(cx, 0.0, 0.0, false, false, |cx| {
                 Binding::new(
                     cx,
-                    EditorData::chain.map(|c| c.borrow().update_queue.len()),
+                    ChainData::chain.map(|c| c.borrow().update_queue.len()),
                     |cx, _len| {
-                        let chain = EditorData::chain.get(cx);
+                        let chain = ChainData::chain.get(cx);
                         let borrow = chain.borrow();
 
                         for effect in borrow.effects.iter() {
-                            let data = match borrow.query(effect) {
-                                Some(data) => data,
-                                None => continue
-                            };
-
-                            if data.is::<Overdrive>() {
-                                EffectHandle::<Overdrive, OverdriveControl>::new(
-                                    cx,
-                                    effect.clone(),
-                                    chain.clone(),
-                                );
-                            }
+                            borrow.query(effect).unwrap().view(cx, effect.clone(), chain.clone());
                         }
                         VStack::new(cx, |cx| {
                             VStack::new(cx, |cx| {
@@ -78,7 +66,7 @@ impl View for EffectList {
         cx: &mut nih_plug_vizia::vizia::prelude::EventContext,
         event: &mut nih_plug_vizia::vizia::prelude::Event,
     ) {
-        let chain = EditorData::chain.get(cx);
+        let chain = ChainData::chain.get(cx);
 
         event.map(|drag_event, _| match drag_event {
             EffectListEvent::DragChange(effect) => {

@@ -1,4 +1,4 @@
-use fretcat_effects::{ChainCommand, Overdrive};
+use fretcat_effects::{ChainCommand, Overdrive, ChainData};
 use nih_plug::nih_log;
 use nih_plug_vizia::vizia::prelude::{Code, KeyChord, Keymap, KeymapEntry, LensExt, Modifiers};
 
@@ -10,13 +10,13 @@ pub fn make_keymap() -> Keymap<Action> {
         (
             KeyChord::new(Modifiers::CTRL | Modifiers::SHIFT, Code::KeyP),
             KeymapEntry::new(Action::PrintChain, |ex| {
-                nih_log!("{:#?}", EditorData::chain.get(ex).borrow());
+                nih_log!("{:#?}", ChainData::chain.get(ex).borrow());
             }),
         ),
         (
             KeyChord::new(Modifiers::CTRL | Modifiers::SHIFT, Code::KeyI),
             KeymapEntry::new(Action::InsertChain, |ex| {
-                EditorData::chain
+                ChainData::chain
                     .get(ex)
                     .borrow()
                     .add_to_queue(ChainCommand::Insert(Box::new(Overdrive::default())));

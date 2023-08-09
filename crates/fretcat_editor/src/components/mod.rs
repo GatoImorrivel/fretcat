@@ -1,5 +1,6 @@
 mod card;
 mod effect_list;
+mod effect_handle;
 mod sidebar;
 
 use nih_plug_vizia::vizia::prelude::Data;

@@ -1,5 +1,8 @@
 use std::{any::TypeId, collections::HashMap, hash::Hash, sync::Arc};
 
+use atomic_refcell::AtomicRefCell;
+use nih_plug_vizia::vizia::prelude::*;
+
 use crossbeam::queue::ArrayQueue;
 
 use crate::{
@@ -9,6 +12,14 @@ use crate::{
 
 pub type Query<'a> = &'a Box<dyn AudioEffect>;
 pub type QueryMut<'a> = &'a mut Box<dyn AudioEffect>;
+pub type ChainHandle = Arc<AtomicRefCell<Chain>>;
+
+#[derive(Debug, Lens)]
+pub struct ChainData {
+    pub chain: ChainHandle
+}
+
+impl Model for ChainData {}
 
 #[derive(Debug, Clone)]
 pub enum ChainCommand {

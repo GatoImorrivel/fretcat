@@ -1,10 +1,9 @@
-mod effects;
 mod components;
 mod keymap;
 
 use std::sync::Arc;
 
-use fretcat_effects::{AtomicRefCell, Chain, Overdrive, ChainCommand};
+use fretcat_effects::{ChainData, ChainHandle};
 
 use keymap::make_keymap;
 use nih_plug_vizia::{ViziaState, create_vizia_editor, ViziaTheming};
@@ -23,11 +22,10 @@ pub fn default_state() -> Arc<EditorState> {
 }
 
 #[allow(unused_parens)]
-pub type InitFlags = (Arc<AtomicRefCell<Chain>>);
+pub type InitFlags = (ChainHandle);
 
 #[derive(Lens)]
 struct EditorData {
-    chain: Arc<AtomicRefCell<Chain>>,
 }
 
 impl Model for EditorData {}
@@ -37,7 +35,7 @@ pub fn create(
     editor_state: Arc<ViziaState>,
 ) -> Option<Box<dyn Editor>> {
     create_vizia_editor(editor_state, ViziaTheming::Custom, move |cx, _| {
-        EditorData {
+        ChainData {
             chain: chain.clone(),
         }
         .build(cx);

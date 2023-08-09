@@ -11,6 +11,6 @@ pub use atomic_refcell::*;
 
 pub use fuzz::Fuzz;
 pub use overdrive::Overdrive;
-pub use chain::{Chain, ChainCommand};
+pub use chain::{Chain, ChainCommand, ChainData, ChainHandle};
 pub use effect::{Effect, AudioEffect};
 pub use dyn_clone;

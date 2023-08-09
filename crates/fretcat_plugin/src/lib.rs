@@ -3,7 +3,7 @@ mod params;
 pub use nih_plug;
 use nih_plug::prelude::*;
 
-use fretcat_effects::{AtomicRefCell, Chain};
+use fretcat_effects::{AtomicRefCell, Chain, ChainHandle};
 use params::FretcatParams;
 
 use std::{num::NonZeroU32, sync::Arc};
@@ -12,7 +12,7 @@ const NUM_INPUT_CHANNELS: u32 = 2;
 const NUM_OUTPUT_CHANNELS: u32 = 2;
 pub struct Fretcat {
     params: Arc<FretcatParams>,
-    chain: Arc<AtomicRefCell<Chain>>,
+    chain: ChainHandle,
 }
 
 impl Default for Fretcat {
@@ -42,7 +42,7 @@ impl Plugin for Fretcat {
     const SAMPLE_ACCURATE_AUTOMATION: bool = true;
 
     type SysExMessage = ();
-    type BackgroundTask = Arc<AtomicRefCell<Chain>>;
+    type BackgroundTask = ChainHandle;
 
     fn params(&self) -> Arc<dyn Params> {
         self.params.clone()
