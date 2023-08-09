@@ -25,7 +25,7 @@ impl EffectList {
                 .unwrap();
             cx.add_stylesheet(include_str!("../../css/effect-handle.css"))
                 .unwrap();
-            ScrollView::new(cx, 0.0, 0.0, false, true, |cx| {
+            ScrollView::new(cx, 0.0, 0.0, false, false, |cx| {
                 Binding::new(
                     cx,
                     EditorData::chain.map(|c| c.borrow().update_queue.len()),
