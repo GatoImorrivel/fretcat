@@ -4,7 +4,7 @@ use nih_plug_vizia::vizia::prelude::*;
 
 use crate::{effect::AudioEffect, ChainData, Effect, Chain};
 
-use effects_derive::{getter, Message};
+use fretcat_macros::{getter, Message};
 
 #[derive(Debug, Clone, Copy, Message)]
 pub struct Overdrive {
