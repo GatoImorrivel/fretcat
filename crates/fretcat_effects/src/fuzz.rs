@@ -32,11 +32,15 @@ impl AudioEffect for Fuzz {
         blend * self.volume
     }
 
-    fn view(&self, cx: &mut Context, effect: Effect, chain: ChainHandle) {
+    fn view(&self, cx: &mut Context, effect: Effect) {
         
     }
 
-    fn update(&self, event: &mut Event, effect: Effect, chain: ChainHandle) {
-        
+    fn update(&self, event: &mut Event, effect: Effect, chain: &mut Chain) -> Option<()>{
+       Some(())
+    }
+
+    fn height(&self) -> f32 {
+        400.0
     }
 }

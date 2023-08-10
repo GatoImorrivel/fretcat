@@ -11,72 +11,79 @@ pub struct EffectHandle {
 }
 
 impl EffectHandle {
-    pub fn new(cx: &mut Context, effect: Effect) {
+    pub fn new(cx: &mut Context, effect: Effect) -> Option<()> {
         let chain = ChainData::chain.get(cx);
+        let c2 = chain.clone();
         let borrow = chain.borrow();
-        let data = borrow.query(&effect).unwrap();
-        let index = borrow.get_position(&effect).unwrap();
-        Self {
-            handle: data.clone(),
-            effect: effect.clone(),
-        }
-        .build(cx, |cx| {
-            HStack::new(cx, move |cx| {
-                VStack::new(cx, move |cx| {
-                    Button::new(
-                        cx,
-                        move |ex| ex.emit(ChainCommand::Remove(effect.clone())),
-                        |cx| Label::new(cx, ""),
-                    )
-                    .class("delete-effect-btn");
-                    Element::new(cx);
-                })
-                .on_drag(move |ex| {
-                    ex.emit(EffectListEvent::DragChange(Some(effect.clone())));
-                    ex.set_drop_data(ex.current());
-                })
-                .class("effect-bar")
-                .width(Stretch(3.0));
-
-                Binding::new(
+        let data = borrow.query(&effect)?;
+        let index = borrow.get_position(&effect)?;
+        HStack::new(cx, move |cx| {
+            VStack::new(cx, move |cx| {
+                Button::new(
                     cx,
-                    CardData::dragging.map(|drag| drag.is_some()),
-                    move |cx, bind| {
-                        let is_dragging = bind.get(cx);
-
-                        if is_dragging {
-                            Element::new(cx)
-                                .position_type(PositionType::SelfDirected)
-                                .width(Stretch(1.0))
-                                .height(Percentage(50.0))
-                                .on_drop(move |ex, _| {
-                                    on_drop(ex, index as i32 - 1, effect.clone())
-                                });
-                            Element::new(cx)
-                                .position_type(PositionType::SelfDirected)
-                                .width(Stretch(1.0))
-                                .height(Percentage(50.0))
-                                .top(Percentage(50.0))
-                                .on_drop(move |ex, _| {
-                                    on_drop(ex, index as i32 + 1, effect.clone())
-                                });
-                        }
-                    },
-                );
+                    move |ex| ex.emit(ChainCommand::Remove(effect.clone())),
+                    |cx| Label::new(cx, ""),
+                )
+                .class("delete-effect-btn");
+                Element::new(cx);
             })
-            .width(Stretch(1.0));
-        });
+            .on_drag(move |ex| {
+                ex.emit(EffectListEvent::DragChange(Some(effect.clone())));
+                ex.set_drop_data(ex.current());
+            })
+            .class("effect-bar")
+            .height(Stretch(1.0))
+            .width(Stretch(3.0));
+
+            VStack::new(cx, move |cx| {
+                Self {
+                    handle: data.clone(),
+                    effect: effect.clone(),
+                }
+                .build(cx);
+                data.view(cx, effect);
+            })
+            .width(Stretch(100.0))
+            .height(Stretch(1.0))
+            .on_drop(move |ex, _| on_drop(ex, index as i32, effect));
+
+            Binding::new(
+                cx,
+                CardData::dragging.map(|drag| drag.is_some()),
+                move |cx, bind| {
+                    let is_dragging = bind.get(cx);
+
+                    if is_dragging {
+                        Element::new(cx)
+                            .position_type(PositionType::SelfDirected)
+                            .width(Stretch(1.0))
+                            .height(Percentage(50.0))
+                            .on_drop(move |ex, _| on_drop(ex, index as i32 - 1, effect.clone()));
+                        Element::new(cx)
+                            .position_type(PositionType::SelfDirected)
+                            .width(Stretch(1.0))
+                            .height(Percentage(50.0))
+                            .top(Percentage(50.0))
+                            .on_drop(move |ex, _| on_drop(ex, index as i32 + 1, effect.clone()));
+                    }
+                },
+            );
+        })
+        .height(Pixels(data.height()))
+        .width(Stretch(1.0));
+
+        Some(())
     }
 }
 
-impl View for EffectHandle {
-    fn element(&self) -> Option<&'static str> {
-        Some("handle")
-    }
-
+impl Model for EffectHandle {
     fn event(&mut self, cx: &mut EventContext, event: &mut Event) {
         let chain = ChainData::chain.get(cx);
-        self.handle.update(event, self.effect, chain);
+        let chain = unsafe { chain.as_ptr().as_mut().unwrap() };
+
+        self.handle.update(event, self.effect, chain).unwrap_or_else(|| {
+            nih_log!("effect {:?} dropped", self.effect);
+        });
     }
 }
 

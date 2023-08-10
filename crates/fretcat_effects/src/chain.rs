@@ -14,7 +14,7 @@ pub type Query<'a> = &'a Box<dyn AudioEffect>;
 pub type QueryMut<'a> = &'a mut Box<dyn AudioEffect>;
 pub type ChainHandle = Arc<AtomicRefCell<Chain>>;
 
-#[derive(Debug, Lens)]
+#[derive(Debug, Lens, Clone)]
 pub struct ChainData {
     pub chain: ChainHandle
 }
@@ -137,6 +137,13 @@ impl Chain {
 
     pub fn get_position(&self, effect: &Effect) -> Option<usize> {
         self.effects.clone().into_iter().position(|e| e == *effect)
+    }
+
+    pub fn check(&self, effect: &Effect) -> bool {
+        match self.query(effect) {
+            Some(_) => true,
+            None => false
+        }
     }
 }
 

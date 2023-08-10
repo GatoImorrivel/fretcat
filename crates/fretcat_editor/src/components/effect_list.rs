@@ -6,7 +6,7 @@ use crate::{
     EditorData,
 };
 
-use super::{CardData, CardEvent};
+use super::{CardData, CardEvent, effect_handle::EffectHandle};
 
 #[derive(Debug, Lens, Clone, Copy)]
 pub struct EffectList {
@@ -33,7 +33,9 @@ impl EffectList {
                         let borrow = chain.borrow();
 
                         for effect in borrow.effects.iter() {
-                            borrow.query(effect).unwrap().view(cx, effect.clone(), chain.clone());
+                            EffectHandle::new(cx, effect.clone()).unwrap_or_else(|| {
+                                nih_log!("dropped effect {:?}", effect);
+                            });
                         }
                         VStack::new(cx, |cx| {
                             VStack::new(cx, |cx| {

@@ -1,18 +1,18 @@
 use std::f32::consts::PI;
 
-use nih_plug::wrapper::clap::lazy_static;
+use nih_plug::{wrapper::clap::lazy_static, nih_dbg};
 use nih_plug_vizia::vizia::prelude::*;
 
-use crate::{chain::ChainHandle, effect::AudioEffect, ChainData, Effect};
+use crate::{chain::ChainHandle, effect::AudioEffect, ChainData, Effect, Chain};
 
-use effects_derive::Getters;
+use effects_derive::{getter, Message};
 
-#[derive(Debug, Clone, Copy, Getters)]
+#[derive(Debug, Clone, Copy, Message)]
 pub struct Overdrive {
-    #[get]
+    #[msg]
     pub gain: f32,
-    #[get]
     pub blend: f32,
+    #[msg]
     pub threshold: f32,
     pub volume: f32,
 }
@@ -28,11 +28,6 @@ impl Default for Overdrive {
     }
 }
 
-enum Message {
-    Gain(f32),
-    Threshold(f32),
-}
-
 impl AudioEffect for Overdrive {
     fn process(&self, _sample: f32) -> f32 {
         let clean = _sample;
@@ -45,33 +40,26 @@ impl AudioEffect for Overdrive {
         ((distorted * self.blend) + (clean * (1.0 - self.blend))) * output_gain
     }
 
-    fn view(&self, cx: &mut Context, effect: Effect, chain: ChainHandle) {
+    fn view(&self, cx: &mut Context, effect: Effect) {
+        cx.add_stylesheet(include_str!("../css/overdrive.css")).unwrap();
         VStack::new(cx, |cx| {
             VStack::new(cx, |cx| {
-                Knob::new(cx, 1.0, (get_gain)(effect.clone()), false)
+                Knob::new(cx, 1.0, getter!(gain), false)
                     .on_changing(|cx, val| cx.emit(Message::Gain(val)));
                 Label::new(cx, "Gain");
             })
             .class("overdrive-knob-group");
             VStack::new(cx, |cx| {
-                Knob::new(cx, 1.0, OverdriveControl::threshold, false)
+                Knob::new(cx, 1.0, getter!(threshold), false)
                     .on_changing(|cx, val| cx.emit(Message::Threshold(val)));
                 Label::new(cx, "Threshold");
             })
             .class("overdrive-knob-group");
-        });
+        }).class("overdrive");
     }
 
-    fn update(&self, event: &mut Event, effect: Effect, chain: ChainHandle) {
-        let data = unsafe {
-            chain
-                .as_ptr()
-                .as_mut()
-                .unwrap()
-                .query_cast_mut::<Self>(&effect)
-                .unwrap()
-        };
-
+    fn update(&self, event: &mut Event, effect: Effect, chain: &mut Chain) -> Option<()> {
+        let data = chain.query_cast_mut::<Self>(&effect)?;
         event.map(|event, _| match event {
             Message::Gain(val) => {
                 data.gain = *val;
@@ -80,5 +68,11 @@ impl AudioEffect for Overdrive {
                 data.threshold = *val;
             }
         });
+
+        Some(())
+    }
+
+    fn height(&self) -> f32 {
+        200.0
     }
 }
