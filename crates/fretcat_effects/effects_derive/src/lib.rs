@@ -2,27 +2,13 @@
 mod message;
 
 use proc_macro::TokenStream;
-use quote::{format_ident, quote};
-use syn::{parse_macro_input, Path, Ident, parse::{Parse, ParseStream}, Token};
+use quote::quote;
+use syn::{parse_macro_input, Ident};
 
 #[proc_macro_derive(Message, attributes(msg))]
 pub fn derive_message(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as syn::DeriveInput);
     message::derive_message_impl(input).unwrap_or_else(|err| err.to_compile_error()).into()
-}
-
-struct GetterInput {
-    ident: Ident,
-    ty_path: Path,
-}
-
-impl Parse for GetterInput {
-    fn parse(input: ParseStream) -> syn::Result<Self> {
-        let ident: Ident = input.parse()?;
-        input.parse::<Token![,]>()?;
-        let ty_path: Path = input.parse()?;
-        Ok(GetterInput { ident, ty_path })
-    }
 }
 
 #[proc_macro]

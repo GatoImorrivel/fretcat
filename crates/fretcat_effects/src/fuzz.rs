@@ -1,10 +1,9 @@
-use std::{f32::consts::PI, sync::Arc};
-
-use atomic_refcell::AtomicRefCell;
+use std::f32::consts::PI;
 
 use nih_plug_vizia::vizia::prelude::*;
 
-use crate::{effect::AudioEffect, Chain, Effect, chain::ChainHandle};
+use crate::{effect::AudioEffect, Chain, Effect};
+
 #[derive(Debug, Clone, Copy)]
 pub struct Fuzz {
     gain: f32,

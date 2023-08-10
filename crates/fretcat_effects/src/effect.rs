@@ -1,12 +1,10 @@
-use atomic_refcell::AtomicRefCell;
 use core::fmt;
-use downcast_rs::{impl_downcast, Downcast, DowncastSync};
+use downcast_rs::{impl_downcast, DowncastSync};
 use dyn_clone::DynClone;
 use nih_plug_vizia::vizia::prelude::*;
 use rand::random;
-use std::{any::Any, sync::Arc};
 
-use crate::{Chain, chain::ChainHandle};
+use crate::Chain;
 
 #[derive(Debug, Clone, Copy, Hash, PartialEq, Eq)]
 pub struct Effect(u64);

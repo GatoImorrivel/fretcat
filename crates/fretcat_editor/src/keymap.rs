@@ -2,9 +2,6 @@ use fretcat_effects::{ChainCommand, Overdrive, ChainData};
 use nih_plug::nih_log;
 use nih_plug_vizia::vizia::prelude::{Code, KeyChord, Keymap, KeymapEntry, LensExt, Modifiers};
 
-use crate::EditorData;
-
-
 pub fn make_keymap() -> Keymap<Action> {
     Keymap::from(vec![
         (

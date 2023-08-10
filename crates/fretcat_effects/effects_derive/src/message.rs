@@ -19,7 +19,7 @@ pub(crate) fn derive_message_impl(
 }
 
 fn derive_struct(
-    input: &syn::DeriveInput,
+    _input: &syn::DeriveInput,
     s: &DataStruct,
 ) -> Result<proc_macro2::TokenStream, syn::Error> {
     let msg_fields = s.fields.iter().filter(|field| {

@@ -1,6 +1,6 @@
 use nih_plug_vizia::vizia::prelude::*;
 
-use super::{card::card_system_init, EffectKind, EFFECT_CARDS};
+use super::{EffectKind, EFFECT_CARDS};
 
 const KIND_PER_ROW: usize = 2;
 
@@ -111,7 +111,7 @@ impl View for Sidebar {
         Some("sidebar")
     }
 
-    fn event(&mut self, cx: &mut EventContext, event: &mut Event) {
+    fn event(&mut self, _cx: &mut EventContext, event: &mut Event) {
         event.map(|event, _| match event {
             SidebarMessage::ChangeTab(tab) => {
                 self.current_tab = *tab;

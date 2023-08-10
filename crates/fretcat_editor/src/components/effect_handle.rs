@@ -1,4 +1,4 @@
-use fretcat_effects::{AudioEffect, ChainCommand, ChainData, ChainHandle, Effect};
+use fretcat_effects::{AudioEffect, ChainCommand, ChainData, Effect};
 use nih_plug::nih_log;
 use nih_plug_vizia::vizia::prelude::*;
 
@@ -13,7 +13,6 @@ pub struct EffectHandle {
 impl EffectHandle {
     pub fn new(cx: &mut Context, effect: Effect) -> Option<()> {
         let chain = ChainData::chain.get(cx);
-        let c2 = chain.clone();
         let borrow = chain.borrow();
         let data = borrow.query(&effect)?;
         let index = borrow.get_position(&effect)?;

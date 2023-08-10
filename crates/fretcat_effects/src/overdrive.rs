@@ -1,9 +1,8 @@
 use std::f32::consts::PI;
 
-use nih_plug::{wrapper::clap::lazy_static, nih_dbg};
 use nih_plug_vizia::vizia::prelude::*;
 
-use crate::{chain::ChainHandle, effect::AudioEffect, ChainData, Effect, Chain};
+use crate::{effect::AudioEffect, ChainData, Effect, Chain};
 
 use effects_derive::{getter, Message};
 

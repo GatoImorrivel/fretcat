@@ -1,11 +1,7 @@
-use fretcat_effects::{AtomicRefCell, AudioEffect, Chain, ChainCommand, Effect, Overdrive, ChainData};
 use nih_plug::nih_log;
-use nih_plug_vizia::vizia::{image::Pixel, input::MouseState, prelude::*};
+use nih_plug_vizia::vizia::prelude::*;
 
-use crate::{
-    EditorData,
-};
-
+use fretcat_effects::{ChainCommand, Effect, ChainData};
 use super::{CardData, CardEvent, effect_handle::EffectHandle};
 
 #[derive(Debug, Lens, Clone, Copy)]
