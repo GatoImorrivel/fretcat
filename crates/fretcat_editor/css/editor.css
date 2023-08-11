@@ -9,12 +9,22 @@
     z-index: 3;
 }
 
-.list-wrapper {
+.preset-control-wrapper {
+    height: 1s;
+}
+
+.effect-list-wrapper {
+    height: 10s;
+    child-left: 2%;
+    child-right: 2%;
+}
+
+.right-wrapper {
     width: 12s;
     background-color: #1f1f1f;
     box-shadow:  10px 10px 20px #181818;
     z-index: 2;
-    child-left: 1%;
+    row-between: 1%;
 }
 
 button:hover {

@@ -6,9 +6,9 @@ use std::sync::Arc;
 use fretcat_effects::{ChainData, ChainHandle};
 
 use keymap::make_keymap;
-use nih_plug_vizia::{ViziaState, create_vizia_editor, ViziaTheming};
-use nih_plug_vizia::vizia::prelude::*;
 use nih_plug::prelude::*;
+use nih_plug_vizia::vizia::prelude::*;
+use nih_plug_vizia::{create_vizia_editor, ViziaState, ViziaTheming};
 
 use components::*;
 
@@ -25,8 +25,7 @@ pub fn default_state() -> Arc<EditorState> {
 pub type InitFlags = (ChainHandle);
 
 #[derive(Lens)]
-struct EditorData {
-}
+struct EditorData {}
 
 impl Model for EditorData {}
 
@@ -53,9 +52,14 @@ pub fn create(
             })
             .class("sidebar-wrapper");
             VStack::new(cx, |cx| {
-                EffectList::new(cx);
+                VStack::new(cx, |cx| {
+                    PresetControl::new(cx);
+                }).class("preset-control-wrapper");
+                VStack::new(cx, |cx| {
+                    EffectList::new(cx);
+                }).class("effect-list-wrapper");
             })
-            .class("list-wrapper");
+            .class("right-wrapper");
         })
         .class("main");
 

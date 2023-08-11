@@ -68,6 +68,7 @@ impl EffectHandle {
                 },
             );
         })
+        .class("effect-handle")
         .height(Pixels(data.height()))
         .width(Stretch(1.0));
 

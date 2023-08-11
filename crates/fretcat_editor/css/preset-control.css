@@ -1,0 +1,24 @@
+preset-control {
+    background-color: #0f0f0f;
+    box-shadow: 8px 8px 15px #181818;
+}
+
+.preset-name {
+    color: white;
+    font-size: 36;
+}
+
+.save-btn {
+    color: white;
+    font-size: 36;
+    width: 50pt;
+    height: 50pt;
+    background-color: #0f0f0f;
+    border-width: 0px;
+    border-color: transparent;
+    border-radius: 0px;
+}
+
+preset-control > hstack {
+    col-between: 1s;
+}

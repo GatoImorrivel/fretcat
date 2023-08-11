@@ -1,4 +1,5 @@
 mod card;
+mod preset_control;
 mod effect_list;
 mod effect_handle;
 mod sidebar;
@@ -8,6 +9,7 @@ use strum::{IntoEnumIterator, EnumIter};
 
 pub use effect_list::{EffectList, EffectListEvent};
 pub use sidebar::Sidebar;
+pub use preset_control::PresetControl;
 pub use card::*;
 
 #[derive(Debug, EnumIter, Clone, Copy, PartialEq, Hash, Eq, Data)]
