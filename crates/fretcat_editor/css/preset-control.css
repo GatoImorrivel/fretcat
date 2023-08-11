@@ -8,11 +8,18 @@ preset-control {
     font-size: 36;
 }
 
+.name-wrapper {
+    child-space: 1s;
+    child-left: 10pt;
+    max-height: 1s;
+    overflow: hidden;
+}
+
 .save-btn {
     color: white;
     font-size: 36;
     width: 50pt;
-    height: 50pt;
+    height: 1s;
     background-color: #0f0f0f;
     border-width: 0px;
     border-color: transparent;

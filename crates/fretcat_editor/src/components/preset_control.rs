@@ -12,7 +12,9 @@ impl PresetControl {
             cx.add_stylesheet(include_str!("../../css/preset-control.css"))
                 .unwrap();
             HStack::new(cx, |cx| {
-                Label::new(cx, "untitled").class("preset-name");
+                VStack::new(cx, |cx| {
+                    Label::new(cx, "untitled").class("preset-name");
+                }).class("name-wrapper");
                 Button::new(
                     cx,
                     |ex| ex.emit(PresetMessage::Save),
