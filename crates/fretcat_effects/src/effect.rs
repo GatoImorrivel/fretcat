@@ -4,6 +4,8 @@ use dyn_clone::DynClone;
 use nih_plug_vizia::vizia::prelude::*;
 use rand::random;
 
+use erased_serde::{Serialize};
+
 use crate::Chain;
 
 #[derive(Debug, Clone, Copy, Hash, PartialEq, Eq)]
@@ -15,12 +17,11 @@ impl Effect {
     }
 }
 
-pub trait AudioEffect: fmt::Debug + Send + Sync + DynClone + DowncastSync {
+pub trait AudioEffect: Serialize + fmt::Debug + Send + Sync + DynClone + DowncastSync {
     fn process(&self, _sample: f32) -> f32;
     fn view(&self, cx: &mut Context, effect: Effect);
     fn update(&self, event: &mut Event, effect: Effect, chain: &mut Chain) -> Option<()>;
     fn height(&self) -> f32;
-    fn serialize(&self) -> String;
 }
 
 impl_downcast!(AudioEffect);

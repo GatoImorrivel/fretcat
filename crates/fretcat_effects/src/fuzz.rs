@@ -1,10 +1,11 @@
 use std::f32::consts::PI;
+use serde::{Deserialize, Serialize};
 
 use nih_plug_vizia::vizia::prelude::*;
 
 use crate::{effect::AudioEffect, Chain, Effect};
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct Fuzz {
     gain: f32,
     blend: f32,
@@ -37,10 +38,6 @@ impl AudioEffect for Fuzz {
 
     fn update(&self, event: &mut Event, effect: Effect, chain: &mut Chain) -> Option<()>{
        Some(())
-    }
-
-    fn serialize(&self) -> String {
-       "bolas".to_owned()
     }
 
     fn height(&self) -> f32 {

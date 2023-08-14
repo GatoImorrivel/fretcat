@@ -8,7 +8,7 @@ use crossbeam::queue::ArrayQueue;
 
 use crate::{
     effect::{AudioEffect, Effect},
-    overdrive::Overdrive,
+    overdrive::Overdrive, preset::Preset,
 };
 
 pub type Query<'a> = &'a Box<dyn AudioEffect>;
@@ -28,7 +28,7 @@ pub enum ChainCommand {
     InsertAt(usize, Box<dyn AudioEffect>),
     Remove(Effect),
     Swap(Effect, Effect),
-    Save,
+    Save(String),
 }
 
 #[derive(Debug)]
@@ -64,8 +64,17 @@ impl Chain {
                     }
                 }
             }
-            ChainCommand::Save => {
-                self.serialize();
+            ChainCommand::Save(name) => {
+                let ordered = self.effects.clone().into_iter().fold(
+                    Vec::<Box<dyn AudioEffect>>::new(),|mut acc,
+                    e | {
+                        let e = self.query(&e).unwrap().clone();
+                        acc.push(e);
+                        acc
+                    },
+                );
+
+                Preset::new(name.as_ref(), ordered).save();
             }
         }
     }
@@ -149,30 +158,6 @@ impl Chain {
             Some(_) => true,
             None => false,
         }
-    }
-
-    pub fn serialize(&self) {
-        let home = std::env::var("HOME").unwrap();
-        let path = format!("{}/Documents/chain.json", home);
-        let path = Path::new(&path);
-        let mut json: String = "".to_owned();
-        let ordered = self.effects.clone().into_iter().fold(
-            Vec::<Box<dyn AudioEffect>>::new(),
-            |mut acc, e| {
-                let d = self.query(&e).unwrap().clone();
-                acc.push(d);
-                acc
-            },
-        );
-
-        ordered.into_iter().for_each(|d| {
-            json += &d.serialize();
-        });
-
-        File::create(path)
-            .unwrap()
-            .write_all(json.as_bytes())
-            .unwrap();
     }
 }
 
