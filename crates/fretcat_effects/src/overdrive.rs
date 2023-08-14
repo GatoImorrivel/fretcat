@@ -3,10 +3,11 @@ use std::f32::consts::PI;
 use nih_plug_vizia::vizia::prelude::*;
 
 use crate::{effect::AudioEffect, ChainData, Effect, Chain};
+use serde::{Serialize, Deserialize};
 
 use fretcat_macros::{getter, Message};
 
-#[derive(Debug, Clone, Copy, Message)]
+#[derive(Debug, Clone, Copy, Message, Serialize)]
 pub struct Overdrive {
     #[msg]
     pub gain: f32,

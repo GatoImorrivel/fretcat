@@ -20,6 +20,7 @@ pub trait AudioEffect: fmt::Debug + Send + Sync + DynClone + DowncastSync {
     fn view(&self, cx: &mut Context, effect: Effect);
     fn update(&self, event: &mut Event, effect: Effect, chain: &mut Chain) -> Option<()>;
     fn height(&self) -> f32;
+    fn serialize(&self) -> String;
 }
 
 impl_downcast!(AudioEffect);

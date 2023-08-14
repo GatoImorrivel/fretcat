@@ -89,6 +89,10 @@ impl View for EffectList {
                 ChainCommand::Swap(e1, e2) => {
                     chain.borrow().add_to_queue(ChainCommand::Swap(e1, e2));
                 }
+                ChainCommand::Save => {
+                    nih_log!("oioioi");
+                    chain.borrow().add_to_queue(ChainCommand::Save);
+                }
             }
         }
     }

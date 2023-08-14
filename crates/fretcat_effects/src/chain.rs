@@ -1,6 +1,7 @@
-use std::{collections::HashMap, sync::Arc};
+use std::{collections::HashMap, fs::File, io::Write, path::Path, sync::Arc};
 
 use atomic_refcell::AtomicRefCell;
+use nih_plug::nih_log;
 use nih_plug_vizia::vizia::prelude::*;
 
 use crossbeam::queue::ArrayQueue;
@@ -16,7 +17,7 @@ pub type ChainHandle = Arc<AtomicRefCell<Chain>>;
 
 #[derive(Debug, Lens, Clone)]
 pub struct ChainData {
-    pub chain: ChainHandle
+    pub chain: ChainHandle,
 }
 
 impl Model for ChainData {}
@@ -27,6 +28,7 @@ pub enum ChainCommand {
     InsertAt(usize, Box<dyn AudioEffect>),
     Remove(Effect),
     Swap(Effect, Effect),
+    Save,
 }
 
 #[derive(Debug)]
@@ -61,6 +63,9 @@ impl Chain {
                         self.effects.swap(i1, i2);
                     }
                 }
+            }
+            ChainCommand::Save => {
+                self.serialize();
             }
         }
     }
@@ -142,8 +147,32 @@ impl Chain {
     pub fn check(&self, effect: &Effect) -> bool {
         match self.query(effect) {
             Some(_) => true,
-            None => false
+            None => false,
         }
+    }
+
+    pub fn serialize(&self) {
+        let home = std::env::var("HOME").unwrap();
+        let path = format!("{}/Documents/chain.json", home);
+        let path = Path::new(&path);
+        let mut json: String = "".to_owned();
+        let ordered = self.effects.clone().into_iter().fold(
+            Vec::<Box<dyn AudioEffect>>::new(),
+            |mut acc, e| {
+                let d = self.query(&e).unwrap().clone();
+                acc.push(d);
+                acc
+            },
+        );
+
+        ordered.into_iter().for_each(|d| {
+            json += &d.serialize();
+        });
+
+        File::create(path)
+            .unwrap()
+            .write_all(json.as_bytes())
+            .unwrap();
     }
 }
 
@@ -158,5 +187,15 @@ impl Default for Chain {
         chain.insert(Box::new(Overdrive::default()));
 
         chain
+    }
+}
+
+impl Clone for Chain {
+    fn clone(&self) -> Self {
+        Self {
+            data_cache: self.data_cache.clone(),
+            effects: self.effects.clone(),
+            update_queue: ArrayQueue::new(20),
+        }
     }
 }

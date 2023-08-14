@@ -1,4 +1,7 @@
+use fretcat_effects::{ChainData, ChainCommand};
 pub use nih_plug_vizia::vizia::prelude::*;
+
+use crate::EditorData;
 
 pub struct PresetControl {}
 
@@ -31,5 +34,12 @@ impl View for PresetControl {
         Some("preset-control")
     }
 
-    fn event(&mut self, cx: &mut EventContext, event: &mut Event) {}
+    fn event(&mut self, cx: &mut EventContext, event: &mut Event) {
+        event.map(|event, _| match event {
+            PresetMessage::Save => {
+                let chain = ChainData::chain.get(cx);
+                chain.borrow().add_to_queue(ChainCommand::Save);
+            }
+        });
+    }
 }

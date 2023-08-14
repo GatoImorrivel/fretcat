@@ -39,6 +39,10 @@ impl AudioEffect for Fuzz {
        Some(())
     }
 
+    fn serialize(&self) -> String {
+       "bolas".to_owned()
+    }
+
     fn height(&self) -> f32 {
         400.0
     }
