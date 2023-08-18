@@ -89,9 +89,6 @@ impl View for EffectList {
                 ChainCommand::Swap(e1, e2) => {
                     chain.borrow().add_to_queue(ChainCommand::Swap(e1, e2));
                 }
-                ChainCommand::Save(name) => {
-                    chain.borrow().add_to_queue(ChainCommand::Save(name));
-                }
             }
         }
     }

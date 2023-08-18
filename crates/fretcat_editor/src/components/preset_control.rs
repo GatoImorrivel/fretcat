@@ -1,8 +1,6 @@
 use fretcat_effects::{ChainData, ChainCommand};
 pub use nih_plug_vizia::vizia::prelude::*;
 
-use crate::EditorData;
-
 pub struct PresetControl {}
 
 pub enum PresetMessage {
@@ -38,7 +36,6 @@ impl View for PresetControl {
         event.map(|event, _| match event {
             PresetMessage::Save => {
                 let chain = ChainData::chain.get(cx);
-                chain.borrow().add_to_queue(ChainCommand::Save("Bolas".to_owned()));
             }
         });
     }

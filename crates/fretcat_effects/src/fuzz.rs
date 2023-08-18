@@ -1,16 +1,14 @@
-use std::f32::consts::PI;
-use serde::{Deserialize, Serialize};
-
+use serde::{Serialize, Deserialize};
 use nih_plug_vizia::vizia::prelude::*;
 
 use crate::{effect::AudioEffect, Chain, Effect};
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct Fuzz {
-    gain: f32,
-    blend: f32,
-    threshold: f32,
-    volume: f32,
+    pub gain: f32,
+    pub blend: f32,
+    pub threshold: f32,
+    pub volume: f32,
 }
 
 impl Default for Fuzz {

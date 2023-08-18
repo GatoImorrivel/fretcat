@@ -1,5 +1,6 @@
 {
     "rust-analyzer.linkedProjects": [
-        ".\\Cargo.toml"
+        ".\\Cargo.toml",
+        ".\\crates\\fretcat_serialization\\Cargo.toml"
     ]
 }

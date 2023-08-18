@@ -1,14 +1,13 @@
-use std::{collections::HashMap, fs::File, io::Write, path::Path, sync::Arc};
+use std::{collections::HashMap, sync::Arc};
 
 use atomic_refcell::AtomicRefCell;
-use nih_plug::nih_log;
 use nih_plug_vizia::vizia::prelude::*;
 
 use crossbeam::queue::ArrayQueue;
 
 use crate::{
     effect::{AudioEffect, Effect},
-    overdrive::Overdrive, preset::Preset,
+    overdrive::Overdrive,
 };
 
 pub type Query<'a> = &'a Box<dyn AudioEffect>;
@@ -28,7 +27,6 @@ pub enum ChainCommand {
     InsertAt(usize, Box<dyn AudioEffect>),
     Remove(Effect),
     Swap(Effect, Effect),
-    Save(String),
 }
 
 #[derive(Debug)]
@@ -63,18 +61,6 @@ impl Chain {
                         self.effects.swap(i1, i2);
                     }
                 }
-            }
-            ChainCommand::Save(name) => {
-                let ordered = self.effects.clone().into_iter().fold(
-                    Vec::<Box<dyn AudioEffect>>::new(),|mut acc,
-                    e | {
-                        let e = self.query(&e).unwrap().clone();
-                        acc.push(e);
-                        acc
-                    },
-                );
-
-                Preset::new(name.as_ref(), ordered).save();
             }
         }
     }

@@ -1,12 +1,12 @@
 use std::f32::consts::PI;
 
-use nih_plug_vizia::vizia::prelude::*;
 use rayon::prelude::*;
+use serde::{Serialize, Deserialize};
+use fretcat_macros::{getter, Message};
+use nih_plug_vizia::vizia::prelude::*;
 
 use crate::{effect::AudioEffect, ChainData, Effect, Chain};
 
-use serde::{Deserialize, Serialize};
-use fretcat_macros::{getter, Message};
 
 #[derive(Debug, Clone, Copy, Message, Serialize, Deserialize)]
 pub struct Overdrive {

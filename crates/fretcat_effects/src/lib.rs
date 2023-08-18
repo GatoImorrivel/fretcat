@@ -14,5 +14,4 @@ pub use overdrive::Overdrive;
 pub use chain::{Chain, ChainCommand, ChainData, ChainHandle};
 pub use effect::{Effect, AudioEffect};
 pub use rayon;
-mod preset;
 pub use dyn_clone;
