@@ -5,9 +5,11 @@ pub use nih_plug;
 use nih_plug::prelude::*;
 
 use fretcat_effects::{AtomicRefCell, Chain, ChainHandle};
+use fretcat_effects::rayon::prelude::*;
 use params::FretcatParams;
 
-use std::{num::NonZeroU32, sync::Arc, borrow::BorrowMut};
+use std::sync::atomic::Ordering;
+use std::{num::NonZeroU32, sync::Arc};
 
 const NUM_INPUT_CHANNELS: u32 = 2;
 const NUM_OUTPUT_CHANNELS: u32 = 2;
@@ -86,7 +88,15 @@ impl Plugin for Fretcat {
         _aux: &mut AuxiliaryBuffers,
         _context: &mut impl ProcessContext<Self>,
     ) -> ProcessStatus {
+        let noise_gate = self.editor_data.noise_gate.load(Ordering::Acquire);
+        let in_gain = self.editor_data.in_gain.load(Ordering::Acquire);
+        let out_gain = self.editor_data.out_gain.load(Ordering::Acquire);
+
         for channel in buffer.as_slice() {
+            channel.par_iter_mut().for_each(|sample| {
+                *sample = sample.clamp(-noise_gate, noise_gate);
+            });
+
             for effect in self.chain.borrow().effects.iter() {
                 self.chain.borrow().query(effect).unwrap().process(*channel);
             }

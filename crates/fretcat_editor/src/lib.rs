@@ -41,13 +41,13 @@ impl Model for EditorData {
     fn event(&mut self, cx: &mut EventContext, event: &mut Event) {
         event.map(|event, _| match event {
             EditorEvent::SetNoiseGate(val) => {
-                self.noise_gate.store(*val, Ordering::Relaxed);
+                self.noise_gate.store(nih_plug::util::db_to_gain(*val), Ordering::Relaxed);
             }
             EditorEvent::SetInGain(val) => {
-                self.in_gain.store(*val, Ordering::Relaxed);
+                self.in_gain.store(nih_plug::util::db_to_gain(*val), Ordering::Relaxed);
             }
             EditorEvent::SetOutGain(val) => {
-                self.out_gain.store(*val, Ordering::Relaxed);
+                self.out_gain.store(nih_plug::util::db_to_gain(*val), Ordering::Relaxed);
             }
         });
     }
