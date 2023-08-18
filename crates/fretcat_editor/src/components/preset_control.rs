@@ -38,7 +38,7 @@ impl View for PresetControl {
         event.map(|event, _| match event {
             PresetMessage::Save => {
                 let chain = ChainData::chain.get(cx);
-                chain.borrow().add_to_queue(ChainCommand::Save);
+                chain.borrow().add_to_queue(ChainCommand::Save("Bolas".to_owned()));
             }
         });
     }

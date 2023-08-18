@@ -4,7 +4,7 @@ mod effect_list;
 mod effect_handle;
 mod sidebar;
 
-use nih_plug_vizia::vizia::prelude::Data;
+use nih_plug_vizia::vizia::prelude::*;
 use strum::{IntoEnumIterator, EnumIter};
 
 pub use effect_list::{EffectList, EffectListEvent};

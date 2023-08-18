@@ -25,11 +25,7 @@ impl Default for Fuzz {
 }
 
 impl AudioEffect for Fuzz {
-    fn process(&self, _sample: f32) -> f32 {
-        let dirty = (2.0 / PI) * f32::atan(_sample * self.gain * self.threshold);
-        let blend = ((dirty * self.blend) + (_sample * (1.0 / self.blend))) / 2.0;
-
-        blend * self.volume
+    fn process(&self, input_buffer: &mut [f32]) {
     }
 
     fn view(&self, cx: &mut Context, effect: Effect) {

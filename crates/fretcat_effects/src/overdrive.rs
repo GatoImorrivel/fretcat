@@ -1,6 +1,7 @@
 use std::f32::consts::PI;
 
 use nih_plug_vizia::vizia::prelude::*;
+use rayon::prelude::*;
 
 use crate::{effect::AudioEffect, ChainData, Effect, Chain};
 
@@ -29,15 +30,17 @@ impl Default for Overdrive {
 }
 
 impl AudioEffect for Overdrive {
-    fn process(&self, _sample: f32) -> f32 {
-        let clean = _sample;
-        let threshold = self.threshold * 100.0;
-        let amplified = _sample * self.gain * threshold;
-        let distorted = (2.0 / PI) * f32::atan(amplified);
+    fn process(&self, input_buffer: &mut [f32]) {
+        input_buffer.par_iter_mut().for_each(|sample| {
+            let clean = *sample;
+            let threshold = self.threshold * 100.0;
+            let amplified = *sample * self.gain * threshold;
+            let distorted = (2.0 / PI) * f32::atan(amplified);
 
-        let output_gain = self.volume * 10.0;
+            let output_gain = self.volume * 10.0;
 
-        ((distorted * self.blend) + (clean * (1.0 - self.blend))) * output_gain
+            *sample = ((distorted * self.blend) + (clean * (1.0 - self.blend))) * output_gain;
+        });
     }
 
     fn view(&self, cx: &mut Context, effect: Effect) {

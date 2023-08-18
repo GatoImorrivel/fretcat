@@ -1,7 +1,7 @@
 mod components;
 mod keymap;
 
-use std::sync::Arc;
+use std::sync::{Arc, atomic::Ordering};
 
 use fretcat_effects::{ChainData, ChainHandle};
 
@@ -22,15 +22,39 @@ pub fn default_state() -> Arc<EditorState> {
 }
 
 #[allow(unused_parens)]
-pub type InitFlags = (ChainHandle);
+pub type InitFlags = (ChainHandle, EditorData);
 
-#[derive(Lens)]
-struct EditorData {}
+#[derive(Debug, Clone, Lens, Default)]
+pub struct EditorData {
+    pub noise_gate: Arc<AtomicF32>,
+    pub in_gain: Arc<AtomicF32>,
+    pub out_gain: Arc<AtomicF32>,
+}
 
-impl Model for EditorData {}
+pub enum EditorEvent {
+    SetNoiseGate(f32),
+    SetInGain(f32),
+    SetOutGain(f32)
+}
+
+impl Model for EditorData {
+    fn event(&mut self, cx: &mut EventContext, event: &mut Event) {
+        event.map(|event, _| match event {
+            EditorEvent::SetNoiseGate(val) => {
+                self.noise_gate.store(*val, Ordering::Relaxed);
+            }
+            EditorEvent::SetInGain(val) => {
+                self.in_gain.store(*val, Ordering::Relaxed);
+            }
+            EditorEvent::SetOutGain(val) => {
+                self.out_gain.store(*val, Ordering::Relaxed);
+            }
+        });
+    }
+}
 
 pub fn create(
-    #[allow(unused_parens)] (chain): InitFlags,
+    #[allow(unused_parens)] (chain, editor_data): InitFlags,
     editor_state: Arc<ViziaState>,
 ) -> Option<Box<dyn Editor>> {
     create_vizia_editor(editor_state, ViziaTheming::Custom, move |cx, _| {
@@ -39,6 +63,8 @@ pub fn create(
         }
         .build(cx);
         make_keymap().build(cx);
+
+        editor_data.clone().build(cx);
 
         cx.add_stylesheet(include_str!("../css/editor.css"))
             .unwrap();

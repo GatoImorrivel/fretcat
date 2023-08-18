@@ -1,18 +1,20 @@
 mod params;
 
+use fretcat_editor::EditorData;
 pub use nih_plug;
 use nih_plug::prelude::*;
 
 use fretcat_effects::{AtomicRefCell, Chain, ChainHandle};
 use params::FretcatParams;
 
-use std::{num::NonZeroU32, sync::Arc};
+use std::{num::NonZeroU32, sync::Arc, borrow::BorrowMut};
 
 const NUM_INPUT_CHANNELS: u32 = 2;
 const NUM_OUTPUT_CHANNELS: u32 = 2;
 pub struct Fretcat {
     params: Arc<FretcatParams>,
     chain: ChainHandle,
+    editor_data: EditorData
 }
 
 impl Default for Fretcat {
@@ -20,6 +22,7 @@ impl Default for Fretcat {
         Self {
             params: Arc::new(FretcatParams::default()),
             chain: Arc::new(AtomicRefCell::new(Chain::default())),
+            editor_data: EditorData::default()
         }
     }
 }
@@ -50,7 +53,7 @@ impl Plugin for Fretcat {
 
     fn editor(&mut self, _async_executor: AsyncExecutor<Self>) -> Option<Box<dyn Editor>> {
         #[allow(unused_parens)]
-        fretcat_editor::create((self.chain.clone()), self.params.editor_state.clone())
+        fretcat_editor::create((self.chain.clone(), self.editor_data.clone()), self.params.editor_state.clone())
     }
 
     fn initialize(
@@ -83,11 +86,9 @@ impl Plugin for Fretcat {
         _aux: &mut AuxiliaryBuffers,
         _context: &mut impl ProcessContext<Self>,
     ) -> ProcessStatus {
-        for channel in buffer.iter_samples() {
-            for sample in channel {
-                for effect in self.chain.borrow().effects.iter() {
-                    *sample = self.chain.borrow().query(effect).unwrap().process(*sample);
-                }
+        for channel in buffer.as_slice() {
+            for effect in self.chain.borrow().effects.iter() {
+                self.chain.borrow().query(effect).unwrap().process(*channel);
             }
         }
 
