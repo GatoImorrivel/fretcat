@@ -24,7 +24,8 @@ fn derive_enum(
 ) -> Result<proc_macro2::TokenStream, syn::Error> {
     let enum_name = &input.ident;
 
-    let mut ifs = vec![];
+    let mut from_ifs = vec![];
+    let mut into_ifs = vec![];
     for variant in e.variants.iter() {
         let fields = &variant.fields;
 
@@ -35,9 +36,15 @@ fn derive_enum(
             let variant_ident = &variant.ident;
             let ty = &field.unnamed.first().unwrap().ty;
 
-            ifs.push(quote! {
+            from_ifs.push(quote! {
                 if value.is::<#ty>() {
                     return Ok(#enum_name::#variant_ident(value.downcast_ref::<#ty>().unwrap().clone()));
+                }
+            });
+
+            into_ifs.push(quote! {
+                if let #enum_name::#variant_ident(val) = self {
+                    return Ok(Box::new(val));
                 }
             });
         } else {
@@ -50,7 +57,17 @@ fn derive_enum(
             type Error = MapperError;
 
             fn try_from(value: Box<dyn AudioEffect>) -> Result<Self, Self::Error> {
-                #(#ifs)*
+                #(#from_ifs)*
+
+                Err(Self::Error::NotFound)
+            }
+        }
+
+        impl TryInto<Box<dyn AudioEffect>> for Mapper {
+            type Error = MapperError;
+
+            fn try_into(self) -> Result<Box<dyn AudioEffect>, Self::Error> {
+                #(#into_ifs)*
 
                 Err(Self::Error::NotFound)
             }
