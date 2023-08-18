@@ -1,4 +1,5 @@
 use fretcat_effects::{ChainData, ChainCommand};
+use fretcat_serialization::Preset;
 pub use nih_plug_vizia::vizia::prelude::*;
 
 pub struct PresetControl {}
@@ -36,6 +37,10 @@ impl View for PresetControl {
         event.map(|event, _| match event {
             PresetMessage::Save => {
                 let chain = ChainData::chain.get(cx);
+
+                let preset = Preset::from(chain);
+
+                preset.save();
             }
         });
     }

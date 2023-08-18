@@ -88,15 +88,7 @@ impl Plugin for Fretcat {
         _aux: &mut AuxiliaryBuffers,
         _context: &mut impl ProcessContext<Self>,
     ) -> ProcessStatus {
-        let noise_gate = self.editor_data.noise_gate.load(Ordering::Acquire);
-        let in_gain = self.editor_data.in_gain.load(Ordering::Acquire);
-        let out_gain = self.editor_data.out_gain.load(Ordering::Acquire);
-
         for channel in buffer.as_slice() {
-            channel.par_iter_mut().for_each(|sample| {
-                *sample = sample.clamp(-noise_gate, noise_gate);
-            });
-
             for effect in self.chain.borrow().effects.iter() {
                 self.chain.borrow().query(effect).unwrap().process(*channel);
             }

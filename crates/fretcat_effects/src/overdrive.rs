@@ -31,7 +31,7 @@ impl Default for Overdrive {
 
 impl AudioEffect for Overdrive {
     fn process(&self, input_buffer: &mut [f32]) {
-        input_buffer.par_iter_mut().for_each(|sample| {
+        input_buffer.iter_mut().for_each(|sample| {
             let clean = *sample;
             let threshold = self.threshold * 100.0;
             let amplified = *sample * self.gain * threshold;
