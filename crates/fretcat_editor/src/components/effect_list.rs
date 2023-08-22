@@ -1,7 +1,7 @@
 use nih_plug::nih_log;
 use nih_plug_vizia::vizia::prelude::*;
 
-use fretcat_effects::{ChainCommand, Effect, ChainData};
+use fretcat_effects::{ChainCommand, effects::Effect, ChainData};
 use super::{CardData, CardEvent, effect_handle::EffectHandle};
 
 #[derive(Debug, Lens, Clone, Copy)]

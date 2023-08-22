@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use fretcat_effects::{AudioEffect, Fuzz, Overdrive};
+use fretcat_effects::effects::{AudioEffect, Fuzz, Overdrive};
 use nih_plug_vizia::vizia::prelude::*;
 
 use crate::EffectKind;

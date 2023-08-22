@@ -1,4 +1,5 @@
-use fretcat_effects::{AudioEffect, ChainCommand, ChainData, Effect};
+use fretcat_effects::{ChainCommand, ChainData};
+use fretcat_effects::effects::{AudioEffect, Effect};
 use nih_plug::nih_log;
 use nih_plug_vizia::vizia::prelude::*;
 

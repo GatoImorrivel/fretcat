@@ -1,12 +1,12 @@
 use std::f32::consts::PI;
 
-use rayon::prelude::*;
 use serde::{Serialize, Deserialize};
 use fretcat_macros::{getter, Message};
 use nih_plug_vizia::vizia::prelude::*;
 
-use crate::{effect::AudioEffect, ChainData, Effect, Chain};
+use crate::{ChainData, Chain};
 
+use super::{AudioEffect, Effect};
 
 #[derive(Debug, Clone, Copy, Message, Serialize, Deserialize)]
 pub struct Overdrive {
@@ -44,7 +44,7 @@ impl AudioEffect for Overdrive {
     }
 
     fn view(&self, cx: &mut Context, effect: Effect) {
-        cx.add_stylesheet(include_str!("../css/overdrive.css")).unwrap();
+        cx.add_stylesheet(include_str!("../../css/overdrive.css")).unwrap();
         VStack::new(cx, |cx| {
             VStack::new(cx, |cx| {
                 Knob::new(cx, 1.0, getter!(gain), false)

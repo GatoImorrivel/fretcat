@@ -4,7 +4,7 @@ mod tests;
 
 use std::{fs, path::Path};
 
-use fretcat_effects::{AudioEffect, Chain, ChainHandle};
+use fretcat_effects::{effects::AudioEffect, Chain, ChainHandle};
 use mapper::Mapper;
 use serde::{Deserialize, Serialize};
 

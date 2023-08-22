@@ -6,6 +6,12 @@ use rand::random;
 
 use crate::Chain;
 
+mod overdrive;
+mod fuzz;
+
+pub use overdrive::Overdrive;
+pub use fuzz::Fuzz;
+
 #[derive(Debug, Clone, Copy, Hash, PartialEq, Eq)]
 pub struct Effect(u64);
 

@@ -1,7 +1,9 @@
 use serde::{Serialize, Deserialize};
 use nih_plug_vizia::vizia::prelude::*;
 
-use crate::{effect::AudioEffect, Chain, Effect};
+use crate::Chain;
+
+use super::{AudioEffect, Effect};
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct Fuzz {

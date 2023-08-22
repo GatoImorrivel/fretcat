@@ -5,10 +5,7 @@ use nih_plug_vizia::vizia::prelude::*;
 
 use crossbeam::queue::ArrayQueue;
 
-use crate::{
-    effect::{AudioEffect, Effect},
-    overdrive::Overdrive,
-};
+use crate::effects::{AudioEffect, Effect, Overdrive};
 
 pub type Query<'a> = &'a Box<dyn AudioEffect>;
 pub type QueryMut<'a> = &'a mut Box<dyn AudioEffect>;

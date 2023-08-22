@@ -1,4 +1,5 @@
-use crate::{Chain, ChainCommand, Overdrive};
+use crate::{Chain, ChainCommand};
+use crate::effects::Overdrive;
 
 #[test]
 fn chain_query() {

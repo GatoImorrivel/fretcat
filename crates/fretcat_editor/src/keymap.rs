@@ -1,4 +1,4 @@
-use fretcat_effects::{ChainCommand, Overdrive, ChainData};
+use fretcat_effects::{ChainCommand, ChainData, effects::Overdrive};
 use nih_plug::nih_log;
 use nih_plug_vizia::vizia::prelude::{Code, KeyChord, Keymap, KeymapEntry, LensExt, Modifiers};
 

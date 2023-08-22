@@ -1,4 +1,4 @@
-use fretcat_effects::{Fuzz, Overdrive, AudioEffect};
+use fretcat_effects::effects::{Fuzz, Overdrive, AudioEffect};
 use fretcat_macros::EffectMapper;
 
 use serde::{Deserialize, Serialize};
