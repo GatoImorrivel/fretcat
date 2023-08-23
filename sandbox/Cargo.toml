@@ -9,4 +9,5 @@ edition = "2021"
 anyhow = "1.0.71"
 cpal = "0.15.2"
 hot-lib-reloader = "0.6.5"
+hound = "3.5.0"
 process = {path = "process"}

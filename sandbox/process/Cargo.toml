@@ -10,3 +10,4 @@ crate-type = ["rlib", "dylib"]
 
 [dependencies]
 hot-lib-reloader = "0.6.5"
+rayon = "1.7.0"

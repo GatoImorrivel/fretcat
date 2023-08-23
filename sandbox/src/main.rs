@@ -6,49 +6,24 @@ mod hot_lib {
     hot_functions_from_file!("process/src/lib.rs");
 }
 
+use std::{fs::File, io::BufReader, path::Path};
+
 use cpal::{
     traits::{DeviceTrait, HostTrait, StreamTrait},
     FromSample, Sample, SizedSample,
 };
+use hound::WavReader;
 
 fn main() -> anyhow::Result<()> {
     let stream = stream_setup_for()?;
     stream.play()?;
 
     // Wait for a keypress to exit
-    println!("Playing sine wave. Press Enter to exit...");
+    println!("Press Enter to exit...");
     let mut input = String::new();
-    std::io::stdin().read_line(&mut input).unwrap();            
+    std::io::stdin().read_line(&mut input).unwrap();
 
     Ok(())
-}
-
-pub struct Oscillator {
-    pub sample_rate: f32,
-    pub current_sample_index: f32,
-    pub frequency_hz: f32,
-    pub amplitude: f32
-}
-
-impl Oscillator {
-    fn advance_sample(&mut self) {
-        self.current_sample_index = (self.current_sample_index + 1.0) % self.sample_rate;
-    }
-
-    fn calculate_sine_output_from_freq(&self, freq: f32) -> f32 {
-        let two_pi = 2.0 * std::f32::consts::PI;
-        (self.current_sample_index * freq * two_pi / self.sample_rate).sin() / self.amplitude
-    }
-
-    fn sine_wave(&mut self) -> f32 {
-        self.advance_sample();
-        self.calculate_sine_output_from_freq(self.frequency_hz)
-    }
-
-    fn tick(&mut self) -> f32 {
-        self.advance_sample();
-        self.sine_wave()
-    }
 }
 
 pub fn stream_setup_for() -> Result<cpal::Stream, anyhow::Error>
@@ -88,6 +63,29 @@ pub fn host_device_setup(
     Ok((host, device, config))
 }
 
+struct Input {
+    samples: Vec<f32>,
+    current_sample: usize,
+}
+
+impl Input {
+    pub fn new(input: Vec<f32>) -> Self {
+        Self {
+            samples: input,
+            current_sample: 0usize,
+        }
+    }
+
+    pub fn tick(&mut self) -> f32 {
+        if self.current_sample >= self.samples.len() {
+            self.current_sample = 0;
+        }
+        let out = self.samples[self.current_sample];
+        self.current_sample += 1;
+        out
+    }
+}
+
 pub fn make_stream<T>(
     device: &cpal::Device,
     config: &cpal::StreamConfig,
@@ -96,21 +94,20 @@ where
     T: SizedSample + FromSample<f32>,
 {
     let num_channels = config.channels as usize;
-    let mut oscillator = Oscillator {
-        sample_rate: config.sample_rate.0 as f32,
-        current_sample_index: 0.0,
-        frequency_hz: 440.0,
-        amplitude: 20.0
-    };
     let err_fn = |err| eprintln!("Error building output sound stream: {}", err);
 
-    let time_at_start = std::time::Instant::now();
-    println!("Time at start: {:?}", time_at_start);
+    let mut reader = WavReader::open("./H.wav").unwrap();
+    let samples = reader
+        .samples::<i16>()
+        .map(|s| s.unwrap() as f32)
+        .collect::<Vec<_>>();
+
+    let mut input = Input::new(samples);
 
     let stream = device.build_output_stream(
         config,
         move |output: &mut [T], _: &cpal::OutputCallbackInfo| {
-            process_frame(output, &mut oscillator, num_channels)
+            process_frame(output, &mut input, num_channels)
         },
         err_fn,
         None,
@@ -119,21 +116,17 @@ where
     Ok(stream)
 }
 
-fn process_frame<SampleType>(
-    output: &mut [SampleType],
-    oscillator: &mut Oscillator,
-    num_channels: usize,
-) where
+fn process_frame<SampleType>(output: &mut [SampleType], input: &mut Input, num_channels: usize)
+where
     SampleType: Sample + FromSample<f32>,
 {
-    for frame in output.chunks_mut(num_channels) {
-        let value: SampleType = SampleType::from_sample(oscillator.tick());
+    let mut buffer = vec![];
+    for i in 0..output.len() {
+        buffer.push(input.tick());
+    }
+    hot_lib::process_sample(&mut buffer);
 
-        // copy the same value to all channels
-        for sample in frame.iter_mut() {
-            *sample = value;
-            let s = hot_lib::process_sample(sample.to_float_sample().to_sample());
-            *sample = SampleType::from_sample(s);
-        }
+    for (i, sample) in output.iter_mut().enumerate() {
+        *sample = SampleType::from_sample(buffer[i] / 100000.0);
     }
 }
