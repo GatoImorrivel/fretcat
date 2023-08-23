@@ -10,4 +10,6 @@ anyhow = "1.0.71"
 cpal = "0.15.2"
 hot-lib-reloader = "0.6.5"
 hound = "3.5.0"
+ndarray = "0.15.6"
+ndarray-conv = "0.2.0"
 process = {path = "process"}
