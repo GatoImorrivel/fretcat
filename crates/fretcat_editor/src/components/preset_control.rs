@@ -2,20 +2,28 @@ use fretcat_effects::{ChainData, ChainCommand};
 use fretcat_serialization::Preset;
 pub use nih_plug_vizia::vizia::prelude::*;
 
-pub struct PresetControl {}
+#[derive(Debug, Lens)]
+pub struct PresetControl {
+    pub preset_name: String,
+}
 
 pub enum PresetMessage {
     Save,
+    NameChange(String)
 }
 
 impl PresetControl {
     pub fn new(cx: &mut Context) {
-        Self {}.build(cx, |cx| {
+        Self {
+            preset_name: "Untitled".to_owned()
+        }.build(cx, |cx| {
             cx.add_stylesheet(include_str!("../../css/preset-control.css"))
                 .unwrap();
             HStack::new(cx, |cx| {
                 VStack::new(cx, |cx| {
-                    Label::new(cx, "untitled").class("preset-name");
+                    Textbox::new(cx, Self::preset_name)
+                        .on_edit(|ex, val| ex.emit(PresetMessage::NameChange(val)))
+                        .class("preset-name");
                 }).class("name-wrapper");
                 Button::new(
                     cx,
@@ -41,6 +49,9 @@ impl View for PresetControl {
                 let preset = Preset::from(chain);
 
                 preset.save();
+            }
+            PresetMessage::NameChange(val) => {
+                self.preset_name = val.to_owned();
             }
         });
     }

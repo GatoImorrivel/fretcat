@@ -18,3 +18,4 @@ nih_plug = { git = "https://github.com/geom3trik/nih-plug.git", branch = "vizia-
 nih_plug_vizia = { git = "https://github.com/geom3trik/nih-plug.git", branch = "vizia-update" }
 rayon = "1.7.0"
 serde = { version = "1.0.183", features = ["derive"] }
+fundsp = "0.15.0"

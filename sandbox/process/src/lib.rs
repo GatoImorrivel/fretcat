@@ -3,19 +3,21 @@ use std::f32::consts::PI;
 use convolutions_rs::convolutions::ConvolutionLayer;
 use ndarray::prelude::*;
 use rayon::prelude::*;
-use fundsp::prelude::*;
+use fundsp::{prelude::*, hacker32::butterpass_hz};
+
+use lazy_static::*;
 
 #[no_mangle]
 pub fn process_sample(buffer: &mut [f32]) {
-    let blend = 1.0;
-    let gain =  100.0;
-    buffer.par_iter_mut().for_each(|sample| {
-        let clean = *sample;
-        let amplified = *sample * gain;
-        let distorted = (2.0 / PI) * f32::atan(amplified) * gain;
+    let freq = 440.0;
+    let resonance = 0.25;
 
-        *sample = (distorted * blend) + (clean * (1.0 - blend));
-    });
+    let input = buffer.iter().map(|sample| sample.clone()).collect::<Vec<_>>();
+    let mut filter = highpass_hz::<f32, f32>(freq, resonance);
+
+    for (input, output) in input.chunks(64).zip(buffer.chunks_mut(64)) {
+        filter.process(input.len(), &[input] , &mut[output]);
+    }
 }
 
 fn convolve(signal: &[f32], kernel: &[f32]) -> Vec<f32> {
