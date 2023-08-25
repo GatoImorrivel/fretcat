@@ -90,7 +90,7 @@ impl Plugin for Fretcat {
     ) -> ProcessStatus {
         for channel in buffer.as_slice() {
             for effect in self.chain.borrow().effects.iter() {
-                self.chain.borrow().query(effect).unwrap().process(*channel);
+                self.chain.borrow_mut().query(effect).unwrap().process(*channel);
             }
         }
 

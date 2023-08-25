@@ -28,11 +28,11 @@ fn chain_query_mut_cast() {
     let overdrive = {
         let overdrive = chain.query_cast_mut::<Overdrive>(&effect).unwrap();
 
-        overdrive.gain = 10.0;
+        overdrive.blend = 10.0;
         overdrive.clone()
     };
 
-    assert_eq!(overdrive.gain, chain.query_cast::<Overdrive>(&effect).unwrap().clone().gain);
+    assert_eq!(overdrive.blend, chain.query_cast::<Overdrive>(&effect).unwrap().clone().blend);
 }
 
 #[test]

@@ -17,8 +17,6 @@ pub struct Overdrive {
     pub freq: f32,
     #[msg]
     pub volume: f32,
-    #[serde(skip_serializing, skip_deserializing)]
-    filter: Filter
 }
 
 #[derive(Clone)]
@@ -46,7 +44,6 @@ impl Default for Overdrive {
             blend: 1.0,
             freq: 0.0,
             volume: 1.0,
-            filter: Filter::default() 
         }
     }
 }
@@ -55,7 +52,7 @@ impl AudioEffect for Overdrive {
     fn process(&self, input_buffer: &mut [f32]) {
         input_buffer.iter_mut().for_each(|sample| {
             let clean = *sample;
-            let amplified = *sample * nih_plug::util::db_to_gain_fast(5.0);
+            let amplified = *sample * 5.0;
             let distorted = (2.0 / PI) * f32::atan(amplified);
 
             let output_gain = self.volume * 10.0;
@@ -96,7 +93,6 @@ impl AudioEffect for Overdrive {
             }
             Message::Freq(val) => {
                 data.freq = *val;
-                data.filter.filter.set_cutoff(*val);
             }
             Message::Volume(val) => {
                 data.volume = *val;
