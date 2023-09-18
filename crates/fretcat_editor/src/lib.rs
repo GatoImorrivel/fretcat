@@ -1,12 +1,14 @@
 mod components;
 mod keymap;
 
-use std::sync::{Arc, atomic::Ordering};
+use std::sync::{atomic::Ordering, Arc};
 
 use fretcat_effects::{ChainData, ChainHandle};
 
 use keymap::make_keymap;
 use nih_plug::prelude::*;
+use nih_plug_vizia::vizia::image::imageops::FilterType;
+use nih_plug_vizia::vizia::image::{load_from_memory_with_format, DynamicImage, ImageFormat};
 use nih_plug_vizia::vizia::prelude::*;
 use nih_plug_vizia::{create_vizia_editor, ViziaState, ViziaTheming};
 
@@ -34,20 +36,23 @@ pub struct EditorData {
 pub enum EditorEvent {
     SetNoiseGate(f32),
     SetInGain(f32),
-    SetOutGain(f32)
+    SetOutGain(f32),
 }
 
 impl Model for EditorData {
     fn event(&mut self, cx: &mut EventContext, event: &mut Event) {
         event.map(|event, _| match event {
             EditorEvent::SetNoiseGate(val) => {
-                self.noise_gate.store(nih_plug::util::db_to_gain(*val), Ordering::Relaxed);
+                self.noise_gate
+                    .store(nih_plug::util::db_to_gain(*val), Ordering::Relaxed);
             }
             EditorEvent::SetInGain(val) => {
-                self.in_gain.store(nih_plug::util::db_to_gain(*val), Ordering::Relaxed);
+                self.in_gain
+                    .store(nih_plug::util::db_to_gain(*val), Ordering::Relaxed);
             }
             EditorEvent::SetOutGain(val) => {
-                self.out_gain.store(nih_plug::util::db_to_gain(*val), Ordering::Relaxed);
+                self.out_gain
+                    .store(nih_plug::util::db_to_gain(*val), Ordering::Relaxed);
             }
         });
     }
@@ -66,6 +71,7 @@ pub fn create(
 
         editor_data.clone().build(cx);
         register_fonts(cx);
+        register_images(cx);
 
         cx.add_stylesheet(include_str!("../css/editor.css"))
             .unwrap();
@@ -79,10 +85,12 @@ pub fn create(
             VStack::new(cx, |cx| {
                 VStack::new(cx, |cx| {
                     PresetControl::new(cx);
-                }).class("preset-control-wrapper");
+                })
+                .class("preset-control-wrapper");
                 VStack::new(cx, |cx| {
                     EffectList::new(cx);
-                }).class("effect-list-wrapper");
+                })
+                .class("effect-list-wrapper");
             })
             .class("right-wrapper");
         })
@@ -93,6 +101,26 @@ pub fn create(
 }
 
 fn register_fonts(cx: &mut Context) {
-    cx.add_font_mem(include_bytes!("../../assets/fonts/SymbolsNerdFontMono-Regular.ttf"));
+    cx.add_font_mem(include_bytes!(
+        "../../assets/fonts/SymbolsNerdFontMono-Regular.ttf"
+    ));
     cx.add_font_mem(include_bytes!("../../assets/fonts/Saturday.otf"));
+}
+
+fn register_images(cx: &mut Context) {
+    let image = load_from_memory_with_format(
+        include_bytes!("../../assets/images/drive-bg.png"),
+        ImageFormat::Png,
+    )
+    .unwrap()
+    .resize_to_fill(EDITOR_WIDTH / 2, EDITOR_HEIGHT / 2, FilterType::Lanczos3)
+    .brighten(-50)
+    .to_rgb8();
+
+    cx.load_image(
+        "drive-background",
+        DynamicImage::ImageRgb8(image),
+        ImageRetentionPolicy::Forever,
+    )
+    .build(cx);
 }

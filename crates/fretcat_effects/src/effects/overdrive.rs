@@ -1,12 +1,16 @@
 use std::{f32::consts::PI, fmt::Debug};
 
-use fundsp::{hacker32::highpass_hz, prelude::An, svf::{FixedSvf, HighpassMode}};
-use nih_plug::util::db_to_gain_fast;
-use serde::{Serialize, Deserialize};
 use fretcat_macros::{getter, Message};
-use nih_plug_vizia::vizia::prelude::*;
+use fundsp::{
+    hacker32::highpass_hz,
+    prelude::An,
+    svf::{FixedSvf, HighpassMode},
+};
+use nih_plug::util::db_to_gain_fast;
+use nih_plug_vizia::vizia::{prelude::*, image::{DynamicImage, load_from_memory, load_from_memory_with_format, ImageFormat}};
+use serde::{Deserialize, Serialize};
 
-use crate::{ChainData, Chain};
+use crate::{Chain, ChainData};
 
 use super::{AudioEffect, Effect};
 
@@ -22,7 +26,11 @@ pub struct Overdrive {
 
 impl Debug for Overdrive {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("Overdrive").field("gain", &self.gain).field("freq", &self.freq).field("volume", &self.volume).finish()
+        f.debug_struct("Overdrive")
+            .field("gain", &self.gain)
+            .field("freq", &self.freq)
+            .field("volume", &self.volume)
+            .finish()
     }
 }
 
@@ -50,7 +58,8 @@ impl AudioEffect for Overdrive {
     }
 
     fn view(&self, cx: &mut Context, effect: Effect) {
-        cx.add_stylesheet(include_str!("../../css/overdrive.css")).unwrap();
+        cx.add_stylesheet(include_str!("../../css/overdrive.css"))
+            .unwrap();
         HStack::new(cx, |cx| {
             HStack::new(cx, |cx| {
                 Knob::new(cx, 1.0, getter!(gain), false)
@@ -73,7 +82,8 @@ impl AudioEffect for Overdrive {
                 Label::new(cx, "Output Gain");
             })
             .class("overdrive-knob-group");
-        }).class("overdrive");
+        })
+        .class("overdrive");
     }
 
     fn update(&self, event: &mut Event, effect: Effect, chain: &mut Chain) -> Option<()> {
