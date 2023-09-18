@@ -1,6 +1,7 @@
 use std::{f32::consts::PI, fmt::Debug};
 
 use fundsp::{hacker32::highpass_hz, prelude::An, svf::{FixedSvf, HighpassMode}};
+use nih_plug::util::db_to_gain_fast;
 use serde::{Serialize, Deserialize};
 use fretcat_macros::{getter, Message};
 use nih_plug_vizia::vizia::prelude::*;
@@ -12,36 +13,23 @@ use super::{AudioEffect, Effect};
 #[derive(Clone, Message, Serialize, Deserialize)]
 pub struct Overdrive {
     #[msg]
-    pub blend: f32,
+    pub gain: f32,
     #[msg]
     pub freq: f32,
     #[msg]
     pub volume: f32,
 }
 
-#[derive(Clone)]
-struct Filter {
-    pub filter: An<FixedSvf<f32, f32, HighpassMode<f32>>>
-}
-
-impl Default for Filter {
-    fn default() -> Self {
-        Self {
-            filter: highpass_hz(0.0, 0.25)
-        }
-    }
-}
-
 impl Debug for Overdrive {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("Overdrive").field("blend", &self.blend).field("freq", &self.freq).field("volume", &self.volume).finish()
+        f.debug_struct("Overdrive").field("gain", &self.gain).field("freq", &self.freq).field("volume", &self.volume).finish()
     }
 }
 
 impl Default for Overdrive {
     fn default() -> Self {
         Self {
-            blend: 1.0,
+            gain: 1.0,
             freq: 0.0,
             volume: 1.0,
         }
@@ -52,33 +40,36 @@ impl AudioEffect for Overdrive {
     fn process(&self, input_buffer: &mut [f32]) {
         input_buffer.iter_mut().for_each(|sample| {
             let clean = *sample;
-            let amplified = *sample * 5.0;
+            let amplified = *sample * db_to_gain_fast(self.gain * 10.0);
             let distorted = (2.0 / PI) * f32::atan(amplified);
 
-            let output_gain = self.volume * 10.0;
+            let output_gain = db_to_gain_fast(self.volume * 10.0);
 
-            *sample = ((distorted * self.blend) + (clean * (1.0 - self.blend))) * output_gain;
+            *sample = ((distorted * self.gain) + (clean * (1.0 - self.gain))) * output_gain;
         });
     }
 
     fn view(&self, cx: &mut Context, effect: Effect) {
         cx.add_stylesheet(include_str!("../../css/overdrive.css")).unwrap();
-        VStack::new(cx, |cx| {
-            VStack::new(cx, |cx| {
-                Knob::new(cx, 1.0, getter!(blend), false)
-                    .on_changing(|cx, val| cx.emit(Message::Blend(val)));
+        HStack::new(cx, |cx| {
+            HStack::new(cx, |cx| {
+                Knob::new(cx, 1.0, getter!(gain), false)
+                    .on_changing(|cx, val| cx.emit(Message::Gain(val)))
+                    .class("gain-knob");
                 Label::new(cx, "Gain");
             })
             .class("overdrive-knob-group");
-            VStack::new(cx, |cx| {
+            HStack::new(cx, |cx| {
                 Knob::new(cx, 1.0, getter!(freq), false)
-                    .on_changing(|cx, val| cx.emit(Message::Freq(val)));
+                    .on_changing(|cx, val| cx.emit(Message::Freq(val)))
+                    .class("tone-knob");
                 Label::new(cx, "Tone");
             })
             .class("overdrive-knob-group");
-            VStack::new(cx, |cx| {
+            HStack::new(cx, |cx| {
                 Knob::new(cx, 1.0, getter!(volume), false)
-                    .on_changing(|cx, val| cx.emit(Message::Volume(val)));
+                    .on_changing(|cx, val| cx.emit(Message::Volume(val)))
+                    .class("volume-knob");
                 Label::new(cx, "Output Gain");
             })
             .class("overdrive-knob-group");
@@ -88,8 +79,8 @@ impl AudioEffect for Overdrive {
     fn update(&self, event: &mut Event, effect: Effect, chain: &mut Chain) -> Option<()> {
         let data = chain.query_cast_mut::<Self>(&effect)?;
         event.map(|event, _| match event {
-            Message::Blend(val) => {
-                data.blend = *val;
+            Message::Gain(val) => {
+                data.gain = *val;
             }
             Message::Freq(val) => {
                 data.freq = *val;

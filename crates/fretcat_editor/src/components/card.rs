@@ -31,7 +31,8 @@ pub fn card_system_init(cx: &mut Context) {
 }
 
 pub fn card_system_view(cx: &mut Context) {
-    cx.add_stylesheet(include_str!("../../css/cards.css")).unwrap();
+    cx.add_stylesheet(include_str!("../../css/cards.css"))
+        .unwrap();
 
     Binding::new(cx, CardData::dragging, |cx, bind| {
         let dragging = bind.get(cx);
@@ -115,7 +116,15 @@ impl Card {
 
 pub const OVERDRIVE_CARD: Card = Card {
     content: |cx| {
-        Label::new(cx, "Overdrive");
+        VStack::new(cx, |cx| {
+            Label::new(cx, "Drive")
+                .font_family(vec![FamilyOwned::Name("Saturday".to_owned())])
+                .color(Color::red())
+                .font_size(75.0);
+        })
+        .border_width(Pixels(2.0))
+        .border_color(Color::red())
+        .child_space(Stretch(1.0));
     },
     drag: |ex| {
         ex.emit(CardEvent::DragChange(Some(OVERDRIVE_CARD)));

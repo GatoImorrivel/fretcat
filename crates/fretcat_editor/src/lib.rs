@@ -65,11 +65,10 @@ pub fn create(
         make_keymap().build(cx);
 
         editor_data.clone().build(cx);
+        register_fonts(cx);
 
         cx.add_stylesheet(include_str!("../css/editor.css"))
             .unwrap();
-        cx.add_font_mem(include_bytes!("../res/SymbolsNerdFontMono-Regular.ttf"));
-
         card_system_init(cx);
 
         HStack::new(cx, |cx| {
@@ -91,4 +90,9 @@ pub fn create(
 
         card_system_view(cx);
     })
+}
+
+fn register_fonts(cx: &mut Context) {
+    cx.add_font_mem(include_bytes!("../../assets/fonts/SymbolsNerdFontMono-Regular.ttf"));
+    cx.add_font_mem(include_bytes!("../../assets/fonts/Saturday.otf"));
 }

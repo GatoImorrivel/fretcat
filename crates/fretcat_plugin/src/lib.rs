@@ -89,9 +89,7 @@ impl Plugin for Fretcat {
         _context: &mut impl ProcessContext<Self>,
     ) -> ProcessStatus {
         for channel in buffer.as_slice() {
-            for effect in self.chain.borrow().effects.iter() {
-                self.chain.borrow_mut().query(effect).unwrap().process(*channel);
-            }
+            self.chain.borrow().process(channel);
         }
 
         if !self.chain.borrow().update_queue.is_empty() {

@@ -35,6 +35,13 @@ pub struct Chain {
 
 impl Chain {
     #[inline]
+    pub fn process(&self, buffer: &mut [f32]) {
+        self.effects.iter().for_each(|e| {
+            self.data_cache.get(e).unwrap().process(buffer);
+        });
+    }
+
+    #[inline]
     pub fn add_to_queue(&self, command: ChainCommand) {
         self.update_queue.force_push(command);
     }
