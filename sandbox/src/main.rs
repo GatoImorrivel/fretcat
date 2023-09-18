@@ -10,7 +10,7 @@ use std::{fs::File, io::BufReader, path::Path};
 
 use cpal::{
     traits::{DeviceTrait, HostTrait, StreamTrait},
-    FromSample, Sample, SizedSample,
+    FromSample, Sample, SizedSample, BufferSize,
 };
 use hound::WavReader;
 
@@ -58,6 +58,7 @@ pub fn host_device_setup(
     println!("Output device : {}", device.name()?);
 
     let config = device.default_output_config()?;
+
     println!("Default output config : {:?}", config);
 
     Ok((host, device, config))
@@ -124,7 +125,7 @@ where
     for i in 0..output.len() {
         buffer.push(input.tick());
     }
-    hot_lib::process_sample(&mut buffer);
+    process::process_sample(&mut buffer);
 
     for (i, sample) in output.iter_mut().enumerate() {
         *sample = SampleType::from_sample(buffer[i] / 100000.0);
