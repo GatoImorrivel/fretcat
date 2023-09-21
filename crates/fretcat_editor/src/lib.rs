@@ -105,6 +105,7 @@ fn register_fonts(cx: &mut Context) {
         "../../assets/fonts/SymbolsNerdFontMono-Regular.ttf"
     ));
     cx.add_font_mem(include_bytes!("../../assets/fonts/Saturday.otf"));
+    cx.add_font_mem(include_bytes!("../../assets/fonts/Montserrat.ttf"));
 }
 
 fn register_images(cx: &mut Context) {
@@ -113,7 +114,7 @@ fn register_images(cx: &mut Context) {
         ImageFormat::Png,
     )
     .unwrap()
-    .resize_to_fill(EDITOR_WIDTH / 2, EDITOR_HEIGHT / 2, FilterType::Lanczos3)
+    .thumbnail(EDITOR_WIDTH as u32, 500)
     .brighten(-50)
     .to_rgb8();
 

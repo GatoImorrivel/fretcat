@@ -20,15 +20,23 @@
 }
 
 .overdrive label {
+    color: whitesmoke;
     font-family: "Saturday";
     font-size: 30;
 }
 
-.overdrive-knob-group > knob > zstack > .knob-head {
-    background-image: linear-gradient(180deg, #110220, #31055e);
+.overdrive-knob-group .knob-head {
+    background-image: linear-gradient(180deg, rgb(39, 24, 37), rgb(41, 10, 37));
     border-width: 0px;
     background-color: transparent;
-    box-shadow: 2px 2px 8px #110220;
+}
+
+.overdrive-knob-group arctrack {
+    color: rgb(232, 86, 215);
+}
+
+.overdrive-knob-group > knob {
+    box-shadow: -1px -1px 8px #110220;
 }
 
 .overdrive-knob-group {
