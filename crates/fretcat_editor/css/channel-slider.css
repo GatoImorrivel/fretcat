@@ -1,0 +1,11 @@
+channel-slider .background {
+    background-image: linear-gradient(0deg, rgba(49,255,60,1) 0%, rgba(255,236,62,1) 72%, rgba(255,52,52,1) 100%);
+    border-radius: 10px;
+}
+
+channel-slider .drag-ball {
+    border-radius: 100px;
+    background-color: red;
+    position-type: self-directed;
+    width: 1s;
+}

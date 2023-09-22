@@ -3,6 +3,7 @@ mod preset_control;
 mod effect_list;
 mod effect_handle;
 mod sidebar;
+mod channel_slider;
 
 use nih_plug_vizia::vizia::prelude::*;
 use strum::{IntoEnumIterator, EnumIter};

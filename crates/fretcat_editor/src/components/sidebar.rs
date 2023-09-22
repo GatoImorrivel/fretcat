@@ -1,6 +1,6 @@
 use nih_plug_vizia::vizia::prelude::*;
 
-use super::{EffectKind, EFFECT_CARDS};
+use super::{EffectKind, EFFECT_CARDS, channel_slider::ChannelSlider};
 
 const KIND_PER_ROW: usize = 2;
 
@@ -48,6 +48,15 @@ impl Sidebar {
                         )
                         .class("tab-btn")
                         .toggle_class("tab-selected-kind", current_tab == SidebarTab::Preset);
+
+                        VStack::new(cx, |cx| {
+                            ChannelSlider::new(cx, 20.0, 200.0);
+                            ChannelSlider::new(cx, 20.0, 200.0);
+                        })
+                        .child_space(Stretch(1.0))
+                        .row_between(Stretch(1.0))
+                        .height(Stretch(1.0))
+                        .width(Stretch(1.0));
                     })
                     .class("bar");
                     VStack::new(cx, |cx| match current_tab {

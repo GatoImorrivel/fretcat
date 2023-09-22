@@ -1,20 +1,15 @@
 use std::{f32::consts::PI, fmt::Debug};
 
 use fretcat_macros::{getter, Message};
-use fundsp::{
-    hacker32::highpass_hz,
-    prelude::An,
-    svf::{FixedSvf, HighpassMode},
-};
 use nih_plug::util::db_to_gain_fast;
-use nih_plug_vizia::vizia::{prelude::*, image::{DynamicImage, load_from_memory, load_from_memory_with_format, ImageFormat}};
+use nih_plug_vizia::vizia::prelude::*;
 use serde::{Deserialize, Serialize};
 
-use crate::{Chain, ChainData};
+use crate::{Chain, ChainData, common::Highpass};
 
 use super::{AudioEffect, Effect};
 
-#[derive(Clone, Message, Serialize, Deserialize)]
+#[derive(Debug, Clone, Message, Serialize, Deserialize)]
 pub struct Overdrive {
     #[msg]
     pub gain: f32,
@@ -22,16 +17,6 @@ pub struct Overdrive {
     pub freq: f32,
     #[msg]
     pub volume: f32,
-}
-
-impl Debug for Overdrive {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("Overdrive")
-            .field("gain", &self.gain)
-            .field("freq", &self.freq)
-            .field("volume", &self.volume)
-            .finish()
-    }
 }
 
 impl Default for Overdrive {

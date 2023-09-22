@@ -125,7 +125,7 @@ where
     for i in 0..output.len() {
         buffer.push(input.tick());
     }
-    process::process_sample(&mut buffer);
+    hot_lib::process_sample(&mut buffer);
 
     for (i, sample) in output.iter_mut().enumerate() {
         *sample = SampleType::from_sample(buffer[i] / 100000.0);
