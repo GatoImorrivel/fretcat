@@ -10,7 +10,8 @@ lazy_static::lazy_static! {
         let mut hashmap: HashMap<EffectKind, Vec<Card>> = HashMap::new();
         hashmap.insert(EffectKind::Distortion, vec![
             OVERDRIVE_CARD,
-            FUZZ_CARD
+            FUZZ_CARD,
+            DISTORTION_CARD
         ]);
 
         hashmap.insert(EffectKind::Delay, vec![]);
@@ -135,10 +136,37 @@ pub const OVERDRIVE_CARD: Card = Card {
 
 pub const FUZZ_CARD: Card = Card {
     content: |cx| {
-        Label::new(cx, "Fuzz");
+        VStack::new(cx, |cx| {
+            Label::new(cx, "Fuzz")
+                .font_family(vec![FamilyOwned::Name("Get Now".to_owned())])
+                .color(Color::rgb(232, 142, 57))
+                .font_size(75.0);
+        })
+        .border_width(Pixels(2.0))
+        .border_color(Color::rgb(232, 142, 57))
+        .child_space(Stretch(1.0));
     },
     drag: |ex| {
         ex.emit(CardEvent::DragChange(Some(FUZZ_CARD)));
+        ex.set_drop_data(ex.current());
+    },
+    spawn: || Box::new(Fuzz::default()),
+};
+
+pub const DISTORTION_CARD: Card = Card {
+    content: |cx| {
+        VStack::new(cx, |cx| {
+            Label::new(cx, "DISTORTION")
+                .font_family(vec![FamilyOwned::Name("Hatch".to_owned())])
+                .color(Color::rgb(232, 57, 57))
+                .font_size(40.0);
+        })
+        .border_width(Pixels(2.0))
+        .border_color(Color::rgb(232, 57, 57))
+        .child_space(Stretch(1.0));
+    },
+    drag: |ex| {
+        ex.emit(CardEvent::DragChange(Some(DISTORTION_CARD)));
         ex.set_drop_data(ex.current());
     },
     spawn: || Box::new(Fuzz::default()),

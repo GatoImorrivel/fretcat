@@ -31,6 +31,7 @@ pub struct EditorData {
     pub noise_gate: Arc<AtomicF32>,
     pub in_gain: Arc<AtomicF32>,
     pub out_gain: Arc<AtomicF32>,
+    pub bolas: String
 }
 
 pub enum EditorEvent {
@@ -106,6 +107,8 @@ fn register_fonts(cx: &mut Context) {
     ));
     cx.add_font_mem(include_bytes!("../../assets/fonts/Saturday.otf"));
     cx.add_font_mem(include_bytes!("../../assets/fonts/Montserrat.ttf"));
+    cx.add_font_mem(include_bytes!("../../assets/fonts/Get Now.otf"));
+    cx.add_font_mem(include_bytes!("../../assets/fonts/Hatch.ttf"));
 }
 
 fn register_images(cx: &mut Context) {

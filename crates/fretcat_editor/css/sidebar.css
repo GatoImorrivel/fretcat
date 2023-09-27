@@ -2,7 +2,8 @@
 }
 
 .sidebar .bar label {
-    font-size: 36;
+    font-size: xx-large;
+    transform: translate(-1px, -1px);
 }
 
 .bar {
@@ -19,11 +20,12 @@
 
 .tab-btn {
     width: 1s;
-    height: 41.5pt;
+    height: 7%;
     background-color: #0f0f0f;
     border-width: 0px;
     border-color: transparent;
     border-radius: 0px;
+    child-space: 1s;
 }
 
 .tab-btn label {
@@ -32,10 +34,11 @@
 
 .tab-selected-kind {
     width: 1s;
-    height: 41.5pt;
+    height: 7%;
     border-width: 4px;
     border-color: #0f0f0f;
     background-image: linear-gradient(145deg, #e6e6e6, #ffffff);
+    child-space: 1s;
 }
 
 .tab-selected-kind label {

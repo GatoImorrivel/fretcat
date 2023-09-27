@@ -44,7 +44,7 @@ impl Sidebar {
                         Button::new(
                             cx,
                             |ex| ex.emit(SidebarMessage::ChangeTab(SidebarTab::Preset)),
-                            |cx| Label::new(cx, "󰒓"),
+                            |cx| Label::new(cx, ""),
                         )
                         .class("tab-btn")
                         .toggle_class("tab-selected-kind", current_tab == SidebarTab::Preset);

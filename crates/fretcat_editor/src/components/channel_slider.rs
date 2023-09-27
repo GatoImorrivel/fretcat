@@ -30,18 +30,6 @@ impl View for ChannelSlider {
 
         event.map(|e, _| match e {
             WindowEvent::MouseMove(_, y) => {
-                if !self.dragging {
-                    return;
-                }
-
-                nih_log!("DRAGGING: {}", *y);
-                if *y < cx.bounds().bottom() {
-                    self.value = 0.0;
-                }
-
-                if *y > cx.bounds().top() {
-                    self.value = 1.0;
-                }
             }
             WindowEvent::MouseUp(_) => {
                 self.dragging = false;
