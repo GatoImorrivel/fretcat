@@ -89,6 +89,6 @@ impl AudioEffect for Overdrive {
     }
 
     fn height(&self) -> f32 {
-        200.0
+        100.0
     }
 }

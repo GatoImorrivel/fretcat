@@ -71,8 +71,8 @@ pub fn create(
         make_keymap().build(cx);
 
         editor_data.clone().build(cx);
-        register_fonts(cx);
-        register_images(cx);
+        fretcat_effects::register_fonts(cx);
+        fretcat_effects::register_images(cx);
 
         cx.add_stylesheet(include_str!("../css/editor.css"))
             .unwrap();
@@ -99,32 +99,4 @@ pub fn create(
 
         card_system_view(cx);
     })
-}
-
-fn register_fonts(cx: &mut Context) {
-    cx.add_font_mem(include_bytes!(
-        "../../assets/fonts/SymbolsNerdFontMono-Regular.ttf"
-    ));
-    cx.add_font_mem(include_bytes!("../../assets/fonts/Saturday.otf"));
-    cx.add_font_mem(include_bytes!("../../assets/fonts/Montserrat.ttf"));
-    cx.add_font_mem(include_bytes!("../../assets/fonts/Get Now.otf"));
-    cx.add_font_mem(include_bytes!("../../assets/fonts/Hatch.ttf"));
-}
-
-fn register_images(cx: &mut Context) {
-    let image = load_from_memory_with_format(
-        include_bytes!("../../assets/images/drive-bg.png"),
-        ImageFormat::Png,
-    )
-    .unwrap()
-    .thumbnail(EDITOR_WIDTH as u32, 500)
-    .brighten(-50)
-    .to_rgb8();
-
-    cx.load_image(
-        "drive-background",
-        DynamicImage::ImageRgb8(image),
-        ImageRetentionPolicy::Forever,
-    )
-    .build(cx);
 }

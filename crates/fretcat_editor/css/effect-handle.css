@@ -1,5 +1,6 @@
 .effect-handle {
     box-shadow:  8px 8px 15px #181818;
+    border-color: red;
 }
 
 .effect-bar {

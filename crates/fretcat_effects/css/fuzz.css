@@ -1,0 +1,60 @@
+.fuzz {
+    background-image: url("fuzz-background");
+    overflow: hidden;
+    width: 1s;
+}
+
+.fuzz knob {
+    width: 100px;
+    height: 100px;
+}
+
+.fuzz .tone-knob {
+    width: 50px;
+    height: 50px;
+}
+
+.fuzz .volume-knob {
+    width: 75px;
+    height: 75px;
+}
+
+.fuzz label {
+    color: black;
+    font-family: "Get Now";
+    font-size: 30;
+}
+
+.fuzz-knob-group .knob-head {
+    background-image: linear-gradient(180deg, rgb(0, 0, 0), rgb(23, 23, 23));
+    border-width: 0px;
+    background-color: transparent;
+}
+
+.fuzz-knob-group arctrack {
+    color: rgb(232, 142, 57);
+}
+
+.fuzz-knob-group > knob {
+    box-shadow: -1px -1px 8px #110220;
+}
+
+.fuzz-knob-group {
+    child-top: 2s;
+}
+
+.fuzz-knob-group:nth-child(1) {
+    width: 1s;
+}
+
+.fuzz-knob-group:nth-child(2) {
+    width: 2s;
+}
+
+.fuzz-knob-group:nth-child(3) {
+    width: 1s;
+}
+
+.fuzz-knob-group > knob {
+    border-radius: 100%;
+}

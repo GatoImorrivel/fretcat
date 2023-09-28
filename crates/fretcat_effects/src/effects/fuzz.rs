@@ -1,24 +1,21 @@
+use fretcat_macros::{Message, getter};
 use serde::{Serialize, Deserialize};
 use nih_plug_vizia::vizia::prelude::*;
 
 use crate::Chain;
+use crate::ChainData;
 
 use super::{AudioEffect, Effect};
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[derive(Debug, Message,Clone, Copy, Serialize, Deserialize)]
 pub struct Fuzz {
-    pub gain: f32,
-    pub blend: f32,
-    pub threshold: f32,
-    pub volume: f32,
+    #[msg]
+    pub volume: f32
 }
 
 impl Default for Fuzz {
     fn default() -> Self {
         Self {
-            gain: 1.0,
-            blend: 1.0,
-            threshold: 1.0,
             volume: 1.0,
         }
     }
@@ -29,14 +26,32 @@ impl AudioEffect for Fuzz {
     }
 
     fn view(&self, cx: &mut Context, effect: Effect) {
-        
+        cx.add_stylesheet(include_str!("../../css/fuzz.css"))
+            .unwrap();
+        HStack::new(cx, |cx| {
+            HStack::new(cx, |cx| {
+                Knob::new(cx, 1.0, getter!(volume), false)
+                    .on_changing(|cx, val| cx.emit(Message::Volume(val)))
+                    .class("volume-knob");
+                Label::new(cx, "Output Gain");
+            })
+            .class("fuzz-knob-group");
+        })
+        .class("fuzz");
     }
 
     fn update(&self, event: &mut Event, effect: Effect, chain: &mut Chain) -> Option<()>{
-       Some(())
+        let data = chain.query_cast_mut::<Self>(&effect)?;
+        event.map(|event, _| match event {
+            Message::Volume(val) => {
+                data.volume = *val;
+            }
+        });
+
+        Some(())
     }
 
     fn height(&self) -> f32 {
-        400.0
+        100.0
     }
 }
