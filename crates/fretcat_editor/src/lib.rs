@@ -1,14 +1,10 @@
 mod components;
-mod keymap;
 
 use std::sync::{atomic::Ordering, Arc};
 
 use fretcat_effects::{ChainData, ChainHandle};
 
-use keymap::make_keymap;
 use nih_plug::prelude::*;
-use nih_plug_vizia::vizia::image::imageops::FilterType;
-use nih_plug_vizia::vizia::image::{load_from_memory_with_format, DynamicImage, ImageFormat};
 use nih_plug_vizia::vizia::prelude::*;
 use nih_plug_vizia::{create_vizia_editor, ViziaState, ViziaTheming};
 
@@ -68,7 +64,6 @@ pub fn create(
             chain: chain.clone(),
         }
         .build(cx);
-        make_keymap().build(cx);
 
         editor_data.clone().build(cx);
         fretcat_effects::register_fonts(cx);
