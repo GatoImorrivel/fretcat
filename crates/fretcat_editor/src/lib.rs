@@ -27,7 +27,7 @@ pub struct EditorData {
     pub noise_gate: Arc<AtomicF32>,
     pub in_gain: Arc<AtomicF32>,
     pub out_gain: Arc<AtomicF32>,
-    pub bolas: String
+    pub bolas: String,
 }
 
 pub enum EditorEvent {

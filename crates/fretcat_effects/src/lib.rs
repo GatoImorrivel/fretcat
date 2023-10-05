@@ -14,10 +14,6 @@ pub use chain::{Chain, ChainCommand, ChainData, ChainHandle};
 pub use dyn_clone;
 pub use rayon;
 
-pub struct Internal<T: Default> {
-    internals: UnsafeCell<T>,
-}
-
 pub fn register_fonts(cx: &mut Context) {
     cx.add_font_mem(include_bytes!(
         "../../assets/fonts/SymbolsNerdFontMono-Regular.ttf"
@@ -62,6 +58,6 @@ pub fn register_images(cx: &mut Context) {
 pub fn register_styles(cx: &mut Context) {
     cx.add_stylesheet(include_str!("../css/overdrive.css"))
         .unwrap();
-    cx.add_stylesheet(include_str!("../css/fuzz.css"))
-        .unwrap();
+    cx.add_stylesheet(include_str!("../css/fuzz.css")).unwrap();
 }
+

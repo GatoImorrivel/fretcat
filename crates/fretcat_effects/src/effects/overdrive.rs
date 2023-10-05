@@ -5,7 +5,9 @@ use nih_plug::util::db_to_gain_fast;
 use nih_plug_vizia::vizia::prelude::*;
 use serde::{Deserialize, Serialize};
 
-use crate::{Chain, ChainData, common::Highpass};
+use crate::{Chain, ChainData};
+
+use crate::common::{Filter, FilterMode, map_normalized_value};
 
 use super::{AudioEffect, Effect};
 
@@ -17,14 +19,21 @@ pub struct Overdrive {
     pub freq: f32,
     #[msg]
     pub volume: f32,
+    max_freq_hz: f32,
+    min_freq_hz: f32,
+    filter: Filter
 }
 
 impl Default for Overdrive {
     fn default() -> Self {
+        let min_freq_hz = 1000.0;
         Self {
             gain: 1.0,
             freq: 0.0,
             volume: 1.0,
+            max_freq_hz: 2000.0,
+            min_freq_hz,
+            filter: Filter::new(FilterMode::Lowpass, 44100.0, min_freq_hz, 1.0)
         }
     }
 }
@@ -39,6 +48,7 @@ impl AudioEffect for Overdrive {
             let output_gain = db_to_gain_fast(self.volume * 10.0);
 
             *sample = ((distorted * self.gain) + (clean * (1.0 - self.gain))) * output_gain;
+            *sample = self.filter.tick(*sample);
         });
     }
 
@@ -77,6 +87,8 @@ impl AudioEffect for Overdrive {
             }
             Message::Freq(val) => {
                 data.freq = *val;
+                data.filter.recalculate_coeffs(map_normalized_value(*val, self.min_freq_hz, self.max_freq_hz), self.filter.q());
+                nih_plug::nih_log!("{:#?}", data.filter);
             }
             Message::Volume(val) => {
                 data.volume = *val;
