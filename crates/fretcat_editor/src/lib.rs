@@ -68,6 +68,7 @@ pub fn create(
         editor_data.clone().build(cx);
         fretcat_effects::register_fonts(cx);
         fretcat_effects::register_images(cx);
+        fretcat_effects::register_styles(cx);
 
         cx.add_stylesheet(include_str!("../css/editor.css"))
             .unwrap();

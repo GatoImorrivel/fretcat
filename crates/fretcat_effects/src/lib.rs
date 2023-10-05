@@ -58,3 +58,10 @@ pub fn register_images(cx: &mut Context) {
         ImageRetentionPolicy::Forever,
     );
 }
+
+pub fn register_styles(cx: &mut Context) {
+    cx.add_stylesheet(include_str!("../css/overdrive.css"))
+        .unwrap();
+    cx.add_stylesheet(include_str!("../css/fuzz.css"))
+        .unwrap();
+}

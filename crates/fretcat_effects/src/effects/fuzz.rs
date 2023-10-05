@@ -26,8 +26,6 @@ impl AudioEffect for Fuzz {
     }
 
     fn view(&self, cx: &mut Context, effect: Effect) {
-        cx.add_stylesheet(include_str!("../../css/fuzz.css"))
-            .unwrap();
         HStack::new(cx, |cx| {
             HStack::new(cx, |cx| {
                 Knob::new(cx, 1.0, getter!(volume), false)
