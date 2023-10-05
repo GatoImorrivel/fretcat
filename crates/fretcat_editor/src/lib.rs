@@ -72,6 +72,10 @@ pub fn create(
 
         cx.add_stylesheet(include_str!("../css/editor.css"))
             .unwrap();
+        cx.add_stylesheet(include_str!("../css/effect-list.css"))
+            .unwrap();
+        cx.add_stylesheet(include_str!("../css/effect-handle.css"))
+            .unwrap();
         card_system_init(cx);
 
         HStack::new(cx, |cx| {

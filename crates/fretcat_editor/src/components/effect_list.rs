@@ -16,10 +16,6 @@ pub enum EffectListEvent {
 impl EffectList {
     pub fn new(cx: &mut Context) {
         Self { dragging: None }.build(cx, |cx| {
-            cx.add_stylesheet(include_str!("../../css/effect-list.css"))
-                .unwrap();
-            cx.add_stylesheet(include_str!("../../css/effect-handle.css"))
-                .unwrap();
             ScrollView::new(cx, 0.0, 0.0, false, false, |cx| {
                 Binding::new(
                     cx,

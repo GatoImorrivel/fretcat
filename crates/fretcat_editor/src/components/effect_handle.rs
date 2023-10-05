@@ -58,7 +58,7 @@ impl EffectHandle {
                             .position_type(PositionType::SelfDirected)
                             .width(Stretch(1.0))
                             .height(Percentage(50.0))
-                            .on_drop(move |ex, _| on_drop(ex, index as i32 - 1, effect.clone()));
+                            .on_drop(move |ex, _| on_drop(ex, index as i32, effect.clone()));
                         Element::new(cx)
                             .position_type(PositionType::SelfDirected)
                             .width(Stretch(1.0))
