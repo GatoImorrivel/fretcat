@@ -92,9 +92,7 @@ impl Plugin for Fretcat {
             self.chain.borrow().process(channel);
         }
 
-        if !self.chain.borrow().update_queue.is_empty() {
-            _context.execute_background(self.chain.clone());
-        }
+        _context.execute_background(self.chain.clone());
         ProcessStatus::Normal
     }
 }
