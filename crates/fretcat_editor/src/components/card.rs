@@ -26,6 +26,7 @@ lazy_static::lazy_static! {
 pub fn card_system_init(cx: &mut Context) {
     CardData {
         dragging: None,
+        is_dragging: false,
         cursor: (0.0, 0.0),
     }
     .build(cx);
@@ -35,13 +36,16 @@ pub fn card_system_view(cx: &mut Context) {
     cx.add_stylesheet(include_str!("../../css/cards.css"))
         .unwrap();
 
-    Binding::new(cx, CardData::dragging, |cx, bind| {
-        let dragging = bind.get(cx);
-        if let Some(dragging) = dragging {
+    Binding::new(cx, CardData::is_dragging, |cx, bind| {
+        let is_dragging = bind.get(cx);
+        if is_dragging {
             Binding::new(cx, CardData::cursor, move |cx, bind| {
                 let cursor = bind.get(cx);
+                let card = CardData::dragging.get(cx);
                 VStack::new(cx, |cx| {
-                    (dragging.content)(cx);
+                    if let Some(card) = card  {
+                        (card.content)(cx);
+                    }
                 })
                 .class("card-base")
                 .width(Pixels(300.0))
@@ -56,6 +60,7 @@ pub fn card_system_view(cx: &mut Context) {
 #[derive(Lens, Clone, PartialEq, Data)]
 pub struct CardData {
     pub(crate) dragging: Option<Card>,
+    pub(crate) is_dragging: bool,
     pub(crate) cursor: (f32, f32),
 }
 
@@ -71,8 +76,8 @@ impl Model for CardData {
             }
             WindowEvent::MouseUp(btn) => match btn {
                 MouseButton::Left => {
-                    self.dragging = None;
-                }
+                    self.is_dragging = false;
+                } 
                 _ => {}
             },
             _ => {}
@@ -80,6 +85,7 @@ impl Model for CardData {
 
         event.map(|e, _| match e {
             CardEvent::DragChange(card) => {
+                self.is_dragging = card.is_some();
                 self.dragging = card.clone();
             }
         });
