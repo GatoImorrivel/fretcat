@@ -11,8 +11,6 @@ pub enum PresetMessage {
 impl PresetControl {
     pub fn new(cx: &mut Context) {
         Self {}.build(cx, |cx| {
-            cx.add_stylesheet(include_str!("../../css/preset-control.css"))
-                .unwrap();
             HStack::new(cx, |cx| {
                 VStack::new(cx, |cx| {
                     Label::new(cx, "untitled").class("preset-name");

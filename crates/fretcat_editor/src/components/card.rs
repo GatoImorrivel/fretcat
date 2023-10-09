@@ -33,9 +33,6 @@ pub fn card_system_init(cx: &mut Context) {
 }
 
 pub fn card_system_view(cx: &mut Context) {
-    cx.add_stylesheet(include_str!("../../css/cards.css"))
-        .unwrap();
-
     Binding::new(cx, CardData::is_dragging, |cx, bind| {
         let is_dragging = bind.get(cx);
         if is_dragging {

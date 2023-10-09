@@ -2,8 +2,6 @@ mod chain;
 mod common;
 pub mod effects;
 
-use std::cell::UnsafeCell;
-
 use nih_plug_vizia::vizia::{
     image::{load_from_memory_with_format, DynamicImage, ImageFormat},
     prelude::*,
@@ -12,7 +10,6 @@ use nih_plug_vizia::vizia::{
 pub use atomic_refcell::*;
 pub use chain::{Chain, ChainCommand, ChainData, ChainHandle};
 pub use dyn_clone;
-pub use rayon;
 
 pub fn register_fonts(cx: &mut Context) {
     cx.add_font_mem(include_bytes!(

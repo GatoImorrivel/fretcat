@@ -47,8 +47,6 @@ impl ChannelSlider {
             height,
         }
         .build(cx, |cx| {
-            cx.add_stylesheet(include_str!("../../css/channel-slider.css"))
-                .unwrap();
             Element::new(cx)
                 .height(Pixels(height))
                 .width(Pixels(width))

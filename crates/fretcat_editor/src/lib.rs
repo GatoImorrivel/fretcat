@@ -69,13 +69,8 @@ pub fn create(
         fretcat_effects::register_fonts(cx);
         fretcat_effects::register_images(cx);
         fretcat_effects::register_styles(cx);
+        register_styles(cx);
 
-        cx.add_stylesheet(include_str!("../css/editor.css"))
-            .unwrap();
-        cx.add_stylesheet(include_str!("../css/effect-list.css"))
-            .unwrap();
-        cx.add_stylesheet(include_str!("../css/effect-handle.css"))
-            .unwrap();
         card_system_init(cx);
 
         HStack::new(cx, |cx| {
@@ -99,4 +94,22 @@ pub fn create(
 
         card_system_view(cx);
     })
+}
+
+fn register_styles(cx: &mut Context) {
+    cx.add_stylesheet(include_str!("../css/editor.css"))
+        .unwrap();
+    cx.add_stylesheet(include_str!("../css/effect-list.css"))
+        .unwrap();
+    cx.add_stylesheet(include_str!("../css/effect-handle.css"))
+        .unwrap();
+    cx.add_stylesheet(include_str!("../css/sidebar.css"))
+        .unwrap();
+    cx.add_stylesheet(include_str!("../css/preset-control.css"))
+        .unwrap();
+    cx.add_stylesheet(include_str!("../css/channel-slider.css"))
+        .unwrap();
+    cx.add_stylesheet(include_str!("../css/cards.css"))
+        .unwrap();
+
 }

@@ -28,8 +28,6 @@ impl Sidebar {
             selected_kind: EffectKind::Distortion,
         }
         .build(cx, |cx| {
-            cx.add_stylesheet(include_str!("../../css/sidebar.css"))
-                .unwrap();
             HStack::new(cx, |cx| {
                 Binding::new(cx, Sidebar::current_tab, |cx, bind| {
                     let current_tab = bind.get(cx);

@@ -1,6 +1,5 @@
-use proc_macro2::{Ident, Span};
-use quote::{quote, __private::ext::RepToTokensExt};
-use syn::{spanned::Spanned, Data, DataStruct, Fields, DataEnum};
+use quote::quote;
+use syn::{spanned::Spanned, Data, Fields, DataEnum};
 
 pub(crate) fn derive_mapper_impl(
     input: syn::DeriveInput,
