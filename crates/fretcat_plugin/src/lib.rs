@@ -7,14 +7,15 @@ use nih_plug::prelude::*;
 use fretcat_effects::Chain;
 use params::FretcatParams;
 
-use std::{num::NonZeroU32, sync::Arc};
+use std::{num::NonZeroU32, sync::Arc, time::Instant};
 
 const NUM_INPUT_CHANNELS: u32 = 2;
 const NUM_OUTPUT_CHANNELS: u32 = 2;
 pub struct Fretcat {
     params: Arc<FretcatParams>,
     chain: Arc<Chain>,
-    editor_data: EditorData
+    editor_data: EditorData,
+    debug_clock: Instant
 }
 
 impl Default for Fretcat {
@@ -22,7 +23,8 @@ impl Default for Fretcat {
         Self {
             params: Arc::new(FretcatParams::default()),
             chain: Arc::new(Chain::default()),
-            editor_data: EditorData::default()
+            editor_data: EditorData::default(),
+            debug_clock: Instant::now()
         }
     }
 }
@@ -88,9 +90,13 @@ impl Plugin for Fretcat {
         _aux: &mut AuxiliaryBuffers,
         _context: &mut impl ProcessContext<Self>,
     ) -> ProcessStatus {
+        let d1 = self.debug_clock.elapsed();
         for channel in buffer.as_slice() {
             self.chain.process(channel);
         }
+        let d2 = self.debug_clock.elapsed();
+
+        nih_log!("{}", (d2 - d1).as_nanos());
 
         _context.execute_background(self.chain.clone());
         ProcessStatus::Normal
