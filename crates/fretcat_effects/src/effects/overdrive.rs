@@ -39,15 +39,14 @@ impl Default for Overdrive {
 }
 
 impl AudioEffect for Overdrive {
-    fn process(&self, input_buffer: &mut [f32]) {
+    fn process(&mut self, input_buffer: &mut [f32]) {
         input_buffer.iter_mut().for_each(|sample| {
-            let clean = *sample;
             let amplified = *sample * db_to_gain_fast(self.gain * 10.0);
             let distorted = (2.0 / PI) * f32::atan(amplified);
 
             let output_gain = db_to_gain_fast(self.volume * 10.0);
 
-            *sample = ((distorted * self.gain) + (clean * (1.0 - self.gain))) * output_gain;
+            *sample = distorted * output_gain;
             *sample = self.filter.tick(*sample);
         });
     }

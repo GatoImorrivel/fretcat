@@ -22,7 +22,7 @@ impl Default for Fuzz {
 }
 
 impl AudioEffect for Fuzz {
-    fn process(&self, input_buffer: &mut [f32]) {
+    fn process(&mut self, input_buffer: &mut [f32]) {
     }
 
     fn view(&self, cx: &mut Context, effect: usize) {

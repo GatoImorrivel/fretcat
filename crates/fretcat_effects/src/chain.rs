@@ -32,8 +32,8 @@ pub struct Chain {
 
 impl Chain {
     #[inline]
-    pub fn process(&self, buffer: &mut [f32]) {
-        self.effects.iter().for_each(|e| {
+    pub fn process(&mut self, buffer: &mut [f32]) {
+        self.effects.iter_mut().for_each(|e| {
             e.process(buffer);
         });
     }

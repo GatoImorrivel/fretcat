@@ -42,24 +42,20 @@ impl Filter {
     }
 
     #[inline]
-    pub fn process(&self, input: &mut [f32]) {
+    pub fn process(&mut self, input: &mut [f32]) {
         for i in 0..input.len() {
             input[i] = self.tick(input[i]);
         }
     }
 
     #[inline]
-    pub fn tick(&self, sample: f32) -> f32 {
+    pub fn tick(&mut self, sample: f32) -> f32 {
         let v0 = sample;
         let v3 = v0 - self.ic2eq;
         let v1 = self.coeffs.a1 * self.ic1eq + self.coeffs.a2 * v3;
         let v2 = self.ic2eq + self.coeffs.a2 * self.ic1eq + self.coeffs.a3 * v3;
-        let ic1eq_ptr = &self.ic1eq as *const f32 as *mut f32;
-        let ic2eq_ptr = &self.ic2eq as *const f32 as *mut f32;
-        unsafe {
-            *ic1eq_ptr = 2.0 * v1 - self.ic1eq;
-            *ic2eq_ptr = 2.0 * v2 - self.ic2eq;
-        }
+        self.ic1eq = 2.0 * v1 - self.ic1eq;
+        self.ic2eq = 2.0 * v2 - self.ic2eq;
         self.coeffs.m0 * v0 + self.coeffs.m1 * v1 + self.coeffs.m2 * v2
     }
 

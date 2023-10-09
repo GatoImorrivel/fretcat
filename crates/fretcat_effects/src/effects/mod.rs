@@ -12,7 +12,7 @@ pub use overdrive::Overdrive;
 pub use fuzz::Fuzz;
 
 pub trait AudioEffect: fmt::Debug + Send + Sync + DynClone + DowncastSync {
-    fn process(&self, input_buffer: &mut [f32]);
+    fn process(&mut self, input_buffer: &mut [f32]);
     fn view(&self, cx: &mut Context, effect: usize);
     fn update(&self, event: &mut Event, effect: usize, chain: &mut Chain) -> Option<()>;
     fn height(&self) -> f32;
