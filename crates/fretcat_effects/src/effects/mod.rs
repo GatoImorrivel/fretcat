@@ -23,8 +23,8 @@ impl Effect {
 
 pub trait AudioEffect: fmt::Debug + Send + Sync + DynClone + DowncastSync {
     fn process(&self, input_buffer: &mut [f32]);
-    fn view(&self, cx: &mut Context, effect: Effect);
-    fn update(&self, event: &mut Event, effect: Effect, chain: &mut Chain) -> Option<()>;
+    fn view(&self, cx: &mut Context, effect: usize);
+    fn update(&self, event: &mut Event, effect: usize, chain: &mut Chain) -> Option<()>;
     fn height(&self) -> f32;
 }
 

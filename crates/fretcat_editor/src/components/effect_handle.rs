@@ -8,15 +8,14 @@ use crate::components::{CardData, CardEvent, EffectList, EffectListEvent};
 #[derive(Debug, Clone)]
 pub struct EffectHandle {
     handle: Box<dyn AudioEffect>,
-    effect: Effect,
+    effect: usize,
 }
 
 impl EffectHandle {
-    pub fn new(cx: &mut Context, effect: Effect) -> Option<()> {
+    pub fn new(cx: &mut Context, effect: usize) -> Option<()> {
         let chain = ChainData::chain.get(cx);
         let borrow = chain.borrow();
-        let data = borrow.query(&effect)?;
-        let index = borrow.get_position(&effect)?;
+        let data = borrow.query(effect)?;
         HStack::new(cx, move |cx| {
             VStack::new(cx, move |cx| {
                 Button::new(
@@ -28,7 +27,7 @@ impl EffectHandle {
                 Element::new(cx);
             })
             .on_drag(move |ex| {
-                ex.emit(EffectListEvent::DragChange(Some(effect.clone())));
+                ex.emit(EffectListEvent::DragChange(Some(effect)));
                 ex.set_drop_data(ex.current());
             })
             .class("effect-bar")
@@ -45,7 +44,7 @@ impl EffectHandle {
             })
             .width(Stretch(100.0))
             .height(Stretch(1.0))
-            .on_drop(move |ex, _| on_drop(ex, index as i32, effect));
+            .on_drop(move |ex, _| on_drop(ex, effect));
 
             Binding::new(
                 cx,
@@ -58,13 +57,13 @@ impl EffectHandle {
                             .position_type(PositionType::SelfDirected)
                             .width(Stretch(1.0))
                             .height(Percentage(50.0))
-                            .on_drop(move |ex, _| on_drop(ex, index as i32, effect.clone()));
+                            .on_drop(move |ex, _| on_drop(ex, effect));
                         Element::new(cx)
                             .position_type(PositionType::SelfDirected)
                             .width(Stretch(1.0))
                             .height(Percentage(50.0))
                             .top(Percentage(50.0))
-                            .on_drop(move |ex, _| on_drop(ex, index as i32 + 1, effect.clone()));
+                            .on_drop(move |ex, _| on_drop(ex, effect + 1));
                     }
                 },
             );
@@ -88,7 +87,7 @@ impl Model for EffectHandle {
     }
 }
 
-fn on_drop(ex: &mut EventContext, mut index: i32, effect: Effect) {
+fn on_drop(ex: &mut EventContext, mut index: usize) {
     let card = CardData::dragging.get(ex);
     let drag_effect = EffectList::dragging.get(ex);
 
@@ -97,12 +96,12 @@ fn on_drop(ex: &mut EventContext, mut index: i32, effect: Effect) {
     }
 
     if let Some(card) = card {
-        ex.emit(ChainCommand::InsertAt(index as usize, card.spawn()));
+        ex.emit(ChainCommand::InsertAt(index, card.spawn()));
         ex.emit(CardEvent::DragChange(None));
     }
 
     if let Some(drag_effect) = drag_effect {
-        ex.emit(ChainCommand::Swap(effect, drag_effect));
+        ex.emit(ChainCommand::Swap(index, drag_effect));
         ex.emit(EffectListEvent::DragChange(None));
     }
 }

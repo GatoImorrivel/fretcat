@@ -22,22 +22,21 @@ impl Model for ChainData {}
 pub enum ChainCommand {
     Insert(Box<dyn AudioEffect>),
     InsertAt(usize, Box<dyn AudioEffect>),
-    Remove(Effect),
-    Swap(Effect, Effect),
+    Remove(usize),
+    Swap(usize, usize),
 }
 
 #[derive(Debug)]
 pub struct Chain {
-    pub effects: Vec<Effect>,
+    pub effects: Vec<Box<dyn AudioEffect>>,
     pub update_queue: ArrayQueue<ChainCommand>,
-    pub(crate) data_cache: HashMap<Effect, Box<dyn AudioEffect>>,
 }
 
 impl Chain {
     #[inline]
     pub fn process(&self, buffer: &mut [f32]) {
         self.effects.iter().for_each(|e| {
-            self.data_cache.get(e).unwrap().process(buffer);
+            e.process(buffer);
         });
     }
 
@@ -56,107 +55,62 @@ impl Chain {
                 self.insert_at(pos, audio_effect);
             }
             ChainCommand::Remove(effect) => {
-                self.remove(&effect);
+                self.remove(effect);
             }
             ChainCommand::Swap(e1, e2) => {
-                let i1 = self.index_of(&e1);
-                let i2 = self.index_of(&e2);
-
-                if let Some(i1) = i1 {
-                    if let Some(i2) = i2 {
-                        self.effects.swap(i1, i2);
-                    }
+                if self.effects.get(e1).is_some() && self.effects.get(e2).is_some() {
+                    self.effects.swap(e1, e2);
                 }
             }
         }
     }
 
     #[inline]
-    fn index_of(&self, effect: &Effect) -> Option<usize> {
-        let (index, _) = self
-            .effects
-            .iter()
-            .enumerate()
-            .find(|(_, e)| **e == *effect)?;
-
-        Some(index)
+    pub fn insert(&mut self, audio_effect: Box<dyn AudioEffect>) -> usize {
+        self.effects.push(audio_effect);
+        self.effects.clone().into_iter().enumerate().last().unwrap().0
     }
 
     #[inline]
-    pub fn insert(&mut self, audio_effect: Box<dyn AudioEffect>) -> (usize, Effect) {
-        let e = Effect::new();
-        self.effects.push(e);
-        self.data_cache.insert(e, audio_effect);
-        self.effects.clone().into_iter().enumerate().last().unwrap()
+    pub fn insert_at(&mut self, index: usize, audio_effect: Box<dyn AudioEffect>) {
+        self.effects.insert(index, audio_effect);
     }
 
     #[inline]
-    pub fn insert_at(&mut self, index: usize, audio_effect: Box<dyn AudioEffect>) -> Effect {
-        let e = Effect::new();
-        self.effects.insert(index, e);
-        self.data_cache.insert(e, audio_effect);
-        self.effects.clone()[index]
-    }
-
-    #[inline]
-    pub fn remove(&mut self, effect: &Effect) {
-        let fetch = self
-            .effects
-            .clone()
-            .into_iter()
-            .enumerate()
-            .find(|(_i, e)| e == effect);
-
-        if let Some((index, effect)) = fetch {
+    pub fn remove(&mut self, index: usize) {
+        if self.effects.get(index).is_some() {
             self.effects.remove(index);
-            self.data_cache.remove(&effect);
         }
     }
 
     #[inline]
-    pub fn query(&self, effect: &Effect) -> Option<Query> {
-        let c = self.data_cache.get(&effect)?;
+    pub fn query(&self, effect: usize) -> Option<Query> {
+        let c = self.effects.get(effect)?;
 
         Some(c)
     }
 
     #[inline]
-    pub fn query_mut(&mut self, effect: &Effect) -> Option<QueryMut> {
-        let c = self.data_cache.get_mut(effect)?;
+    pub fn query_mut(&mut self, effect: usize) -> Option<QueryMut> {
+        let c = self.effects.get_mut(effect)?;
         Some(c)
     }
 
     #[inline]
-    pub fn query_cast<T: AudioEffect + 'static>(&self, effect: &Effect) -> Option<&T> {
-        self.data_cache.get(effect)?.as_any().downcast_ref::<T>()
+    pub fn query_cast<T: AudioEffect + 'static>(&self, effect: usize) -> Option<&T> {
+        self.effects.get(effect)?.as_any().downcast_ref::<T>()
     }
 
     #[inline]
-    pub fn query_cast_mut<T: AudioEffect + 'static>(&mut self, effect: &Effect) -> Option<&mut T> {
-        self.data_cache
+    pub fn query_cast_mut<T: AudioEffect + 'static>(&mut self, effect: usize) -> Option<&mut T> {
+        self.effects
             .get_mut(effect)?
             .as_any_mut()
             .downcast_mut::<T>()
     }
 
     #[inline]
-    pub fn query_index(&self, index: usize) -> Option<(Effect, &Box<dyn AudioEffect>)> {
-        let e = match self.effects.get(index) {
-            Some(e) => e,
-            None => return None,
-        };
-
-        let data = self.data_cache.get(e).unwrap();
-        Some((*e, data))
-    }
-
-    #[inline]
-    pub fn get_position(&self, effect: &Effect) -> Option<usize> {
-        self.effects.clone().into_iter().position(|e| e == *effect)
-    }
-
-    #[inline]
-    pub fn check(&self, effect: &Effect) -> bool {
+    pub fn check(&self, effect: usize) -> bool {
         match self.query(effect) {
             Some(_) => true,
             None => false,
@@ -168,7 +122,6 @@ impl Default for Chain {
     fn default() -> Self {
         let mut chain = Chain {
             effects: vec![],
-            data_cache: HashMap::new(),
             update_queue: ArrayQueue::new(20).into(),
         };
 
@@ -181,7 +134,6 @@ impl Default for Chain {
 impl Clone for Chain {
     fn clone(&self) -> Self {
         Self {
-            data_cache: self.data_cache.clone(),
             effects: self.effects.clone(),
             update_queue: ArrayQueue::new(20),
         }

@@ -25,7 +25,7 @@ impl AudioEffect for Fuzz {
     fn process(&self, input_buffer: &mut [f32]) {
     }
 
-    fn view(&self, cx: &mut Context, effect: Effect) {
+    fn view(&self, cx: &mut Context, effect: usize) {
         HStack::new(cx, |cx| {
             HStack::new(cx, |cx| {
                 Knob::new(cx, 1.0, getter!(volume), false)
@@ -38,8 +38,8 @@ impl AudioEffect for Fuzz {
         .class("fuzz");
     }
 
-    fn update(&self, event: &mut Event, effect: Effect, chain: &mut Chain) -> Option<()>{
-        let data = chain.query_cast_mut::<Self>(&effect)?;
+    fn update(&self, event: &mut Event, effect: usize, chain: &mut Chain) -> Option<()>{
+        let data = chain.query_cast_mut::<Self>(effect)?;
         event.map(|event, _| match event {
             Message::Volume(val) => {
                 data.volume = *val;

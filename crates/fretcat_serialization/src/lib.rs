@@ -76,7 +76,7 @@ impl From<ChainHandle> for Preset {
             .borrow()
             .effects
             .iter()
-            .map(|e| Mapper::try_from(value.borrow().query(e).unwrap().clone()).unwrap())
+            .map(|e| Mapper::try_from(e.clone()).unwrap())
             .collect();
 
         me.effects = mappers;
@@ -92,7 +92,7 @@ impl From<&Chain> for Preset {
         let mappers = value
             .effects
             .iter()
-            .map(|e| Mapper::try_from(value.query(e).unwrap().clone()).unwrap())
+            .map(|e| Mapper::try_from(e.clone()).unwrap())
             .collect();
 
         me.effects = mappers;

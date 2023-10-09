@@ -6,11 +6,11 @@ use super::{CardData, CardEvent, effect_handle::EffectHandle};
 
 #[derive(Debug, Lens, Clone, Copy)]
 pub struct EffectList {
-    pub dragging: Option<Effect>,
+    pub dragging: Option<usize>,
 }
 
 pub enum EffectListEvent {
-    DragChange(Option<Effect>),
+    DragChange(Option<usize>),
 }
 
 impl EffectList {
@@ -24,9 +24,9 @@ impl EffectList {
                         let chain = ChainData::chain.get(cx);
                         let borrow = chain.borrow();
 
-                        for effect in borrow.effects.iter() {
-                            EffectHandle::new(cx, effect.clone()).unwrap_or_else(|| {
-                                nih_log!("dropped effect {:?}", effect);
+                        for (index, _) in borrow.effects.iter().enumerate() {
+                            EffectHandle::new(cx, index).unwrap_or_else(|| {
+                                nih_log!("dropped effect {:?}", index);
                             });
                         }
                         VStack::new(cx, |cx| {
