@@ -8,7 +8,7 @@ use fretcat_common::vizia::{
 };
 
 pub use atomic_refcell::*;
-pub use chain::{Chain, ChainCommand, ChainData, ChainHandle};
+pub use chain::{Chain, ChainCommand, ChainData};
 pub use dyn_clone;
 
 pub fn register_fonts(cx: &mut Context) {

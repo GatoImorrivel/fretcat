@@ -2,7 +2,6 @@ use core::fmt;
 use downcast_rs::{impl_downcast, DowncastSync};
 use dyn_clone::DynClone;
 use fretcat_common::vizia::prelude::*;
-use rand::random;
 
 use crate::Chain;
 
@@ -11,15 +10,6 @@ mod fuzz;
 
 pub use overdrive::Overdrive;
 pub use fuzz::Fuzz;
-
-#[derive(Debug, Clone, Copy, Hash, PartialEq, Eq)]
-pub struct Effect(u64);
-
-impl Effect {
-    pub fn new() -> Self {
-        Self(random())
-    }
-}
 
 pub trait AudioEffect: fmt::Debug + Send + Sync + DynClone + DowncastSync {
     fn process(&self, input_buffer: &mut [f32]);

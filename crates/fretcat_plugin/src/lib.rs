@@ -4,7 +4,7 @@ use fretcat_editor::EditorData;
 pub use nih_plug;
 use nih_plug::prelude::*;
 
-use fretcat_effects::{AtomicRefCell, Chain, ChainHandle};
+use fretcat_effects::Chain;
 use params::FretcatParams;
 
 use std::{num::NonZeroU32, sync::Arc};
@@ -13,7 +13,7 @@ const NUM_INPUT_CHANNELS: u32 = 2;
 const NUM_OUTPUT_CHANNELS: u32 = 2;
 pub struct Fretcat {
     params: Arc<FretcatParams>,
-    chain: ChainHandle,
+    chain: Arc<Chain>,
     editor_data: EditorData
 }
 
@@ -21,7 +21,7 @@ impl Default for Fretcat {
     fn default() -> Self {
         Self {
             params: Arc::new(FretcatParams::default()),
-            chain: Arc::new(AtomicRefCell::new(Chain::default())),
+            chain: Arc::new(Chain::default()),
             editor_data: EditorData::default()
         }
     }
@@ -45,7 +45,7 @@ impl Plugin for Fretcat {
     const SAMPLE_ACCURATE_AUTOMATION: bool = true;
 
     type SysExMessage = ();
-    type BackgroundTask = ChainHandle;
+    type BackgroundTask = Arc<Chain>;
 
     fn params(&self) -> Arc<dyn Params> {
         self.params.clone()
@@ -69,11 +69,13 @@ impl Plugin for Fretcat {
 
     fn task_executor(&mut self) -> TaskExecutor<Self> {
         Box::new(|chain| {
-             match chain.borrow().update_queue.pop() {
+             match chain.update_queue.pop() {
                 Some(command) => {
-                    unsafe {
-                        chain.as_ptr().as_mut().unwrap().handle_command(command);
-                    }
+                    let chain = unsafe {
+                        &mut *Arc::as_ptr(&chain).cast_mut()
+                    };
+
+                    chain.handle_command(command);
                 },
                 None => ()
             }
@@ -87,7 +89,7 @@ impl Plugin for Fretcat {
         _context: &mut impl ProcessContext<Self>,
     ) -> ProcessStatus {
         for channel in buffer.as_slice() {
-            self.chain.borrow().process(channel);
+            self.chain.process(channel);
         }
 
         _context.execute_background(self.chain.clone());

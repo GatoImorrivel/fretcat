@@ -2,9 +2,9 @@ mod mapper;
 #[cfg(test)]
 mod tests;
 
-use std::{fs, path::Path};
+use std::{fs, path::Path, sync::Arc};
 
-use fretcat_effects::{effects::AudioEffect, Chain, ChainHandle};
+use fretcat_effects::{effects::AudioEffect, Chain};
 use mapper::Mapper;
 use serde::{Deserialize, Serialize};
 
@@ -68,12 +68,11 @@ impl Default for Preset {
     }
 }
 
-impl From<ChainHandle> for Preset {
-    fn from(value: ChainHandle) -> Self {
+impl From<Arc<Chain>> for Preset {
+    fn from(value: Arc<Chain>) -> Self {
         let mut me = Self::default();
 
         let mappers = value
-            .borrow()
             .effects
             .iter()
             .map(|e| Mapper::try_from(e.clone()).unwrap())

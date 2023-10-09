@@ -9,7 +9,7 @@ use crate::{Chain, ChainData};
 
 use crate::common::{Filter, FilterMode, map_normalized_value};
 
-use super::{AudioEffect, Effect};
+use super::AudioEffect;
 
 #[derive(Debug, Clone, Message, Serialize, Deserialize)]
 pub struct Overdrive {

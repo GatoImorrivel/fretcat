@@ -5,7 +5,7 @@ use fretcat_common::vizia::prelude::*;
 use crate::Chain;
 use crate::ChainData;
 
-use super::{AudioEffect, Effect};
+use super::AudioEffect;
 
 #[derive(Debug, Message,Clone, Copy, Serialize, Deserialize)]
 pub struct Fuzz {

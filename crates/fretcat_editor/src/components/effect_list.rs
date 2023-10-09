@@ -1,8 +1,8 @@
 use fretcat_common::nih_plug::nih_log;
 use fretcat_common::vizia::prelude::*;
 
-use fretcat_effects::{ChainCommand, effects::Effect, ChainData};
-use super::{CardData, CardEvent, effect_handle::EffectHandle};
+use super::{effect_handle::EffectHandle, CardData, CardEvent};
+use fretcat_effects::{ChainCommand, ChainData};
 
 #[derive(Debug, Lens, Clone, Copy)]
 pub struct EffectList {
@@ -19,12 +19,11 @@ impl EffectList {
             ScrollView::new(cx, 0.0, 0.0, false, false, |cx| {
                 Binding::new(
                     cx,
-                    ChainData::chain.map(|c| c.borrow().update_queue.len()),
+                    ChainData::chain.map(|c| c.update_queue.len()),
                     |cx, _len| {
                         let chain = ChainData::chain.get(cx);
-                        let borrow = chain.borrow();
 
-                        for (index, _) in borrow.effects.iter().enumerate() {
+                        for (index, _) in chain.effects.iter().enumerate() {
                             EffectHandle::new(cx, index).unwrap_or_else(|| {
                                 nih_log!("dropped effect {:?}", index);
                             });
@@ -55,11 +54,7 @@ impl View for EffectList {
         Some("effect-list")
     }
 
-    fn event(
-        &mut self,
-        cx: &mut EventContext,
-        event: &mut Event,
-    ) {
+    fn event(&mut self, cx: &mut EventContext, event: &mut Event) {
         let chain = ChainData::chain.get(cx);
 
         event.map(|drag_event, _| match drag_event {
@@ -72,18 +67,16 @@ impl View for EffectList {
         if let Some(e) = event {
             match e {
                 ChainCommand::Insert(data) => {
-                    chain.borrow().add_to_queue(ChainCommand::Insert(data));
+                    chain.add_to_queue(ChainCommand::Insert(data));
                 }
                 ChainCommand::InsertAt(index, data) => {
-                    chain
-                        .borrow()
-                        .add_to_queue(ChainCommand::InsertAt(index, data));
+                    chain.add_to_queue(ChainCommand::InsertAt(index, data));
                 }
                 ChainCommand::Remove(effect) => {
-                    chain.borrow().add_to_queue(ChainCommand::Remove(effect));
+                    chain.add_to_queue(ChainCommand::Remove(effect));
                 }
                 ChainCommand::Swap(e1, e2) => {
-                    chain.borrow().add_to_queue(ChainCommand::Swap(e1, e2));
+                    chain.add_to_queue(ChainCommand::Swap(e1, e2));
                 }
             }
         }

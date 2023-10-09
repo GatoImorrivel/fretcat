@@ -1,5 +1,7 @@
+use std::sync::Arc;
+
 use fretcat_effects::{ChainCommand, ChainData};
-use fretcat_effects::effects::{AudioEffect, Effect};
+use fretcat_effects::effects::AudioEffect;
 use fretcat_common::nih_plug::nih_log;
 use fretcat_common::vizia::prelude::*;
 
@@ -14,8 +16,7 @@ pub struct EffectHandle {
 impl EffectHandle {
     pub fn new(cx: &mut Context, effect: usize) -> Option<()> {
         let chain = ChainData::chain.get(cx);
-        let borrow = chain.borrow();
-        let data = borrow.query(effect)?;
+        let data = chain.query(effect)?;
         HStack::new(cx, move |cx| {
             VStack::new(cx, move |cx| {
                 Button::new(
@@ -79,7 +80,7 @@ impl EffectHandle {
 impl Model for EffectHandle {
     fn event(&mut self, cx: &mut EventContext, event: &mut Event) {
         let chain = ChainData::chain.get(cx);
-        let chain = unsafe { chain.as_ptr().as_mut().unwrap() };
+        let chain = unsafe { &mut *Arc::as_ptr(&chain).cast_mut() };
 
         self.handle.update(event, self.effect, chain).unwrap_or_else(|| {
             nih_log!("effect {:?} dropped", self.effect);

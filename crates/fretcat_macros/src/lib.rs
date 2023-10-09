@@ -25,7 +25,7 @@ pub fn getter(input: TokenStream) -> TokenStream {
 
     // Generate the quoted code
     let expanded = quote! {
-        ChainData::chain.map(move |chain| match chain.borrow().query_cast::<Self>(effect) {
+        ChainData::chain.map(move |chain| match chain.query_cast::<Self>(effect) {
             Some(data) => data.#ident,
             None => 0.0
         })

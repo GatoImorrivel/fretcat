@@ -2,7 +2,7 @@ mod components;
 
 use std::sync::{atomic::Ordering, Arc};
 
-use fretcat_effects::{ChainData, ChainHandle};
+use fretcat_effects::{ChainData, Chain};
 
 use fretcat_common::nih_plug::prelude::*;
 use fretcat_common::vizia::prelude::*;
@@ -20,7 +20,7 @@ pub fn default_state() -> Arc<EditorState> {
 }
 
 #[allow(unused_parens)]
-pub type InitFlags = (ChainHandle, EditorData);
+pub type InitFlags = (Arc<Chain>, EditorData);
 
 #[derive(Debug, Clone, Lens, Default)]
 pub struct EditorData {

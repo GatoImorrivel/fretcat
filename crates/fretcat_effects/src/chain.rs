@@ -1,19 +1,17 @@
-use std::{collections::HashMap, sync::Arc};
+use std::sync::Arc;
 
-use atomic_refcell::AtomicRefCell;
 use fretcat_common::vizia::prelude::*;
 
 use crossbeam::queue::ArrayQueue;
 
-use crate::effects::{AudioEffect, Effect, Overdrive};
+use crate::effects::{AudioEffect, Overdrive};
 
 pub type Query<'a> = &'a Box<dyn AudioEffect>;
 pub type QueryMut<'a> = &'a mut Box<dyn AudioEffect>;
-pub type ChainHandle = Arc<AtomicRefCell<Chain>>;
 
 #[derive(Debug, Lens, Clone)]
 pub struct ChainData {
-    pub chain: ChainHandle,
+    pub chain: Arc<Chain>,
 }
 
 impl Model for ChainData {}
