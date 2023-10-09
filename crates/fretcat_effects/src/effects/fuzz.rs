@@ -1,6 +1,6 @@
 use fretcat_macros::{Message, getter};
 use serde::{Serialize, Deserialize};
-use nih_plug_vizia::vizia::prelude::*;
+use fretcat_common::vizia::prelude::*;
 
 use crate::Chain;
 use crate::ChainData;

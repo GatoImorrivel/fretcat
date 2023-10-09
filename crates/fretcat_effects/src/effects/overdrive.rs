@@ -1,8 +1,8 @@
 use std::{f32::consts::PI, fmt::Debug};
 
 use fretcat_macros::{getter, Message};
-use nih_plug::util::db_to_gain_fast;
-use nih_plug_vizia::vizia::prelude::*;
+use fretcat_common::nih_plug::util::db_to_gain_fast;
+use fretcat_common::vizia::prelude::*;
 use serde::{Deserialize, Serialize};
 
 use crate::{Chain, ChainData};
@@ -88,7 +88,7 @@ impl AudioEffect for Overdrive {
             Message::Freq(val) => {
                 data.freq = *val;
                 data.filter.recalculate_coeffs(map_normalized_value(*val, self.min_freq_hz, self.max_freq_hz), self.filter.q());
-                nih_plug::nih_log!("{:#?}", data.filter);
+                fretcat_common::nih_plug::nih_log!("{:#?}", data.filter);
             }
             Message::Volume(val) => {
                 data.volume = *val;

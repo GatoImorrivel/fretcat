@@ -5,10 +5,8 @@ pub use nih_plug;
 use nih_plug::prelude::*;
 
 use fretcat_effects::{AtomicRefCell, Chain, ChainHandle};
-use fretcat_effects::rayon::prelude::*;
 use params::FretcatParams;
 
-use std::sync::atomic::Ordering;
 use std::{num::NonZeroU32, sync::Arc};
 
 const NUM_INPUT_CHANNELS: u32 = 2;

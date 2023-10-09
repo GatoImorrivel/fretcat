@@ -1,7 +1,7 @@
 use std::{collections::HashMap, sync::Arc};
 
 use atomic_refcell::AtomicRefCell;
-use nih_plug_vizia::vizia::prelude::*;
+use fretcat_common::vizia::prelude::*;
 
 use crossbeam::queue::ArrayQueue;
 

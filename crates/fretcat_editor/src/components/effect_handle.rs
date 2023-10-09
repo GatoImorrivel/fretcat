@@ -1,7 +1,7 @@
 use fretcat_effects::{ChainCommand, ChainData};
 use fretcat_effects::effects::{AudioEffect, Effect};
-use nih_plug::nih_log;
-use nih_plug_vizia::vizia::prelude::*;
+use fretcat_common::nih_plug::nih_log;
+use fretcat_common::vizia::prelude::*;
 
 use crate::components::{CardData, CardEvent, EffectList, EffectListEvent};
 

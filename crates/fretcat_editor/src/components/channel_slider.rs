@@ -1,5 +1,4 @@
-use nih_plug::nih_log;
-use nih_plug_vizia::vizia::prelude::*;
+use fretcat_common::vizia::prelude::*;
 
 #[derive(Debug, Clone, Copy, Lens)]
 pub struct ChannelSlider {

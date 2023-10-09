@@ -1,7 +1,7 @@
 use core::fmt;
 use downcast_rs::{impl_downcast, DowncastSync};
 use dyn_clone::DynClone;
-use nih_plug_vizia::vizia::prelude::*;
+use fretcat_common::vizia::prelude::*;
 use rand::random;
 
 use crate::Chain;

@@ -1,6 +1,6 @@
-use fretcat_effects::{ChainData, ChainCommand};
+use fretcat_effects::ChainData;
 use fretcat_serialization::Preset;
-pub use nih_plug_vizia::vizia::prelude::*;
+pub use fretcat_common::vizia::prelude::*;
 
 pub struct PresetControl {}
 

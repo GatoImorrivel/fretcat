@@ -1,5 +1,5 @@
-use nih_plug::nih_log;
-use nih_plug_vizia::vizia::prelude::*;
+use fretcat_common::nih_plug::nih_log;
+use fretcat_common::vizia::prelude::*;
 
 use fretcat_effects::{ChainCommand, effects::Effect, ChainData};
 use super::{CardData, CardEvent, effect_handle::EffectHandle};
@@ -57,8 +57,8 @@ impl View for EffectList {
 
     fn event(
         &mut self,
-        cx: &mut nih_plug_vizia::vizia::prelude::EventContext,
-        event: &mut nih_plug_vizia::vizia::prelude::Event,
+        cx: &mut EventContext,
+        event: &mut Event,
     ) {
         let chain = ChainData::chain.get(cx);
 
