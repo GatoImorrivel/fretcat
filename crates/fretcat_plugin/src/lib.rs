@@ -7,7 +7,8 @@ use nih_plug::prelude::*;
 use fretcat_effects::Chain;
 use params::FretcatParams;
 
-use std::{num::NonZeroU32, sync::Arc, time::Instant};
+use std::time::Instant;
+use std::{num::NonZeroU32, sync::Arc};
 
 const NUM_INPUT_CHANNELS: u32 = 2;
 const NUM_OUTPUT_CHANNELS: u32 = 2;
