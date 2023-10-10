@@ -3,12 +3,13 @@ preset-control {
     box-shadow: 8px 8px 15px #181818;
 }
 
-.preset-name {
+textbox.preset-name {
     color: white;
     background-color: transparent;
     border-color: transparent;
     font-size: 36;
     font-family: 'Montserrat';
+    border-width: 0px;
 }
 
 .name-wrapper {

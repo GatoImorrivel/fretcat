@@ -3,7 +3,7 @@ mod common;
 pub mod effects;
 
 use fretcat_common::vizia::{
-    image::{load_from_memory_with_format, DynamicImage, ImageFormat},
+    image::{load_from_memory_with_format, DynamicImage, ImageFormat, imageops},
     prelude::*,
 };
 
@@ -50,11 +50,31 @@ pub fn register_images(cx: &mut Context) {
         DynamicImage::ImageRgb8(fuzz),
         ImageRetentionPolicy::Forever,
     );
+
+    let studio_reverb = load_from_memory_with_format(
+        include_bytes!("../../assets/images/reverb-bg.png"),
+        ImageFormat::Png,
+    )
+    .unwrap();
+
+    let width = studio_reverb.width();
+    let height = studio_reverb.height();
+
+    let studio_reverb = studio_reverb.resize_to_fill(width * 2, height, imageops::FilterType::Nearest).to_rgb8();
+
+    cx.load_image(
+        "reverb-background",
+        DynamicImage::ImageRgb8(studio_reverb),
+        ImageRetentionPolicy::Forever,
+    );
 }
 
 pub fn register_styles(cx: &mut Context) {
-    cx.add_stylesheet(include_str!("../css/overdrive.css"))
-        .unwrap();
+    // Distortion
+    cx.add_stylesheet(include_str!("../css/overdrive.css")).unwrap();
     cx.add_stylesheet(include_str!("../css/fuzz.css")).unwrap();
+
+    // Reverb
+    cx.add_stylesheet(include_str!("../css/studio-reverb.css")).unwrap();
 }
 

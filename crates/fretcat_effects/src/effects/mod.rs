@@ -5,11 +5,16 @@ use fretcat_common::vizia::prelude::*;
 
 use crate::Chain;
 
-mod overdrive;
+// Distortions
 mod fuzz;
+mod overdrive;
+
+// Reverbs
+mod studioreverb;
 
 pub use overdrive::Overdrive;
 pub use fuzz::Fuzz;
+pub use studioreverb::StudioReverb;
 
 pub trait AudioEffect: fmt::Debug + Send + Sync + DynClone + DowncastSync {
     fn process(&mut self, input_buffer: &mut [f32]);

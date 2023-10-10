@@ -2,9 +2,7 @@ use std::sync::Arc;
 
 use fretcat_common::vizia::prelude::*;
 
-use crossbeam::queue::ArrayQueue;
-
-use crate::effects::{AudioEffect, Overdrive};
+use crate::effects::{AudioEffect, Overdrive, StudioReverb};
 
 pub type Query<'a> = &'a Box<dyn AudioEffect>;
 pub type QueryMut<'a> = &'a mut Box<dyn AudioEffect>;
@@ -14,7 +12,32 @@ pub struct ChainData {
     pub chain: Arc<Chain>,
 }
 
-impl Model for ChainData {}
+impl Model for ChainData {
+    fn event(&mut self, cx: &mut EventContext, event: &mut Event) {
+        let event = event.take();
+        let chain = unsafe {
+            &mut *Arc::as_ptr(&self.chain).cast_mut()
+        };
+        if let Some(e) = event {
+            match e {
+                ChainCommand::Insert(data) => {
+                    chain.handle_command(ChainCommand::Insert(data));
+                }
+                ChainCommand::InsertAt(index, data) => {
+                    chain.handle_command(ChainCommand::InsertAt(index, data));
+                }
+                ChainCommand::Remove(index) => {
+                    chain.handle_command(ChainCommand::Remove(index));
+                }
+                ChainCommand::Swap(e1, e2) => {
+                    chain.handle_command(ChainCommand::Swap(e1, e2));
+                }
+            }
+        }
+    }
+}
+
+
 
 #[derive(Debug, Clone)]
 pub enum ChainCommand {
@@ -24,10 +47,9 @@ pub enum ChainCommand {
     Swap(usize, usize),
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Chain {
     pub effects: Vec<Box<dyn AudioEffect>>,
-    pub update_queue: ArrayQueue<ChainCommand>,
 }
 
 impl Chain {
@@ -36,11 +58,6 @@ impl Chain {
         self.effects.iter_mut().for_each(|e| {
             e.process(buffer);
         });
-    }
-
-    #[inline]
-    pub fn add_to_queue(&self, command: ChainCommand) {
-        self.update_queue.force_push(command);
     }
 
     #[inline]
@@ -120,20 +137,10 @@ impl Default for Chain {
     fn default() -> Self {
         let mut chain = Chain {
             effects: vec![],
-            update_queue: ArrayQueue::new(20).into(),
         };
 
-        chain.insert(Box::new(Overdrive::default()));
+        chain.insert(Box::new(StudioReverb::default()));
 
         chain
-    }
-}
-
-impl Clone for Chain {
-    fn clone(&self) -> Self {
-        Self {
-            effects: self.effects.clone(),
-            update_queue: ArrayQueue::new(20),
-        }
     }
 }

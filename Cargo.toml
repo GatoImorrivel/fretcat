@@ -14,9 +14,6 @@ fretcat_plugin = {path = "./crates/fretcat_plugin"}
 [lib]
 crate-type = ["cdylib", "lib"]
 
-[profile.dev]
-incremental = false
-
 [profile.release]
 lto = "thin"
 strip = "symbols"

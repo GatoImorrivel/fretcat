@@ -42,10 +42,11 @@ impl Plugin for Fretcat {
         ..AudioIOLayout::const_default()
     }];
 
-    const SAMPLE_ACCURATE_AUTOMATION: bool = true;
+    const SAMPLE_ACCURATE_AUTOMATION: bool = false;
+    const HARD_REALTIME_ONLY: bool = true;
 
     type SysExMessage = ();
-    type BackgroundTask = Arc<Chain>;
+    type BackgroundTask = ();
 
     fn params(&self) -> Arc<dyn Params> {
         self.params.clone()
@@ -67,21 +68,6 @@ impl Plugin for Fretcat {
 
     fn reset(&mut self) {}
 
-    fn task_executor(&mut self) -> TaskExecutor<Self> {
-        Box::new(|chain| {
-             match chain.update_queue.pop() {
-                Some(command) => {
-                    let chain = unsafe {
-                        &mut *Arc::as_ptr(&chain).cast_mut()
-                    };
-
-                    chain.handle_command(command);
-                },
-                None => ()
-            }
-        })
-    }
-
     fn process(
         &mut self,
         buffer: &mut Buffer,
@@ -95,7 +81,6 @@ impl Plugin for Fretcat {
             chain.process(channel);
         }
 
-        _context.execute_background(self.chain.clone());
         ProcessStatus::Normal
     }
 }

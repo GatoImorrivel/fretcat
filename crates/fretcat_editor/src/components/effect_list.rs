@@ -19,7 +19,7 @@ impl EffectList {
             ScrollView::new(cx, 0.0, 0.0, false, false, |cx| {
                 Binding::new(
                     cx,
-                    ChainData::chain.map(|c| c.update_queue.len()),
+                    ChainData::chain.map(|c| c.effects.len()),
                     |cx, _len| {
                         let chain = ChainData::chain.get(cx);
 
@@ -55,30 +55,10 @@ impl View for EffectList {
     }
 
     fn event(&mut self, cx: &mut EventContext, event: &mut Event) {
-        let chain = ChainData::chain.get(cx);
-
         event.map(|drag_event, _| match drag_event {
             EffectListEvent::DragChange(effect) => {
                 self.dragging = effect.clone();
             }
         });
-
-        let event = event.take();
-        if let Some(e) = event {
-            match e {
-                ChainCommand::Insert(data) => {
-                    chain.add_to_queue(ChainCommand::Insert(data));
-                }
-                ChainCommand::InsertAt(index, data) => {
-                    chain.add_to_queue(ChainCommand::InsertAt(index, data));
-                }
-                ChainCommand::Remove(effect) => {
-                    chain.add_to_queue(ChainCommand::Remove(effect));
-                }
-                ChainCommand::Swap(e1, e2) => {
-                    chain.add_to_queue(ChainCommand::Swap(e1, e2));
-                }
-            }
-        }
     }
 }

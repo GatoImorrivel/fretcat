@@ -24,7 +24,8 @@ impl EffectHandle {
                     move |ex| ex.emit(ChainCommand::Remove(effect.clone())),
                     |cx| Label::new(cx, ""),
                 )
-                .class("delete-effect-btn");
+                .class("delete-effect-btn")
+                .font_family(vec![FamilyOwned::Name("Symbols Nerd Font Mono".to_owned())]);
                 Element::new(cx);
             })
             .on_drag(move |ex| {

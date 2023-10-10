@@ -18,8 +18,7 @@ pub enum EffectKind {
     Distortion,
     Delay,
     Dynamics,
-    Reverb,
-    Echo,
+    Reverb
 }
 
 impl EffectKind {

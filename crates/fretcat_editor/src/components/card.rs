@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use fretcat_effects::effects::{AudioEffect, Fuzz, Overdrive};
+use fretcat_effects::effects::{AudioEffect, Fuzz, Overdrive, StudioReverb};
 use fretcat_common::vizia::prelude::*;
 
 use crate::EffectKind;
@@ -16,8 +16,9 @@ lazy_static::lazy_static! {
 
         hashmap.insert(EffectKind::Delay, vec![]);
         hashmap.insert(EffectKind::Dynamics, vec![]);
-        hashmap.insert(EffectKind::Echo, vec![]);
-        hashmap.insert(EffectKind::Reverb, vec![]);
+        hashmap.insert(EffectKind::Reverb, vec![
+            REVERB_CARD
+        ]);
 
         hashmap
     };
@@ -173,4 +174,23 @@ pub const DISTORTION_CARD: Card = Card {
         ex.set_drop_data(ex.current());
     },
     spawn: || Box::new(Fuzz::default()),
+};
+
+pub const REVERB_CARD: Card = Card {
+    content: |cx| {
+        VStack::new(cx, |cx| {
+            Label::new(cx, "Studio Reverb")
+                .font_family(vec![FamilyOwned::Name("Saturday".to_owned())])
+                .color(Color::rgb(232, 57, 57))
+                .font_size(40.0);
+        })
+        .border_width(Pixels(2.0))
+        .border_color(Color::rgb(232, 57, 57))
+        .child_space(Stretch(1.0));
+    },
+    drag: |ex| {
+        ex.emit(CardEvent::DragChange(Some(REVERB_CARD)));
+        ex.set_drop_data(ex.current());
+    },
+    spawn: || Box::new(StudioReverb::default()),
 };
