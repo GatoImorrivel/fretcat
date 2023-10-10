@@ -4,13 +4,11 @@ use fretcat_editor::EditorData;
 pub use nih_plug;
 use nih_plug::prelude::*;
 
-use fretcat_effects::Chain;
+use fretcat_effects::{Chain, NUM_CHANNELS};
 use params::FretcatParams;
 
 use std::{num::NonZeroU32, sync::Arc};
 
-const NUM_INPUT_CHANNELS: u32 = 2;
-const NUM_OUTPUT_CHANNELS: u32 = 2;
 pub struct Fretcat {
     params: Arc<FretcatParams>,
     chain: Arc<Chain>,
@@ -37,8 +35,8 @@ impl Plugin for Fretcat {
 
     // The SIMD version only supports stereo
     const AUDIO_IO_LAYOUTS: &'static [AudioIOLayout] = &[AudioIOLayout {
-        main_input_channels: NonZeroU32::new(NUM_INPUT_CHANNELS),
-        main_output_channels: NonZeroU32::new(NUM_OUTPUT_CHANNELS),
+        main_input_channels: NonZeroU32::new(NUM_CHANNELS as u32),
+        main_output_channels: NonZeroU32::new(NUM_CHANNELS as u32),
         ..AudioIOLayout::const_default()
     }];
 
@@ -77,9 +75,8 @@ impl Plugin for Fretcat {
         let chain = unsafe {
             &mut *Arc::as_ptr(&self.chain).cast_mut()
         };
-        for channel in buffer.as_slice() {
-            chain.process(channel);
-        }
+
+        chain.process(buffer.as_slice());
 
         ProcessStatus::Normal
     }

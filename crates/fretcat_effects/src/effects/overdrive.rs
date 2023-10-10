@@ -1,13 +1,13 @@
 use std::{f32::consts::PI, fmt::Debug};
 
-use fretcat_macros::{getter, Message};
 use fretcat_common::nih_plug::util::db_to_gain_fast;
 use fretcat_common::vizia::prelude::*;
+use fretcat_macros::{getter, Message};
 use serde::{Deserialize, Serialize};
 
-use crate::{Chain, ChainData};
+use crate::{Chain, ChainData, NUM_CHANNELS};
 
-use crate::common::{Filter, FilterMode, map_normalized_value};
+use crate::common::{map_normalized_value, Filter, FilterMode};
 
 use super::AudioEffect;
 
@@ -21,7 +21,7 @@ pub struct Overdrive {
     pub volume: f32,
     max_freq_hz: f32,
     min_freq_hz: f32,
-    filter: Filter
+    filter: [Filter; NUM_CHANNELS],
 }
 
 impl Default for Overdrive {
@@ -33,22 +33,28 @@ impl Default for Overdrive {
             volume: 1.0,
             max_freq_hz: 2000.0,
             min_freq_hz,
-            filter: Filter::new(FilterMode::Lowpass, 44100.0, min_freq_hz, 1.0)
+            filter: [Filter::new(FilterMode::Lowpass, 44100.0, min_freq_hz, 1.0); 2],
         }
     }
 }
 
 impl AudioEffect for Overdrive {
-    fn process(&mut self, input_buffer: &mut [f32]) {
-        input_buffer.iter_mut().for_each(|sample| {
-            let amplified = *sample * db_to_gain_fast(self.gain * 10.0);
-            let distorted = (2.0 / PI) * f32::atan(amplified);
+    fn process(&mut self, input_buffer: (&mut [f32], &mut [f32])) {
+        input_buffer
+            .0
+            .iter_mut()
+            .zip(input_buffer.1.iter_mut())
+            .for_each(|(left, right)| {
+                let clipping_fn = |sample: f32| (2.0 / PI) * f32::atan(sample);
 
-            let output_gain = db_to_gain_fast(self.volume * 10.0);
+                let output_gain = db_to_gain_fast(self.volume * 10.0);
 
-            *sample = distorted * output_gain;
-            *sample = self.filter.tick(*sample);
-        });
+                *left = clipping_fn(*left * db_to_gain_fast(*left * 1.0)) * output_gain;
+                *right = clipping_fn(*right * db_to_gain_fast(*right * 1.0)) * output_gain;
+
+                *left = self.filter[0].tick(*left);
+                *right = self.filter[1].tick(*right);
+            });
     }
 
     fn view(&self, cx: &mut Context, effect: usize) {
@@ -86,7 +92,12 @@ impl AudioEffect for Overdrive {
             }
             Message::Freq(val) => {
                 data.freq = *val;
-                data.filter.recalculate_coeffs(map_normalized_value(*val, self.min_freq_hz, self.max_freq_hz), self.filter.q());
+                data.filter.iter_mut().for_each(|filter| {
+                    filter.recalculate_coeffs(
+                        map_normalized_value(*val, self.min_freq_hz, self.max_freq_hz),
+                        filter.q(),
+                    );
+                });
                 fretcat_common::nih_plug::nih_log!("{:#?}", data.filter);
             }
             Message::Volume(val) => {

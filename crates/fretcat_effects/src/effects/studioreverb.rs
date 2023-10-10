@@ -1,6 +1,6 @@
+use crate::{common::Freeverb, NUM_CHANNELS};
 use fretcat_common::vizia::prelude::*;
-use fretcat_macros::{Message, getter};
-use crate::common::Freeverb;
+use fretcat_macros::{getter, Message};
 
 use super::AudioEffect;
 
@@ -13,7 +13,7 @@ pub struct StudioReverb {
     #[msg]
     pub size: f32,
 
-    reverb: Freeverb
+    reverb: Freeverb,
 }
 
 impl Default for StudioReverb {
@@ -21,24 +21,20 @@ impl Default for StudioReverb {
         Self {
             wet: 0.5,
             size: 0.5,
-            reverb: Freeverb::new(44100)
+            reverb: Freeverb::new(44100),
         }
     }
 }
 
-impl StudioReverb {
-    pub fn process(&mut self, input_buffer: &mut [f32]) {
-        input_buffer.iter_mut().for_each(|sample| {
-            *sample = self.reverb.tick((*sample, *sample)).0;
-        });
-    }
-}
-
 impl AudioEffect for StudioReverb {
-    fn process(&mut self, input_buffer: &mut [f32]) {
-        input_buffer.iter_mut().for_each(|sample| {
-            *sample = self.reverb.tick((*sample, *sample)).0;
-        });
+    fn process(&mut self, input_buffer: (&mut [f32], &mut [f32])) {
+        input_buffer
+            .0
+            .iter_mut()
+            .zip(input_buffer.1.iter_mut())
+            .for_each(|(left, right)| {
+                (*left, *right) = self.reverb.tick((*left, *right));
+            });
     }
 
     fn view(&self, cx: &mut Context, effect: usize) {

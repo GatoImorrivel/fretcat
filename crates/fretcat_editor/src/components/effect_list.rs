@@ -7,6 +7,7 @@ use fretcat_effects::{ChainCommand, ChainData};
 #[derive(Debug, Lens, Clone, Copy)]
 pub struct EffectList {
     pub dragging: Option<usize>,
+    pub update_counter: u64
 }
 
 pub enum EffectListEvent {
@@ -15,12 +16,12 @@ pub enum EffectListEvent {
 
 impl EffectList {
     pub fn new(cx: &mut Context) {
-        Self { dragging: None }.build(cx, |cx| {
+        Self { dragging: None, update_counter: 0 }.build(cx, |cx| {
             ScrollView::new(cx, 0.0, 0.0, false, false, |cx| {
                 Binding::new(
                     cx,
-                    ChainData::chain.map(|c| c.effects.len()),
-                    |cx, _len| {
+                    EffectList::update_counter,
+                    |cx, _| {
                         let chain = ChainData::chain.get(cx);
 
                         for (index, _) in chain.effects.iter().enumerate() {
@@ -59,6 +60,11 @@ impl View for EffectList {
             EffectListEvent::DragChange(effect) => {
                 self.dragging = effect.clone();
             }
+        });
+
+        event.map(|event, _| match event {
+            ChainCommand::Insert(_) => self.update_counter += 1,
+            _ => self.update_counter += 1
         });
     }
 }

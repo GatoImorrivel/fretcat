@@ -4,6 +4,8 @@ use fretcat_common::vizia::prelude::*;
 
 use crate::effects::{AudioEffect, Overdrive, StudioReverb};
 
+pub const NUM_CHANNELS: usize = 2;
+
 pub type Query<'a> = &'a Box<dyn AudioEffect>;
 pub type QueryMut<'a> = &'a mut Box<dyn AudioEffect>;
 
@@ -15,9 +17,7 @@ pub struct ChainData {
 impl Model for ChainData {
     fn event(&mut self, cx: &mut EventContext, event: &mut Event) {
         let event = event.take();
-        let chain = unsafe {
-            &mut *Arc::as_ptr(&self.chain).cast_mut()
-        };
+        let chain = unsafe { &mut *Arc::as_ptr(&self.chain).cast_mut() };
         if let Some(e) = event {
             match e {
                 ChainCommand::Insert(data) => {
@@ -37,8 +37,6 @@ impl Model for ChainData {
     }
 }
 
-
-
 #[derive(Debug, Clone)]
 pub enum ChainCommand {
     Insert(Box<dyn AudioEffect>),
@@ -54,10 +52,14 @@ pub struct Chain {
 
 impl Chain {
     #[inline]
-    pub fn process(&mut self, buffer: &mut [f32]) {
-        self.effects.iter_mut().for_each(|e| {
-            e.process(buffer);
-        });
+    pub fn process(&mut self, buffer: &mut [&mut [f32]]) {
+        unsafe {
+            let left: *mut &mut [f32] = std::mem::transmute(&mut buffer[0]);
+            let right: *mut &mut [f32] = std::mem::transmute(&mut buffer[1]);
+            self.effects
+                .iter_mut()
+                .for_each(|e| e.process((&mut *left, &mut *right)));
+        }
     }
 
     #[inline]
@@ -83,7 +85,13 @@ impl Chain {
     #[inline]
     pub fn insert(&mut self, audio_effect: Box<dyn AudioEffect>) -> usize {
         self.effects.push(audio_effect);
-        self.effects.clone().into_iter().enumerate().last().unwrap().0
+        self.effects
+            .clone()
+            .into_iter()
+            .enumerate()
+            .last()
+            .unwrap()
+            .0
     }
 
     #[inline]
@@ -135,9 +143,7 @@ impl Chain {
 
 impl Default for Chain {
     fn default() -> Self {
-        let mut chain = Chain {
-            effects: vec![],
-        };
+        let mut chain = Chain { effects: vec![] };
 
         chain.insert(Box::new(StudioReverb::default()));
 

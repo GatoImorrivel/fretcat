@@ -9,7 +9,7 @@ pub enum FilterMode {
     Lowpass
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct Filter {
     coeffs: SvfCoeffs,
     ic1eq: f32,
