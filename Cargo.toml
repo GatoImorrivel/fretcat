@@ -5,7 +5,7 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [workspace]
-members = ["xtask", "standalone", "crates/fretcat_editor", "crates/fretcat_effects", "crates/fretcat_plugin", "crates/fretcat_common"]
+members = ["xtask", "standalone", "crates/fretcat_editor", "crates/fretcat_effects", "crates/fretcat_plugin", "crates/fretcat_common", "crates/fretcat_common"]
 exclude = ["sandbox"]
 
 [dependencies]

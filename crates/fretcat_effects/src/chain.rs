@@ -2,6 +2,9 @@ use std::sync::Arc;
 
 use fretcat_common::vizia::prelude::*;
 
+#[cfg(feature = "simulate")]
+use crate::effects::InputSimulator;
+
 use crate::effects::{AudioEffect, Overdrive, StudioReverb};
 
 pub const NUM_CHANNELS: usize = 2;
@@ -145,7 +148,10 @@ impl Default for Chain {
     fn default() -> Self {
         let mut chain = Chain { effects: vec![] };
 
-        chain.insert(Box::new(StudioReverb::default()));
+        #[cfg(feature = "simulate")]
+        {
+            chain.insert(Box::new(InputSimulator::default()));
+        }
 
         chain
     }

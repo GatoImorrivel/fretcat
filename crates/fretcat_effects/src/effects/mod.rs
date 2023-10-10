@@ -12,6 +12,11 @@ mod overdrive;
 // Reverbs
 mod studioreverb;
 
+#[cfg(feature = "simulate")]
+mod input_simulator;
+#[cfg(feature = "simulate")]
+pub use input_simulator::InputSimulator;
+
 pub use overdrive::Overdrive;
 pub use fuzz::Fuzz;
 pub use studioreverb::StudioReverb;

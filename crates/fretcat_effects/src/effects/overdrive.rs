@@ -49,8 +49,8 @@ impl AudioEffect for Overdrive {
 
                 let output_gain = db_to_gain_fast(self.volume * 10.0);
 
-                *left = clipping_fn(*left * db_to_gain_fast(*left * 1.0)) * output_gain;
-                *right = clipping_fn(*right * db_to_gain_fast(*right * 1.0)) * output_gain;
+                *left = clipping_fn(*left * db_to_gain_fast(self.gain * 10.0)) * output_gain;
+                *right = clipping_fn(*right * db_to_gain_fast(self.gain * 10.0)) * output_gain;
 
                 *left = self.filter[0].tick(*left);
                 *right = self.filter[1].tick(*right);

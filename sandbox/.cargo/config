@@ -1,3 +1,0 @@
-[alias]
-sandbox = "watch -i process -x run"
-reload = "watch -w process -x build -p process"

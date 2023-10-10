@@ -9,6 +9,9 @@ use params::FretcatParams;
 
 use std::{num::NonZeroU32, sync::Arc};
 
+#[cfg(feature = "testing")]
+use fretcat_testing::INPUT_SIMULATOR;
+
 pub struct Fretcat {
     params: Arc<FretcatParams>,
     chain: Arc<Chain>,
