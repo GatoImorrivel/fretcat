@@ -3,7 +3,7 @@ use fretcat_macros::EffectMapper;
 
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Serialize, Deserialize, EffectMapper)]
+#[derive(Debug, Serialize, Deserialize, EffectMapper, Clone)]
 pub enum Mapper {
     Overdrive(Overdrive),
     Fuzz(Fuzz),

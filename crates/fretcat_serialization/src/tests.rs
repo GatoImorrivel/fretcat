@@ -12,3 +12,13 @@ fn test_preset_serialization() {
     let preset_loaded = Preset::load("Test").unwrap();
     println!("{:#?}", preset_loaded);
 }
+
+#[test]
+fn already_exist() {
+    let mut preset = Preset::default();
+
+    preset.set_name("asjfklsjlflsjklsjlksjflksjflkaafsawa");
+
+    let e = preset.already_exists();
+    assert_eq!(e, false);
+}

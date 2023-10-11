@@ -4,6 +4,7 @@ use std::sync::{atomic::Ordering, Arc};
 
 use fretcat_effects::{ChainData, Chain};
 
+use fretcat_serialization::Preset;
 use nih_plug::prelude::*;
 use nih_plug::vizia::prelude::*;
 use nih_plug::{create_vizia_editor, ViziaState, ViziaTheming};
@@ -24,34 +25,22 @@ pub type InitFlags = (Arc<Chain>, EditorData);
 
 #[derive(Debug, Clone, Lens, Default)]
 pub struct EditorData {
-    pub noise_gate: Arc<AtomicF32>,
-    pub in_gain: Arc<AtomicF32>,
-    pub out_gain: Arc<AtomicF32>,
-    pub bolas: String,
+    pub current_preset: Preset,
+    pub original_preset: Preset
 }
 
-pub enum EditorEvent {
-    SetNoiseGate(f32),
-    SetInGain(f32),
-    SetOutGain(f32),
+impl EditorData {
+    pub fn restore_preset(&mut self) {
+        self.current_preset = self.original_preset.clone();
+    }
+
+    pub fn try_save(&self) {
+        self.current_preset.
+    }
 }
 
 impl Model for EditorData {
     fn event(&mut self, cx: &mut EventContext, event: &mut Event) {
-        event.map(|event, _| match event {
-            EditorEvent::SetNoiseGate(val) => {
-                self.noise_gate
-                    .store(nih_plug::util::db_to_gain(*val), Ordering::Relaxed);
-            }
-            EditorEvent::SetInGain(val) => {
-                self.in_gain
-                    .store(nih_plug::util::db_to_gain(*val), Ordering::Relaxed);
-            }
-            EditorEvent::SetOutGain(val) => {
-                self.out_gain
-                    .store(nih_plug::util::db_to_gain(*val), Ordering::Relaxed);
-            }
-        });
     }
 }
 

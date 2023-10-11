@@ -2,7 +2,7 @@ mod mapper;
 #[cfg(test)]
 mod tests;
 
-use std::{fs, path::Path, sync::Arc};
+use std::{fs, path::{Path, PathBuf}, sync::Arc};
 
 use fretcat_effects::{effects::AudioEffect, Chain};
 use mapper::Mapper;
@@ -14,7 +14,7 @@ pub enum PresetCategory {
     User,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Preset {
     name: String,
     category: PresetCategory,
@@ -26,15 +26,38 @@ impl Preset {
         self.name = name.as_ref().to_owned();
     }
 
-    pub fn save(&self) {
-        let home = home::home_dir().unwrap();
-        let formatted = format!("{}/Documents/Fretcat/{}.json", home.display(), self.name);
-        let preset_path = Path::new(&formatted);
-        fs::create_dir_all(format!("{}/Documents/Fretcat", home.display())).unwrap();
+    pub fn get_name(&self) -> &String {
+        &self.name
+    }
 
+    pub fn already_exists(&self) -> bool {
+        let paths = fs::read_dir(Self::get_preset_dir()).unwrap();
+        for path in paths {
+            if self.get_preset_path() == path.unwrap().path() {
+                return true; 
+            }
+        }
+
+        false
+    }
+
+    pub fn save(&self) {
         let json = serde_json::to_string_pretty(self).unwrap();
 
-        fs::write(preset_path, json).unwrap();
+        fs::write(self.get_preset_path(), json).unwrap();
+    }
+
+    pub fn get_preset_dir() -> PathBuf {
+        let home = home::home_dir().unwrap();
+        fs::create_dir_all(format!("{}/Documents/Fretcat", home.display())).unwrap();
+        let formatted = format!("{}/Documents/Fretcat", home.display());
+        Path::new(&formatted).to_owned()
+    }
+
+    pub fn get_preset_path(&self) -> PathBuf {
+        let home = home::home_dir().unwrap();
+        let formatted = format!("{}/{}.json", Self::get_preset_dir().display(), self.name);
+        Path::new(&formatted).to_owned()
     }
 
     pub fn load<S: AsRef<str>>(preset_name: S) -> Option<Self> {
