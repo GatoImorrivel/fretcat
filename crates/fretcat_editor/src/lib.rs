@@ -33,10 +33,6 @@ impl EditorData {
     pub fn restore_preset(&mut self) {
         self.current_preset = self.original_preset.clone();
     }
-
-    pub fn try_save(&self) {
-        self.current_preset.
-    }
 }
 
 impl Model for EditorData {
