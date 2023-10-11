@@ -38,11 +38,10 @@ impl AudioEffect for Fuzz {
         .class("fuzz");
     }
 
-    fn update(&self, event: &mut Event, effect: usize, chain: &mut Chain) -> Option<()>{
-        let data = chain.query_cast_mut::<Self>(effect)?;
+    fn update(&mut self, event: &mut Event) -> Option<()>{
         event.map(|event, _| match event {
             Message::Volume(val) => {
-                data.volume = *val;
+                self.volume = *val;
             }
         });
 

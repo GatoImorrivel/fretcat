@@ -1,16 +1,11 @@
-use std::sync::Arc;
-
-use fretcat_effects::{ChainCommand, ChainData};
-use fretcat_effects::effects::AudioEffect;
-use fretcat_common::nih_plug::nih_log;
 use fretcat_common::vizia::prelude::*;
+use fretcat_effects::{ChainData, ChainCommand};
 
 use crate::components::{CardData, CardEvent, EffectList, EffectListEvent};
 
 #[derive(Debug, Clone)]
 pub struct EffectHandle {
-    handle: Box<dyn AudioEffect>,
-    effect: usize,
+    index: usize,
 }
 
 impl EffectHandle {
@@ -21,7 +16,7 @@ impl EffectHandle {
             VStack::new(cx, move |cx| {
                 Button::new(
                     cx,
-                    move |ex| ex.emit(ChainCommand::Remove(effect.clone())),
+                    move |ex| ex.emit(ChainCommand::Remove(effect)),
                     |cx| Label::new(cx, ""),
                 )
                 .class("delete-effect-btn")
@@ -38,11 +33,11 @@ impl EffectHandle {
 
             VStack::new(cx, move |cx| {
                 Self {
-                    handle: data.clone(),
-                    effect: effect.clone(),
+                    index: effect
                 }
-                .build(cx);
-                data.view(cx, effect);
+                .build(cx, |cx| {
+                    data.view(cx, effect);
+                });
             })
             .width(Stretch(100.0))
             .height(Stretch(1.0))
@@ -78,24 +73,23 @@ impl EffectHandle {
     }
 }
 
-impl Model for EffectHandle {
-    fn event(&mut self, cx: &mut EventContext, event: &mut Event) {
-        let chain = ChainData::chain.get(cx);
-        let chain = unsafe { &mut *Arc::as_ptr(&chain).cast_mut() };
+impl View for EffectHandle {
+    fn element(&self) -> Option<&'static str> {
+        Some("effect-handle")        
+    }
 
-        self.handle.update(event, self.effect, chain).unwrap_or_else(|| {
-            nih_log!("effect {:?} dropped", self.effect);
-        });
+    fn event(&mut self, cx: &mut EventContext, event: &mut Event) {
+        let chain = ChainData::as_mut(cx);
+        
+        if chain.effects.get(self.index).is_some() {
+            chain.effects.get_mut(self.index).unwrap().update(event);
+        }
     }
 }
 
-fn on_drop(ex: &mut EventContext, mut index: usize) {
+fn on_drop(ex: &mut EventContext, index: usize) {
     let card = CardData::dragging.get(ex);
     let drag_effect = EffectList::dragging.get(ex);
-
-    if index < 0 {
-        index = 0;
-    }
 
     if let Some(card) = card {
         ex.emit(ChainCommand::InsertAt(index, card.spawn()));

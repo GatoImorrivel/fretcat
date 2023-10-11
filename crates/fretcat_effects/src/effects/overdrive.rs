@@ -84,24 +84,22 @@ impl AudioEffect for Overdrive {
         .class("overdrive");
     }
 
-    fn update(&self, event: &mut Event, effect: usize, chain: &mut Chain) -> Option<()> {
-        let data = chain.query_cast_mut::<Self>(effect)?;
+    fn update(&mut self, event: &mut Event) -> Option<()> {
         event.map(|event, _| match event {
             Message::Gain(val) => {
-                data.gain = *val;
+                self.gain = *val;
             }
             Message::Freq(val) => {
-                data.freq = *val;
-                data.filter.iter_mut().for_each(|filter| {
+                self.freq = *val;
+                self.filter.iter_mut().for_each(|filter| {
                     filter.recalculate_coeffs(
                         map_normalized_value(*val, self.min_freq_hz, self.max_freq_hz),
                         filter.q(),
                     );
                 });
-                fretcat_common::nih_plug::nih_log!("{:#?}", data.filter);
             }
             Message::Volume(val) => {
-                data.volume = *val;
+                self.volume = *val;
             }
         });
 

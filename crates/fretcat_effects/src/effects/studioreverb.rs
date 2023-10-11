@@ -57,17 +57,15 @@ impl AudioEffect for StudioReverb {
         .class("studio-reverb");
     }
 
-    fn update(&self, event: &mut Event, effect: usize, chain: &mut crate::Chain) -> Option<()> {
-        let data = chain.query_cast_mut::<Self>(effect)?;
-
+    fn update(&mut self, event: &mut Event) -> Option<()> {
         event.map(|e, _| match e {
             Message::Size(val) => {
-                data.size = *val;
-                data.reverb.set_room_size(*val);
+                self.size = *val;
+                self.reverb.set_room_size(*val);
             }
             Message::Wet(val) => {
-                data.wet = *val;
-                data.reverb.set_wet(*val);
+                self.wet = *val;
+                self.reverb.set_wet(*val);
             }
         });
 

@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use fretcat_common::vizia::prelude::*;
+use fretcat_common::{vizia::prelude::*, nih_plug::nih_log};
 
 #[cfg(feature = "simulate")]
 use crate::effects::InputSimulator;
@@ -17,26 +17,34 @@ pub struct ChainData {
     pub chain: Arc<Chain>,
 }
 
+impl ChainData {
+    pub fn as_mut<'a>(cx: &'a mut EventContext) -> &'a mut Chain {
+        let chain = ChainData::chain.get(cx);
+        unsafe {
+            &mut *Arc::as_ptr(&chain).cast_mut()
+        }
+    }
+}
+
 impl Model for ChainData {
-    fn event(&mut self, cx: &mut EventContext, event: &mut Event) {
-        let event = event.take();
+    fn event(&mut self, _cx: &mut EventContext, event: &mut Event) {
         let chain = unsafe { &mut *Arc::as_ptr(&self.chain).cast_mut() };
-        if let Some(e) = event {
-            match e {
-                ChainCommand::Insert(data) => {
-                    chain.handle_command(ChainCommand::Insert(data));
-                }
-                ChainCommand::InsertAt(index, data) => {
-                    chain.handle_command(ChainCommand::InsertAt(index, data));
-                }
-                ChainCommand::Remove(index) => {
-                    chain.handle_command(ChainCommand::Remove(index));
-                }
-                ChainCommand::Swap(e1, e2) => {
-                    chain.handle_command(ChainCommand::Swap(e1, e2));
+        event.map(|event, _| match event {
+            ChainCommand::Insert(audio_effect) => {
+                chain.insert(audio_effect.clone());
+            }
+            ChainCommand::InsertAt(pos, audio_effect) => {
+                chain.insert_at(*pos, audio_effect.clone());
+            }
+            ChainCommand::Remove(effect) => {
+                chain.remove(*effect);
+            }
+            ChainCommand::Swap(e1, e2) => {
+                if chain.effects.get(*e1).is_some() && chain.effects.get(*e2).is_some() {
+                    chain.effects.swap(*e1, *e2);
                 }
             }
-        }
+        });
     }
 }
 
@@ -62,26 +70,6 @@ impl Chain {
             self.effects
                 .iter_mut()
                 .for_each(|e| e.process((&mut *left, &mut *right)));
-        }
-    }
-
-    #[inline]
-    pub fn handle_command(&mut self, command: ChainCommand) {
-        match command {
-            ChainCommand::Insert(audio_effect) => {
-                self.insert(audio_effect);
-            }
-            ChainCommand::InsertAt(pos, audio_effect) => {
-                self.insert_at(pos, audio_effect);
-            }
-            ChainCommand::Remove(effect) => {
-                self.remove(effect);
-            }
-            ChainCommand::Swap(e1, e2) => {
-                if self.effects.get(e1).is_some() && self.effects.get(e2).is_some() {
-                    self.effects.swap(e1, e2);
-                }
-            }
         }
     }
 

@@ -55,15 +55,14 @@ impl View for EffectList {
         Some("effect-list")
     }
 
-    fn event(&mut self, cx: &mut EventContext, event: &mut Event) {
+    fn event(&mut self, _cx: &mut EventContext, event: &mut Event) {
         event.map(|drag_event, _| match drag_event {
             EffectListEvent::DragChange(effect) => {
                 self.dragging = effect.clone();
             }
         });
 
-        event.map(|event, _| match event {
-            ChainCommand::Insert(_) => self.update_counter += 1,
+        event.map::<ChainCommand, _>(|event, _| match event {
             _ => self.update_counter += 1
         });
     }

@@ -42,7 +42,7 @@ pub fn card_system_view(cx: &mut Context) {
                 let card = CardData::dragging.get(cx);
                 VStack::new(cx, |cx| {
                     if let Some(card) = card  {
-                        (card.content)(cx);
+                        card.content(cx);
                     }
                 })
                 .class("card-base")

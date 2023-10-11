@@ -44,7 +44,7 @@ impl AudioEffect for InputSimulator {
         });
     }
 
-    fn update(&self, event: &mut Event, effect: usize, chain: &mut crate::Chain) -> Option<()> {
+    fn update(&mut self, event: &Event) -> Option<()> {
         Some(())
     }
 
