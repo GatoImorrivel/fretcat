@@ -1,5 +1,5 @@
-use fretcat_common::nih_plug::nih_log;
-use fretcat_common::vizia::prelude::*;
+use nih_plug::nih_log;
+use nih_plug::vizia::prelude::*;
 
 use super::{effect_handle::EffectHandle, CardData, CardEvent};
 use fretcat_effects::{ChainCommand, ChainData};

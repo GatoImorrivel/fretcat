@@ -1,11 +1,11 @@
 use std::{f32::consts::PI, fmt::Debug};
 
-use fretcat_common::nih_plug::util::db_to_gain_fast;
-use fretcat_common::vizia::prelude::*;
+use nih_plug::util::db_to_gain_fast;
+use nih_plug::vizia::prelude::*;
 use fretcat_macros::{getter, Message};
 use serde::{Deserialize, Serialize};
 
-use crate::{Chain, ChainData, NUM_CHANNELS};
+use crate::{ChainData, NUM_CHANNELS};
 
 use crate::common::{map_normalized_value, Filter, FilterMode};
 

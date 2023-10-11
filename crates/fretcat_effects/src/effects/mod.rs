@@ -1,7 +1,7 @@
 use core::fmt;
 use downcast_rs::{impl_downcast, DowncastSync};
 use dyn_clone::DynClone;
-use fretcat_common::vizia::prelude::*;
+use nih_plug::vizia::prelude::*;
 
 // Distortions
 mod fuzz;

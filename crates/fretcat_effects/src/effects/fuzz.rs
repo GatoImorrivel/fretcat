@@ -1,8 +1,7 @@
 use fretcat_macros::{Message, getter};
 use serde::{Serialize, Deserialize};
-use fretcat_common::vizia::prelude::*;
+use nih_plug::vizia::prelude::*;
 
-use crate::Chain;
 use crate::ChainData;
 
 use super::AudioEffect;

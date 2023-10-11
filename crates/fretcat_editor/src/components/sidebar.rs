@@ -1,4 +1,4 @@
-use fretcat_common::vizia::prelude::*;
+use nih_plug::vizia::prelude::*;
 
 use super::{EffectKind, EFFECT_CARDS, channel_slider::ChannelSlider};
 

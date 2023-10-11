@@ -4,9 +4,9 @@ use std::sync::{atomic::Ordering, Arc};
 
 use fretcat_effects::{ChainData, Chain};
 
-use fretcat_common::nih_plug::prelude::*;
-use fretcat_common::vizia::prelude::*;
-use fretcat_common::{create_vizia_editor, ViziaState, ViziaTheming};
+use nih_plug::prelude::*;
+use nih_plug::vizia::prelude::*;
+use nih_plug::{create_vizia_editor, ViziaState, ViziaTheming};
 
 use components::*;
 
@@ -41,15 +41,15 @@ impl Model for EditorData {
         event.map(|event, _| match event {
             EditorEvent::SetNoiseGate(val) => {
                 self.noise_gate
-                    .store(fretcat_common::nih_plug::util::db_to_gain(*val), Ordering::Relaxed);
+                    .store(nih_plug::util::db_to_gain(*val), Ordering::Relaxed);
             }
             EditorEvent::SetInGain(val) => {
                 self.in_gain
-                    .store(fretcat_common::nih_plug::util::db_to_gain(*val), Ordering::Relaxed);
+                    .store(nih_plug::util::db_to_gain(*val), Ordering::Relaxed);
             }
             EditorEvent::SetOutGain(val) => {
                 self.out_gain
-                    .store(fretcat_common::nih_plug::util::db_to_gain(*val), Ordering::Relaxed);
+                    .store(nih_plug::util::db_to_gain(*val), Ordering::Relaxed);
             }
         });
     }

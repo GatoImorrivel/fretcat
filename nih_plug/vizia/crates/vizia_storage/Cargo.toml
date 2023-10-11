@@ -1,0 +1,16 @@
+[package]
+name = "vizia_storage"
+version = "0.1.0"
+authors = ["George Atkinson"]
+license = "MIT"
+repository = "https://github.com/vizia/vizia"
+edition = "2021"
+description = "The storage data structures of vizia"
+rust-version = "1.60"
+
+[dependencies]
+vizia_id = { path = "../vizia_id" }
+
+# morphorm = {path = "../../../morphorm" }
+morphorm = {git = "https://github.com/vizia/morphorm", rev = "8bae565241845d0d36a491d072cbd0ad797e7d54" }
+#morphorm = { path = "../../../morphorm", features = ["rounding"] }

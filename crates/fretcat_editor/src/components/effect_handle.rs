@@ -1,4 +1,4 @@
-use fretcat_common::vizia::prelude::*;
+use nih_plug::vizia::prelude::*;
 use fretcat_effects::{ChainData, ChainCommand};
 
 use crate::components::{CardData, CardEvent, EffectList, EffectListEvent};

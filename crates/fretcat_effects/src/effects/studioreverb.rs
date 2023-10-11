@@ -1,5 +1,5 @@
-use crate::{common::Freeverb, NUM_CHANNELS};
-use fretcat_common::vizia::prelude::*;
+use crate::common::Freeverb;
+use nih_plug::vizia::prelude::*;
 use fretcat_macros::{getter, Message};
 
 use super::AudioEffect;

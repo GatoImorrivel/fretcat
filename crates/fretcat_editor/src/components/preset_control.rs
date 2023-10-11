@@ -1,6 +1,6 @@
 use fretcat_effects::ChainData;
 use fretcat_serialization::Preset;
-pub use fretcat_common::vizia::prelude::*;
+pub use nih_plug::vizia::prelude::*;
 
 #[derive(Debug, Clone, Lens)]
 pub struct PresetControl {
@@ -8,15 +8,19 @@ pub struct PresetControl {
 }
 
 pub enum PresetMessage {
-    Save
+    Save,
+    TextChange(String)
 }
 
 impl PresetControl {
     pub fn new(cx: &mut Context) {
         Self { preset_name: "Untitled".to_owned() }.build(cx, |cx| {
             HStack::new(cx, |cx| {
-                VStack::new(cx, |cx| {
-                    Textbox::new_multiline(cx, Self::preset_name, true).class("preset-name");
+                HStack::new(cx, |cx| {
+                    Textbox::new_multiline(cx, Self::preset_name, true).class("preset-name")
+                    .on_edit(|cx, str| {
+                        cx.emit(PresetMessage::TextChange(str));
+                    });
                 }).class("name-wrapper");
                 Button::new(
                     cx,
@@ -42,6 +46,9 @@ impl View for PresetControl {
                 let preset = Preset::from(chain);
 
                 preset.save();
+            }
+            PresetMessage::TextChange(text) => {
+                self.preset_name = text.to_owned();
             }
         });
     }

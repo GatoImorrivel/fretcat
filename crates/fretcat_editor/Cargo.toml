@@ -6,8 +6,10 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-fretcat_common = {path = "../fretcat_common"}
 fretcat_effects = {path = "../fretcat_effects"}
 fretcat_serialization = {path = "../fretcat_serialization"}
+
+nih_plug = {path = "../../nih_plug"}
 strum = { version = "0.25.0", features = ["derive"]}
 lazy_static = "1.4.0"
+names = {version = "0.14.0", features = []}

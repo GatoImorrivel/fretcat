@@ -5,7 +5,7 @@ mod effect_handle;
 mod sidebar;
 mod channel_slider;
 
-use fretcat_common::vizia::prelude::*;
+use nih_plug::vizia::prelude::*;
 use strum::{IntoEnumIterator, EnumIter};
 
 pub use effect_list::{EffectList, EffectListEvent};

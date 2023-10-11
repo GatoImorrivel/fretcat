@@ -10,8 +10,8 @@ simulate = ["hound"]
 
 [dependencies]
 fretcat_macros = {path = "../fretcat_macros"}
-fretcat_common = {path = "../fretcat_common"}
 
+nih_plug = {path = "../../nih_plug"}
 rand = "0.8.5"
 atomic_refcell = "0.1.10"
 downcast-rs = "1.2.0"

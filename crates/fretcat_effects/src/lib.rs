@@ -2,7 +2,7 @@ mod chain;
 mod common;
 pub mod effects;
 
-use fretcat_common::vizia::{
+use nih_plug::vizia::{
     image::{load_from_memory_with_format, DynamicImage, ImageFormat, imageops},
     prelude::*,
 };

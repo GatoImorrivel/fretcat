@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use fretcat_effects::effects::{AudioEffect, Fuzz, Overdrive, StudioReverb};
-use fretcat_common::vizia::prelude::*;
+use nih_plug::vizia::prelude::*;
 
 use crate::EffectKind;
 

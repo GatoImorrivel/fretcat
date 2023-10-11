@@ -1,0 +1,18 @@
+[package]
+name = "vizia_baseview"
+version = "0.1.0"
+authors = ["George Atkinson <geomyles@yahoo.co.uk>", "Billy Messenger <BillyDM@protonmail.com>"]
+edition = "2021"
+license = "MIT"
+repository = "https://github.com/vizia/vizia"
+description = "Baseview backend for vizia"
+
+[dependencies]
+vizia_core = { path = "../vizia_core" }
+vizia_input = { path = "../vizia_input" }
+vizia_id = { path = "../vizia_id" }
+
+baseview = { path = "../../../baseview", features = ["opengl"]}
+raw-window-handle = "0.4.2"
+femtovg = "0.7.0"
+lazy_static = "1.4.0"

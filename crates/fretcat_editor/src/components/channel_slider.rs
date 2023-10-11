@@ -1,4 +1,4 @@
-use fretcat_common::vizia::prelude::*;
+use nih_plug::vizia::prelude::*;
 
 #[derive(Debug, Clone, Copy, Lens)]
 pub struct ChannelSlider {
