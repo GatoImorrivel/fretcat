@@ -54,16 +54,23 @@ impl MessageHook {
             let mut keyboard_state = window_state.keyboard_state_mut();
     
             let opt_event = unsafe { keyboard_state.process_message(window_state.hwnd, msg, wparam, lparam) };
+
+            if opt_event.is_some() {
+                println!("{:?}", opt_event);
+                println!("msg: {}", msg);
+            }
     
             if let Some(event) = opt_event {
                 let mut window = window_state.create_window();
                 let mut window = crate::Window::new(&mut window);
-    
-                window_state
-                    .handler_mut()
-                    .as_mut()
-                    .unwrap()
-                    .on_event(&mut window, Event::Keyboard(event));
+
+                if msg != 258 {
+                    window_state
+                        .handler_mut()
+                        .as_mut()
+                        .unwrap()
+                        .on_event(&mut window, Event::Keyboard(event));
+                }
             }    
 
             true
