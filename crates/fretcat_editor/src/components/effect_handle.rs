@@ -1,7 +1,7 @@
 use nih_plug::vizia::prelude::*;
 use fretcat_effects::{ChainData, ChainCommand};
 
-use crate::components::{CardData, CardEvent, EffectList, EffectListEvent};
+use crate::components::{CardSystem, CardEvent, EffectList, EffectListEvent};
 
 #[derive(Debug, Clone)]
 pub struct EffectHandle {
@@ -45,7 +45,7 @@ impl EffectHandle {
 
             Binding::new(
                 cx,
-                CardData::dragging.map(|drag| drag.is_some()),
+                CardSystem::dragging.map(|drag| drag.is_some()),
                 move |cx, bind| {
                     let is_dragging = bind.get(cx);
 
@@ -88,7 +88,7 @@ impl View for EffectHandle {
 }
 
 fn on_drop(ex: &mut EventContext, index: usize) {
-    let card = CardData::dragging.get(ex);
+    let card = CardSystem::dragging.get(ex);
     let drag_effect = EffectList::dragging.get(ex);
 
     if let Some(card) = card {

@@ -56,7 +56,8 @@ pub fn create(
         fretcat_effects::register_styles(cx);
         register_styles(cx);
 
-        card_system_init(cx);
+        CardSystem::init(cx);
+        MessageSystem::init(cx);
 
         HStack::new(cx, |cx| {
             VStack::new(cx, |cx| {
@@ -70,6 +71,7 @@ pub fn create(
                 .class("preset-control-wrapper");
                 VStack::new(cx, |cx| {
                     EffectList::new(cx);
+                    MessageSystem::view(cx);
                 })
                 .class("effect-list-wrapper");
             })
@@ -77,7 +79,7 @@ pub fn create(
         })
         .class("main");
 
-        card_system_view(cx);
+        CardSystem::view(cx);
     })
 }
 
@@ -96,5 +98,6 @@ fn register_styles(cx: &mut Context) {
         .unwrap();
     cx.add_stylesheet(include_str!("../css/cards.css"))
         .unwrap();
-
+    cx.add_stylesheet(include_str!("../css/message-system.css"))
+        .unwrap();
 }

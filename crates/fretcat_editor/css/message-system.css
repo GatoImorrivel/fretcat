@@ -1,0 +1,22 @@
+.message-body {
+    child-top: 1s;
+    child-bottom: 1s;
+    col-between: 1s;
+    box-shadow:  8px 8px 15px #181818;
+}
+
+.message-close-btn {
+    background-color: transparent;
+    border-width: 0px;
+    child-space: 1s;
+    color: white;
+}
+
+.message-text {
+    font-family: 'Montserrat';
+    left: 10px;
+}
+
+.message-close-btn:hover label {
+    color: black;
+}

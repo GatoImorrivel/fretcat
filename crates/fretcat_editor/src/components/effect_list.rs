@@ -1,7 +1,7 @@
 use nih_plug::nih_log;
 use nih_plug::vizia::prelude::*;
 
-use super::{effect_handle::EffectHandle, CardData, CardEvent};
+use super::{effect_handle::EffectHandle, CardSystem, CardEvent};
 use fretcat_effects::{ChainCommand, ChainData};
 
 #[derive(Debug, Lens, Clone, Copy)]
@@ -36,7 +36,7 @@ impl EffectList {
                         })
                         .class("new-effect-indicator")
                         .on_drop(|ex, _| {
-                            let card = CardData::dragging.get(ex);
+                            let card = CardSystem::dragging.get(ex);
 
                             if let Some(card) = card {
                                 ex.emit(ChainCommand::Insert(card.spawn()));

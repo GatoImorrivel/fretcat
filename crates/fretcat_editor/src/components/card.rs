@@ -24,49 +24,52 @@ lazy_static::lazy_static! {
     };
 }
 
-pub fn card_system_init(cx: &mut Context) {
-    CardData {
-        dragging: None,
-        is_dragging: false,
-        cursor: (0.0, 0.0),
-    }
-    .build(cx);
-}
-
-pub fn card_system_view(cx: &mut Context) {
-    Binding::new(cx, CardData::is_dragging, |cx, bind| {
-        let is_dragging = bind.get(cx);
-        if is_dragging {
-            Binding::new(cx, CardData::cursor, move |cx, bind| {
-                let cursor = bind.get(cx);
-                let card = CardData::dragging.get(cx);
-                VStack::new(cx, |cx| {
-                    if let Some(card) = card  {
-                        card.content(cx);
-                    }
-                })
-                .class("card-base")
-                .width(Pixels(300.0))
-                .position_type(PositionType::SelfDirected)
-                .left(Pixels(cursor.0))
-                .top(Pixels(cursor.1));
-            });
-        }
-    });
-}
 
 #[derive(Lens, Clone, PartialEq, Data)]
-pub struct CardData {
+pub struct CardSystem {
     pub(crate) dragging: Option<Card>,
     pub(crate) is_dragging: bool,
     pub(crate) cursor: (f32, f32),
+}
+
+impl CardSystem {
+    pub fn init(cx: &mut Context) {
+        Self {
+            dragging: None,
+            is_dragging: false,
+            cursor: (0.0, 0.0),
+        }
+        .build(cx);
+    }
+
+    pub fn view(cx: &mut Context) {
+        Binding::new(cx, CardSystem::is_dragging, |cx, bind| {
+            let is_dragging = bind.get(cx);
+            if is_dragging {
+                Binding::new(cx, CardSystem::cursor, move |cx, bind| {
+                    let cursor = bind.get(cx);
+                    let card = CardSystem::dragging.get(cx);
+                    VStack::new(cx, |cx| {
+                        if let Some(card) = card  {
+                            card.content(cx);
+                        }
+                    })
+                    .class("card-base")
+                    .width(Pixels(300.0))
+                    .position_type(PositionType::SelfDirected)
+                    .left(Pixels(cursor.0))
+                    .top(Pixels(cursor.1));
+                });
+            }
+        });
+    }
 }
 
 pub enum CardEvent {
     DragChange(Option<Card>),
 }
 
-impl Model for CardData {
+impl Model for CardSystem {
     fn event(&mut self, _cx: &mut EventContext, event: &mut Event) {
         event.map(|e, _| match e {
             WindowEvent::MouseMove(x, y) => {

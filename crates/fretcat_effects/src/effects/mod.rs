@@ -1,5 +1,5 @@
 use core::fmt;
-use downcast_rs::{impl_downcast, DowncastSync};
+use downcast_rs::{impl_downcast, Downcast};
 use dyn_clone::DynClone;
 use nih_plug::vizia::prelude::*;
 
@@ -19,7 +19,7 @@ pub use overdrive::Overdrive;
 pub use fuzz::Fuzz;
 pub use studioreverb::StudioReverb;
 
-pub trait AudioEffect: fmt::Debug + Send + Sync + DynClone + DowncastSync {
+pub trait AudioEffect: fmt::Debug + Send + Sync + DynClone + Downcast {
     fn process(&mut self, input_buffer: (&mut [f32], &mut [f32]));
     fn view(&self, cx: &mut Context, effect: usize);
     fn update(&mut self, event: &mut Event) -> Option<()>;
