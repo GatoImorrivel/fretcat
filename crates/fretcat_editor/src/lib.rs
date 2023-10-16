@@ -101,3 +101,13 @@ fn register_styles(cx: &mut Context) {
     cx.add_stylesheet(include_str!("../css/message-system.css"))
         .unwrap();
 }
+
+pub fn darken(color: &Color, factor: f64) -> Color {
+    let factor = factor.max(0.0).min(1.0);
+
+    let darkened_red = (color.r() as f64 * factor) as u8;
+    let darkened_green = (color.g() as f64 * factor) as u8;
+    let darkened_blue = (color.b() as f64 * factor) as u8;
+
+    Color::rgba(darkened_red, darkened_green, darkened_blue, color.a())
+}

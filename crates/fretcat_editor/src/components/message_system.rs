@@ -1,5 +1,7 @@
 use nih_plug::vizia::prelude::*;
 
+use crate::darken;
+
 #[derive(Debug, Clone, Copy, Data, PartialEq, Eq)]
 pub enum MessageKind {
     Error,
@@ -12,8 +14,6 @@ pub struct Message {
     message: String,
     kind: MessageKind,
     color: Color,
-    #[data(ignore)]
-    on_close: Option<Box<fn(&mut EventContext)>>,
 }
 
 const MESSAGE_OPACITY: u8 = 200;
@@ -25,13 +25,11 @@ impl Message {
         message: S,
         kind: MessageKind,
         color: Color,
-        on_close: Option<Box<fn(&mut EventContext)>>,
     ) -> Self {
         Self {
             message: message.as_ref().to_owned(),
             kind,
             color,
-            on_close,
         }
     }
 
@@ -40,7 +38,6 @@ impl Message {
             message,
             MessageKind::Info,
             Color::rgba(80, 198, 204, MESSAGE_OPACITY),
-            None,
         )
     }
 
@@ -49,7 +46,6 @@ impl Message {
             message,
             MessageKind::Error,
             Color::rgba(235, 30, 95, MESSAGE_OPACITY),
-            None,
         )
     }
 
@@ -58,13 +54,7 @@ impl Message {
             message,
             MessageKind::Warning,
             Color::rgba(235, 154, 33, MESSAGE_OPACITY),
-            None,
         )
-    }
-
-    pub fn with_callback(mut self, on_close: fn(&mut EventContext)) -> Self {
-        self.on_close = Some(Box::new(on_close));
-        self
     }
 }
 
@@ -88,13 +78,10 @@ impl MessageSystem {
             VStack::new(cx, |cx| {
                 for (index, message) in messages.into_iter().enumerate() {
                     HStack::new(cx, |cx| {
-                        Label::new(cx, &message.message).class("message-text").color(Color::white());
+                        Label::new(cx, &message.message).class("message-text").color(darken(&message.color, 0.1));
                         Button::new(
                             cx,
                             move |cx| {
-                                if let Some(on_close) = &message.on_close {
-                                    (on_close)(cx);
-                                }
                                 cx.emit(MessageEvent::Close(index));
                             },
                             |cx| Label::new(cx, ""),
@@ -121,9 +108,6 @@ pub enum MessageEvent {
     Info(String),
     Error(String),
     Warning(String),
-    InfoCallback(String, fn(&mut EventContext)),
-    ErrorCallback(String, fn(&mut EventContext)),
-    WarningCallback(String, fn(&mut EventContext)),
     Close(usize),
 }
 
@@ -138,18 +122,6 @@ impl Model for MessageSystem {
             }
             MessageEvent::Warning(str) => {
                 self.messages.push(Message::make_warning(str));
-            }
-            MessageEvent::InfoCallback(str, on_close) => {
-                self.messages
-                    .push(Message::make_info(str).with_callback(*on_close));
-            }
-            MessageEvent::ErrorCallback(str, on_close) => {
-                self.messages
-                    .push(Message::make_error(str).with_callback(*on_close));
-            }
-            MessageEvent::WarningCallback(str, on_close) => {
-                self.messages
-                    .push(Message::make_warning(str).with_callback(*on_close));
             }
             MessageEvent::Close(index) => {
                 self.messages.remove(*index);

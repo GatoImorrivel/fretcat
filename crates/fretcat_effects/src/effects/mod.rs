@@ -19,6 +19,12 @@ pub use overdrive::Overdrive;
 pub use fuzz::Fuzz;
 pub use studioreverb::StudioReverb;
 
+#[derive(Debug, Hash, PartialEq, Eq, Clone, Copy, Data)]
+pub struct PreFX(pub &'static str);
+
+#[derive(Debug, Hash, PartialEq, Eq, Clone, Copy, Data)]
+pub struct PostFX(pub &'static str);
+
 pub trait AudioEffect: fmt::Debug + Send + Sync + DynClone + Downcast {
     fn process(&mut self, input_buffer: (&mut [f32], &mut [f32]));
     fn view(&self, cx: &mut Context, effect: usize);

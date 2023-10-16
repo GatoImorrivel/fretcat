@@ -19,3 +19,4 @@ dyn-clone = "1.0.12"
 crossbeam = { version = "0.8.2", features = ["crossbeam-queue"] }
 serde = { version = "1.0.183", features = ["derive"] }
 hound = {version = "3.5.1", optional = true} 
+indexmap = { version = "2.0.2", features = ["serde"] }

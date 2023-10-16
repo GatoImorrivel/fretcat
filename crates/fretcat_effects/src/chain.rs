@@ -1,12 +1,14 @@
-use std::sync::Arc;
+use std::{sync::Arc, time::Instant};
 
-use nih_plug::vizia::prelude::*;
+use indexmap::IndexMap;
+use nih_plug::{vizia::prelude::*, nih_log};
 
 #[cfg(feature = "simulate")]
 use crate::effects::InputSimulator;
 
 #[allow(unused_imports)]
 use crate::effects::{AudioEffect, Overdrive, StudioReverb};
+use crate::effects::{PostFX, PreFX};
 
 pub const NUM_CHANNELS: usize = 2;
 
@@ -21,9 +23,7 @@ pub struct ChainData {
 impl ChainData {
     pub fn as_mut<'a>(cx: &'a mut EventContext) -> &'a mut Chain {
         let chain = ChainData::chain.get(cx);
-        unsafe {
-            &mut *Arc::as_ptr(&chain).cast_mut()
-        }
+        unsafe { &mut *Arc::as_ptr(&chain).cast_mut() }
     }
 }
 
@@ -60,18 +60,53 @@ pub enum ChainCommand {
 #[derive(Debug, Clone)]
 pub struct Chain {
     pub effects: Vec<Box<dyn AudioEffect>>,
+    pub pre_fx: IndexMap<PreFX, Box<dyn AudioEffect>>,
+    pub post_fx: IndexMap<PostFX, Box<dyn AudioEffect>>,
+    pub in_avg_amplitude: (f32, f32),
+    pub out_avg_amplitude: (f32, f32),
+    pub debug_clock: Instant
 }
 
 impl Chain {
     #[inline]
     pub fn process(&mut self, buffer: &mut [&mut [f32]]) {
+        let d1 = self.debug_clock.elapsed();
         unsafe {
             let left: *mut &mut [f32] = std::mem::transmute(&mut buffer[0]);
             let right: *mut &mut [f32] = std::mem::transmute(&mut buffer[1]);
+
+            self.in_avg_amplitude = Self::get_avg_amplitude((&*left, &*right));
+
+            self.pre_fx
+                .iter_mut()
+                .for_each(|(_, fx)| fx.process((&mut *left, &mut *right)));
             self.effects
                 .iter_mut()
                 .for_each(|e| e.process((&mut *left, &mut *right)));
+            self.post_fx
+                .iter_mut()
+                .for_each(|(_, fx)| fx.process((&mut *left, &mut *right)));
+
+            self.out_avg_amplitude = Self::get_avg_amplitude((&*left, &*right));
         }
+        let d2 = self.debug_clock.elapsed();
+
+        nih_log!("{}", (d2 - d1).as_nanos());
+    }
+
+    #[inline]
+    fn get_avg_amplitude(buffer: (&[f32], &[f32])) -> (f32, f32) {
+        (buffer.0.iter().sum::<f32>() / buffer.0.len() as f32, buffer.1.iter().sum::<f32>() / buffer.1.len() as f32)
+    }
+
+    #[inline]
+    pub fn get_pre_fx<T: AudioEffect>(&mut self, fx: &PreFX) -> Option<&mut T> {
+        self.pre_fx.get_mut(fx)?.downcast_mut::<T>()
+    }
+
+    #[inline]
+    pub fn get_post_fx<T: AudioEffect>(&mut self, fx: &PostFX) -> Option<&mut T> {
+        self.post_fx.get_mut(fx)?.downcast_mut::<T>()
     }
 
     #[inline]
@@ -136,7 +171,14 @@ impl Chain {
 impl Default for Chain {
     fn default() -> Self {
         #[allow(unused_mut)]
-        let mut chain = Chain { effects: vec![] };
+        let mut chain = Chain {
+            effects: vec![],
+            pre_fx: IndexMap::new(),
+            post_fx: IndexMap::new(),
+            in_avg_amplitude: (0.0, 0.0),
+            out_avg_amplitude: (0.0, 0.0),
+            debug_clock: Instant::now()
+        };
 
         #[cfg(feature = "simulate")]
         {
