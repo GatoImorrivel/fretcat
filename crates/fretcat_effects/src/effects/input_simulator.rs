@@ -1,4 +1,4 @@
-use fretcat_common::vizia::prelude::*;
+use nih_plug::{vizia::prelude::*, nih_log};
 
 use super::AudioEffect;
 
@@ -33,7 +33,9 @@ impl InputSimulator {
         }
         let left = self.samples[self.current_sample];
         self.current_sample += 1;
-        (left, left)
+        let right = self.samples[self.current_sample];
+        self.current_sample += 1;
+        (left, right)
     }
 }
 
@@ -44,7 +46,7 @@ impl AudioEffect for InputSimulator {
         });
     }
 
-    fn update(&mut self, event: &Event) -> Option<()> {
+    fn update(&mut self, event: &mut Event) -> Option<()> {
         Some(())
     }
 

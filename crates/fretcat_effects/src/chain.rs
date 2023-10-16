@@ -75,11 +75,13 @@ impl Chain {
             let left: *mut &mut [f32] = std::mem::transmute(&mut buffer[0]);
             let right: *mut &mut [f32] = std::mem::transmute(&mut buffer[1]);
 
-            self.in_avg_amplitude = Self::get_avg_amplitude((&*left, &*right));
 
             self.pre_fx
                 .iter_mut()
                 .for_each(|(_, fx)| fx.process((&mut *left, &mut *right)));
+
+            self.in_avg_amplitude = Self::get_avg_amplitude((&*left, &*right));
+
             self.effects
                 .iter_mut()
                 .for_each(|e| e.process((&mut *left, &mut *right)));
@@ -90,8 +92,6 @@ impl Chain {
             self.out_avg_amplitude = Self::get_avg_amplitude((&*left, &*right));
         }
         let d2 = self.debug_clock.elapsed();
-
-        nih_log!("{}", (d2 - d1).as_nanos());
     }
 
     #[inline]
@@ -182,7 +182,7 @@ impl Default for Chain {
 
         #[cfg(feature = "simulate")]
         {
-            chain.insert(Box::new(InputSimulator::default()));
+            chain.pre_fx.insert(PreFX("input-sim"), Box::new(InputSimulator::default()));
         }
 
         chain
