@@ -1,6 +1,7 @@
+use fretcat_effects::ChainData;
 use nih_plug::vizia::prelude::*;
 
-use super::{EffectKind, EFFECT_CARDS, channel_slider::ChannelSlider};
+use super::{EffectKind, EFFECT_CARDS, audio_slider::AudioSlider};
 
 const KIND_PER_ROW: usize = 2;
 
@@ -48,8 +49,8 @@ impl Sidebar {
                         .toggle_class("tab-selected-kind", current_tab == SidebarTab::Preset);
 
                         VStack::new(cx, |cx| {
-                            ChannelSlider::new(cx, 20.0, 200.0);
-                            ChannelSlider::new(cx, 20.0, 200.0);
+                            AudioSlider::new(cx, 200.0, ChainData::chain.map(|chain| chain.in_avg_amplitude));
+                            AudioSlider::new(cx, 200.0, ChainData::chain.map(|chain| chain.out_avg_amplitude));
                         })
                         .child_space(Stretch(1.0))
                         .row_between(Stretch(1.0))

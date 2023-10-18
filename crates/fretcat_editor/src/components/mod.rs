@@ -3,7 +3,7 @@ mod preset_control;
 mod effect_list;
 mod effect_handle;
 mod sidebar;
-mod channel_slider;
+mod audio_slider;
 mod message_system;
 
 use nih_plug::vizia::prelude::*;

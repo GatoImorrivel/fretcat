@@ -1,4 +1,4 @@
-use fretcat_common::vizia::prelude::*;
+use nih_plug::vizia::prelude::*;
 
 use super::AudioEffect;
 
@@ -44,7 +44,7 @@ impl AudioEffect for InputSimulator {
         });
     }
 
-    fn update(&mut self, event: &Event) -> Option<()> {
+    fn update(&mut self, event: &mut Event) -> Option<()> {
         Some(())
     }
 
