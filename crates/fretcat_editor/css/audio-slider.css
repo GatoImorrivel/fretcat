@@ -1,3 +1,18 @@
-channel-slider .audio-slider-bg {
+audio-slider .audio-slider-bg {
     background-image: linear-gradient(0deg, rgba(49,255,60,1) 0%, rgba(255,236,62,1) 75%, rgba(255,52,52,1) 85%);
+}
+
+audio-slider slider .active {
+    background-color: transparent;
+}
+
+audio-slider slider zstack {
+    background-color: transparent;
+}
+
+audio-slider slider .thumb {
+    border-radius: 0px;
+    height: 2%;
+    width: 105%;
+    background-color: #2f2f2f;
 }

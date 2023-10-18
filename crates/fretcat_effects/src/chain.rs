@@ -8,7 +8,7 @@ use crate::effects::InputSimulator;
 
 #[allow(unused_imports)]
 use crate::effects::{AudioEffect, Overdrive, StudioReverb};
-use crate::effects::{PostFX, PreFX};
+use crate::{effects::{PostFX, PreFX}, common::rms};
 
 pub const NUM_CHANNELS: usize = 2;
 
@@ -97,8 +97,8 @@ impl Chain {
         buffer: (&[f32], &[f32]),
     ) -> (f32, f32) {
         (
-            gain_to_db_fast((buffer.0.iter().map(|sample| sample * sample).sum::<f32>() / buffer.0.len() as f32).sqrt()),
-            gain_to_db_fast((buffer.1.iter().map(|sample| sample * sample).sum::<f32>() / buffer.1.len() as f32).sqrt()),
+            gain_to_db_fast(rms(buffer.0)),
+            gain_to_db_fast(rms(buffer.1)),
         )
     }
 
