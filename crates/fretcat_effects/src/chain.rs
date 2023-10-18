@@ -1,7 +1,7 @@
-use std::{sync::Arc, time::Instant};
+use std::{sync::Arc, time::{Instant, Duration}};
 
 use indexmap::IndexMap;
-use nih_plug::{vizia::prelude::*, nih_log};
+use nih_plug::{nih_log, vizia::prelude::*, util::gain_to_db_fast};
 
 #[cfg(feature = "simulate")]
 use crate::effects::InputSimulator;
@@ -64,23 +64,22 @@ pub struct Chain {
     pub post_fx: IndexMap<PostFX, Box<dyn AudioEffect>>,
     pub in_avg_amplitude: (f32, f32),
     pub out_avg_amplitude: (f32, f32),
-    pub debug_clock: Instant
+    pub clock: Instant,
+    pub previous_duration: Duration
 }
 
 impl Chain {
     #[inline]
     pub fn process(&mut self, buffer: &mut [&mut [f32]]) {
-        let d1 = self.debug_clock.elapsed();
         unsafe {
             let left: *mut &mut [f32] = std::mem::transmute(&mut buffer[0]);
             let right: *mut &mut [f32] = std::mem::transmute(&mut buffer[1]);
-
 
             self.pre_fx
                 .iter_mut()
                 .for_each(|(_, fx)| fx.process((&mut *left, &mut *right)));
 
-            self.in_avg_amplitude = Self::get_avg_amplitude((&*left, &*right));
+            self.in_avg_amplitude = Self::get_rms((&*left, &*right));
 
             self.effects
                 .iter_mut()
@@ -89,14 +88,18 @@ impl Chain {
                 .iter_mut()
                 .for_each(|(_, fx)| fx.process((&mut *left, &mut *right)));
 
-            self.out_avg_amplitude = Self::get_avg_amplitude((&*left, &*right));
+            self.out_avg_amplitude = Self::get_rms((&*left, &*right));
         }
-        let d2 = self.debug_clock.elapsed();
     }
 
     #[inline]
-    fn get_avg_amplitude(buffer: (&[f32], &[f32])) -> (f32, f32) {
-        (buffer.0.iter().sum::<f32>() / buffer.0.len() as f32, buffer.1.iter().sum::<f32>() / buffer.1.len() as f32)
+    fn get_rms(
+        buffer: (&[f32], &[f32]),
+    ) -> (f32, f32) {
+        (
+            gain_to_db_fast((buffer.0.iter().map(|sample| sample * sample).sum::<f32>() / buffer.0.len() as f32).sqrt()),
+            gain_to_db_fast((buffer.1.iter().map(|sample| sample * sample).sum::<f32>() / buffer.1.len() as f32).sqrt()),
+        )
     }
 
     #[inline]
@@ -177,12 +180,13 @@ impl Default for Chain {
             post_fx: IndexMap::new(),
             in_avg_amplitude: (0.0, 0.0),
             out_avg_amplitude: (0.0, 0.0),
-            debug_clock: Instant::now()
+            clock: Instant::now(),
+            previous_duration: Duration::ZERO
         };
 
         #[cfg(feature = "simulate")]
         {
-            chain.pre_fx.insert(PreFX("input-sim"), Box::new(InputSimulator::default()));
+            //chain.pre_fx.insert(PreFX("input-simulator"), Box::new(InputSimulator::default()));
         }
 
         chain

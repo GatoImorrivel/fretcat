@@ -94,7 +94,7 @@ fn register_styles(cx: &mut Context) {
         .unwrap();
     cx.add_stylesheet(include_str!("../css/preset-control.css"))
         .unwrap();
-    cx.add_stylesheet(include_str!("../css/channel-slider.css"))
+    cx.add_stylesheet(include_str!("../css/audio-slider.css"))
         .unwrap();
     cx.add_stylesheet(include_str!("../css/cards.css"))
         .unwrap();

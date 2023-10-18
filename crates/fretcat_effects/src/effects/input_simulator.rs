@@ -1,4 +1,4 @@
-use nih_plug::{vizia::prelude::*, nih_log};
+use nih_plug::vizia::prelude::*;
 
 use super::AudioEffect;
 
