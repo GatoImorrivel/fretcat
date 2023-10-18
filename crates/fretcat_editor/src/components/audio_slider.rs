@@ -38,6 +38,26 @@ impl<L: Lens<Target = (f32, f32)>> AudioSlider<L> {
         }
         .build(cx, |cx| {
             ZStack::new(cx, |cx| {
+                VStack::new(cx, |cx| {
+                    let markers = [
+                        "12", "-", "0", "-", "12", "-", "24", "-", "36", "-", "48", "-", "60",
+                    ];
+                    markers.iter().for_each(|marker| {
+                        Label::new(cx, *marker)
+                            .text_align(if *marker == "-" {
+                                TextAlign::Right
+                            } else {
+                                TextAlign::Left
+                            })
+                            .color(Color::white())
+                            .font_family(vec![FamilyOwned::Name("Montserrat".to_owned())])
+                            .font_size(12.0)
+                            .width(Pixels(10.0));
+                    });
+                })
+                .height(Pixels(height))
+                .left(Percentage(-90.0))
+                .row_between(Stretch(1.0));
                 HStack::new(cx, |cx| {
                     Binding::new(cx, lens, |cx, bind| {
                         let channels = bind.get(cx);

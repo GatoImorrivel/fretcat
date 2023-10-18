@@ -66,7 +66,7 @@ pub struct MessageSystem {
 impl MessageSystem {
     pub fn init(cx: &mut Context) {
         Self {
-            messages: vec![Message::make_error("Bolas"), Message::make_info("ola")],
+            messages: vec![],
         }
         .build(cx);
     }
