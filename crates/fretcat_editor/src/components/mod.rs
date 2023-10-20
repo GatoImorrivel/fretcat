@@ -5,6 +5,7 @@ mod effect_handle;
 mod sidebar;
 mod audio_slider;
 mod message_system;
+mod accordion;
 
 use nih_plug::vizia::prelude::*;
 use strum::{IntoEnumIterator, EnumIter};

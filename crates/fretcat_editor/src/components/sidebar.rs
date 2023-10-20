@@ -1,7 +1,12 @@
-use fretcat_effects::ChainData;
-use nih_plug::vizia::prelude::*;
+use fretcat_effects::{
+    effects::{Gain, PreFX},
+    ChainData,
+};
+use fretcat_serialization::PresetCategory;
+use nih_plug::{util::MINUS_INFINITY_DB, vizia::prelude::*};
+use strum::IntoEnumIterator;
 
-use super::{EffectKind, EFFECT_CARDS, audio_slider::AudioSlider};
+use super::{accordion::Accordion, audio_slider::AudioSlider, EffectKind, EFFECT_CARDS};
 
 const KIND_PER_ROW: usize = 2;
 
@@ -30,35 +35,65 @@ impl Sidebar {
         }
         .build(cx, |cx| {
             HStack::new(cx, |cx| {
-                Binding::new(cx, Sidebar::current_tab, |cx, bind| {
-                    let current_tab = bind.get(cx);
-                    VStack::new(cx, |cx| {
-                        Button::new(
-                            cx,
-                            |ex| ex.emit(SidebarMessage::ChangeTab(SidebarTab::Effect)),
-                            |cx| Label::new(cx, "󰡀"),
-                        )
-                        .class("tab-btn")
-                        .toggle_class("tab-selected-kind", current_tab == SidebarTab::Effect);
-                        Button::new(
-                            cx,
-                            |ex| ex.emit(SidebarMessage::ChangeTab(SidebarTab::Preset)),
-                            |cx| Label::new(cx, ""),
-                        )
-                        .class("tab-btn")
-                        .toggle_class("tab-selected-kind", current_tab == SidebarTab::Preset);
+                VStack::new(cx, |cx| {
+                    Button::new(
+                        cx,
+                        |ex| ex.emit(SidebarMessage::ChangeTab(SidebarTab::Effect)),
+                        |cx| Label::new(cx, "󰡀"),
+                    )
+                    .class("tab-btn")
+                    .bind(Self::current_tab, |mut view, bind| {
+                        let current_tab = bind.get(view.context());
+                        view.toggle_class("tab-selected-kind", current_tab == SidebarTab::Effect);
+                    });
 
-                        VStack::new(cx, |cx| {
-                            AudioSlider::new(cx, 200.0, ChainData::chain.map(|chain| chain.in_avg_amplitude));
-                            AudioSlider::new(cx, 200.0, ChainData::chain.map(|chain| chain.out_avg_amplitude));
-                        })
-                        .child_space(Stretch(1.0))
-                        .row_between(Stretch(1.0))
-                        .height(Stretch(1.0))
-                        .width(Stretch(1.0));
+                    Button::new(
+                        cx,
+                        |ex| ex.emit(SidebarMessage::ChangeTab(SidebarTab::Preset)),
+                        |cx| Label::new(cx, ""),
+                    )
+                    .class("tab-btn")
+                    .bind(Self::current_tab, |mut view, bind| {
+                        let current_tab = bind.get(view.context());
+                        view.toggle_class("tab-selected-kind", current_tab == SidebarTab::Preset);
+                    });
+
+                    VStack::new(cx, |cx| {
+                        AudioSlider::new(
+                            cx,
+                            200.0,
+                            ChainData::chain.map(|chain| chain.in_avg_amplitude),
+                            |ex, val| {
+                                let chain = ChainData::as_mut_ex(ex);
+                                let prefx = chain
+                                    .get_pre_fx::<Gain>(&PreFX("in_gain"))
+                                    .expect("No in gain");
+                                let gain = if val > -60.0 { val } else { 0.0 };
+                                prefx.gain_in_db = gain;
+                            },
+                        );
+                        AudioSlider::new(
+                            cx,
+                            200.0,
+                            ChainData::chain.map(|chain| chain.out_avg_amplitude),
+                            |ex, val| {
+                                let chain = ChainData::as_mut_ex(ex);
+                                let postfx = chain
+                                    .get_pre_fx::<Gain>(&PreFX("out_gain"))
+                                    .expect("No out gain");
+                                let gain = if val > -60.0 { val } else { 0.0 };
+                                postfx.gain_in_db = gain;
+                            },
+                        );
                     })
-                    .class("bar");
-                    VStack::new(cx, |cx| match current_tab {
+                    .child_space(Stretch(1.0))
+                    .row_between(Stretch(1.0))
+                    .height(Stretch(1.0))
+                    .width(Stretch(1.0));
+                })
+                .class("bar");
+                Binding::new(cx, Sidebar::current_tab, |cx, bind| {
+                    VStack::new(cx, |cx| match bind.get(cx) {
                         SidebarTab::Effect => {
                             Binding::new(cx, Sidebar::selected_kind, |cx, bind| {
                                 VStack::new(cx, |cx| {
@@ -103,7 +138,12 @@ impl Sidebar {
                             });
                         }
                         SidebarTab::Preset => {
-                            Label::new(cx, "tetas");
+                            let preset_kinds = PresetCategory::iter()
+                                .map(|category| category.to_string())
+                                .collect::<Vec<_>>();
+                            preset_kinds.into_iter().for_each(|kind| {
+                                Chip::new(cx, &kind);
+                            });
                         }
                     })
                     .class("content");

@@ -31,7 +31,7 @@ impl<L: Lens<Target = (f32, f32)>> View for AudioSlider<L> {
 }
 
 impl<L: Lens<Target = (f32, f32)>> AudioSlider<L> {
-    pub fn new(cx: &mut Context, height: f32, lens: L) {
+    pub fn new(cx: &mut Context, height: f32, lens: L, on_changing: fn(&mut EventContext, f32)) {
         Self {
             gain: 0.0,
             _p: PhantomData,
@@ -91,9 +91,13 @@ impl<L: Lens<Target = (f32, f32)>> AudioSlider<L> {
                 .width(Stretch(1.0))
                 .col_between(Percentage(5.0));
                 Slider::new(cx, Self::gain)
+                    .range(-60.0..6.0)
                     .height(Pixels(height))
                     .width(Stretch(1.0))
-                    .on_changing(|ex, val| ex.emit(AudioSliderMessage::Gain(val)));
+                    .on_changing(move |ex, val|  {
+                        (on_changing)(ex, val);
+                        ex.emit(AudioSliderMessage::Gain(val));
+                    });
             });
         });
     }

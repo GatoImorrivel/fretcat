@@ -79,7 +79,7 @@ impl View for EffectHandle {
     }
 
     fn event(&mut self, cx: &mut EventContext, event: &mut Event) {
-        let chain = ChainData::as_mut(cx);
+        let chain = ChainData::as_mut_ex(cx);
         
         if chain.effects.get(self.index).is_some() {
             chain.effects.get_mut(self.index).unwrap().update(event);

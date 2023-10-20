@@ -7,11 +7,15 @@ use std::{fs, path::{Path, PathBuf}, sync::Arc};
 use fretcat_effects::{effects::AudioEffect, Chain};
 use mapper::Mapper;
 use serde::{Deserialize, Serialize};
+use strum::{EnumIter, Display};
 
-#[derive(Debug, Default, Clone, Copy, Serialize, Deserialize)]
+#[derive(Debug, Default, Clone, Copy, Serialize, Deserialize, EnumIter, Display)]
 pub enum PresetCategory {
     #[default]
     User,
+    Ambient,
+    Rock,
+    Jazzy
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]

@@ -8,7 +8,7 @@ use crate::effects::InputSimulator;
 
 #[allow(unused_imports)]
 use crate::effects::{AudioEffect, Overdrive, StudioReverb};
-use crate::{effects::{PostFX, PreFX}, common::rms};
+use crate::{effects::{PostFX, PreFX, Gain}, common::rms};
 
 pub const NUM_CHANNELS: usize = 2;
 
@@ -21,7 +21,12 @@ pub struct ChainData {
 }
 
 impl ChainData {
-    pub fn as_mut<'a>(cx: &'a mut EventContext) -> &'a mut Chain {
+    pub fn as_mut_ex<'a>(cx: &'a mut EventContext) -> &'a mut Chain {
+        let chain = ChainData::chain.get(cx);
+        unsafe { &mut *Arc::as_ptr(&chain).cast_mut() }
+    }
+
+    pub fn as_mut_cx<'a>(cx: &'a mut Context) -> &'a mut Chain {
         let chain = ChainData::chain.get(cx);
         unsafe { &mut *Arc::as_ptr(&chain).cast_mut() }
     }
@@ -183,6 +188,9 @@ impl Default for Chain {
             clock: Instant::now(),
             previous_duration: Duration::ZERO
         };
+
+        chain.pre_fx.insert(PreFX("in_gain"), Box::new(Gain::default()));
+        chain.post_fx.insert(PostFX("out_gain"), Box::new(Gain::default()));
 
         #[cfg(feature = "simulate")]
         {
