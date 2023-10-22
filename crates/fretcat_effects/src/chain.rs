@@ -1,5 +1,6 @@
 use std::{sync::Arc, time::{Instant, Duration}};
 
+use downcast_rs::Downcast;
 use indexmap::IndexMap;
 use nih_plug::{nih_log, vizia::prelude::*, util::gain_to_db_fast};
 
@@ -156,7 +157,8 @@ impl Chain {
 
     #[inline]
     pub fn query_cast<T: AudioEffect + 'static>(&self, effect: usize) -> Option<&T> {
-        self.effects.get(effect)?.as_any().downcast_ref::<T>()
+        let effect = self.effects.get(effect)?;
+        Downcast::as_any(effect).downcast_ref::<T>()
     }
 
     #[inline]

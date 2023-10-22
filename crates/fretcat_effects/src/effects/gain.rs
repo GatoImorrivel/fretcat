@@ -4,9 +4,8 @@ use nih_plug::{vizia::prelude::*, util::db_to_gain_fast, nih_log};
 
 use super::AudioEffect;
 
-#[derive(Debug, Clone, Copy, Message)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Gain {
-    #[msg]
     pub gain_in_db: f32
 }
 

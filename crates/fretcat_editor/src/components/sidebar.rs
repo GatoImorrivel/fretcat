@@ -1,5 +1,5 @@
 use fretcat_effects::{
-    effects::{Gain, PreFX},
+    effects::{Gain, PreFX, PostFX},
     ChainData,
 };
 use fretcat_serialization::PresetCategory;
@@ -79,7 +79,7 @@ impl Sidebar {
                             |ex, val| {
                                 let chain = ChainData::as_mut_ex(ex);
                                 let postfx = chain
-                                    .get_pre_fx::<Gain>(&PreFX("out_gain"))
+                                    .get_post_fx::<Gain>(&PostFX("out_gain"))
                                     .expect("No out gain");
                                 let gain = if val > -60.0 { val } else { 0.0 };
                                 postfx.gain_in_db = gain;
@@ -141,9 +141,13 @@ impl Sidebar {
                             let preset_kinds = PresetCategory::iter()
                                 .map(|category| category.to_string())
                                 .collect::<Vec<_>>();
-                            preset_kinds.into_iter().for_each(|kind| {
-                                Chip::new(cx, &kind);
-                            });
+                            VStack::new(cx, |cx| {
+                                preset_kinds.into_iter().for_each(|kind| {
+                                    Accordion::new(cx, move |cx| Label::new(cx, &kind), |cx| {
+                                        Label::new(cx, "Hi").color(Color::white());
+                                    });
+                                });
+                            }).row_between(Pixels(0.0));
                         }
                     })
                     .class("content");

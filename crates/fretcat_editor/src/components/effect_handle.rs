@@ -1,4 +1,4 @@
-use nih_plug::vizia::prelude::*;
+use nih_plug::{vizia::prelude::*, nih_log, nih_dbg};
 use fretcat_effects::{ChainData, ChainCommand};
 
 use crate::components::{CardSystem, CardEvent, EffectList, EffectListEvent};
@@ -80,7 +80,7 @@ impl View for EffectHandle {
 
     fn event(&mut self, cx: &mut EventContext, event: &mut Event) {
         let chain = ChainData::as_mut_ex(cx);
-        
+
         if chain.effects.get(self.index).is_some() {
             chain.effects.get_mut(self.index).unwrap().update(event);
         }

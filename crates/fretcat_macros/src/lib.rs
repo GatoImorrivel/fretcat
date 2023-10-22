@@ -4,7 +4,7 @@ mod effect_mapper;
 
 use proc_macro::TokenStream;
 use quote::quote;
-use syn::{parse_macro_input, Ident, Type};
+use syn::{parse_macro_input, Ident, Type, parse_quote};
 
 #[proc_macro_derive(Message, attributes(msg))]
 pub fn derive_message(input: TokenStream) -> TokenStream {

@@ -25,20 +25,9 @@ pub type InitFlags = (Arc<Chain>, EditorData);
 
 #[derive(Debug, Clone, Lens, Default)]
 pub struct EditorData {
-    pub current_preset: Preset,
-    pub original_preset: Preset
 }
 
-impl EditorData {
-    pub fn restore_preset(&mut self) {
-        self.current_preset = self.original_preset.clone();
-    }
-}
-
-impl Model for EditorData {
-    fn event(&mut self, cx: &mut EventContext, event: &mut Event) {
-    }
-}
+impl Model for EditorData {}
 
 pub fn create(
     #[allow(unused_parens)] (chain, editor_data): InitFlags,
@@ -66,7 +55,7 @@ pub fn create(
             .class("sidebar-wrapper");
             VStack::new(cx, |cx| {
                 VStack::new(cx, |cx| {
-                    PresetControl::new(cx);
+                    PresetControl::new(cx, Some(ChainData::chain));
                 })
                 .class("preset-control-wrapper");
                 VStack::new(cx, |cx| {

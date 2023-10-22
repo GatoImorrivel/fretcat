@@ -12,7 +12,6 @@ pub struct StudioReverb {
     pub wet: f32,
     #[msg]
     pub size: f32,
-
     reverb: Freeverb,
 }
 

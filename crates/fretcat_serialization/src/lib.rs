@@ -45,6 +45,10 @@ impl Preset {
         false
     }
 
+    pub fn cloned_mappers(&self) -> Vec<Mapper> {
+        self.effects.clone()
+    }
+
     pub fn save(&self) {
         let json = serde_json::to_string_pretty(self).unwrap();
 

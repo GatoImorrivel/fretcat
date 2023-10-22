@@ -1,10 +1,13 @@
-use fretcat_effects::ChainData;
+use std::sync::Arc;
+
+use fretcat_effects::{ChainData, Chain, effects::AudioEffect};
 use fretcat_serialization::Preset;
 pub use nih_plug::vizia::prelude::*;
 
 #[derive(Debug, Clone, Lens)]
 pub struct PresetControl {
     pub preset_name: String,
+    pub current_preset: Preset,
     pub color: Color,
 }
 
@@ -15,10 +18,17 @@ pub enum PresetMessage {
 }
 
 impl PresetControl {
-    pub fn new(cx: &mut Context) {
+    pub fn new<L: Lens<Target = Arc<Chain>>>(cx: &mut Context, lens: Option<L>) {
+        let current_preset = if let Some(lens) = lens {
+            let chain = lens.get(cx);
+            Preset::from(chain)
+        } else {
+            Preset::default()
+        };
         Self {
             preset_name: "Untitled".to_owned(),
             color: Color::transparent(),
+            current_preset,
         }
         .build(cx, |cx| {
             HStack::new(cx, |cx| {
@@ -60,13 +70,13 @@ impl View for PresetControl {
             PresetMessage::Save => {
                 let chain = ChainData::chain.get(cx);
 
-                let preset = Preset::from(chain);
+                let mappers: Vec<Box<dyn AudioEffect>> = self.current_preset.clone().into();
 
-                preset.save();
             }
             PresetMessage::TextChange(text) => {
                 if text.len() > 0 {
                     self.preset_name = text.to_owned();
+                    self.current_preset.set_name(text.to_owned());
                 }
             }
             PresetMessage::ChangeColor(color) => {
