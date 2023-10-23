@@ -1,6 +1,8 @@
 use fretcat_effects::effects::{Fuzz, Overdrive, AudioEffect};
 use fretcat_macros::EffectMapper;
 
+use std::sync::Arc;
+
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, EffectMapper, Clone)]

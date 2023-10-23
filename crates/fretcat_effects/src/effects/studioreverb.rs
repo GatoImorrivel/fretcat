@@ -1,16 +1,16 @@
-use crate::common::Freeverb;
-use nih_plug::vizia::prelude::*;
+use std::sync::Arc;
+
+use crate::{arc_to_mut, common::Freeverb};
 use fretcat_macros::{getter, Message};
+use nih_plug::vizia::prelude::*;
 
 use super::AudioEffect;
 
 use crate::ChainData;
 
-#[derive(Debug, Clone, Message, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct StudioReverb {
-    #[msg]
     pub wet: f32,
-    #[msg]
     pub size: f32,
     reverb: Freeverb,
 }
@@ -36,42 +36,74 @@ impl AudioEffect for StudioReverb {
             });
     }
 
-    fn view(&self, cx: &mut Context, effect: usize) {
-        HStack::new(cx, |cx| {
-            HStack::new(cx, |cx| {
-                Knob::new(cx, 1.0, getter!(size), false)
-                    .on_changing(|cx, val| cx.emit(Message::Size(val)))
-                    .class("size-knob");
-                Label::new(cx, "Room Size");
-            })
-            .class("studio-reverb-knob-group");
-            HStack::new(cx, |cx| {
-                Knob::new(cx, 1.0, getter!(wet), false)
-                    .on_changing(|cx, val| cx.emit(Message::Wet(val)))
-                    .class("wet-knob");
-                Label::new(cx, "Wet");
-            })
-            .class("studio-reverb-knob-group");
-        })
-        .class("studio-reverb");
-    }
-
-    fn update(&mut self, event: &mut Event) -> Option<()> {
-        event.map(|e, _| match e {
-            Message::Size(val) => {
-                self.size = *val;
-                self.reverb.set_room_size(*val);
-            }
-            Message::Wet(val) => {
-                self.wet = *val;
-                self.reverb.set_wet(*val);
-            }
-        });
-
-        Some(())
+    fn view(&self, cx: &mut Context, effect: Arc<dyn AudioEffect>) {
+        StudioReverbView::new(cx, effect.into_any_arc().downcast::<Self>().unwrap());
     }
 
     fn height(&self) -> f32 {
         100.0
+    }
+}
+
+#[derive(Debug, Clone, Data, Lens, Message)]
+pub struct StudioReverbView {
+    #[msg]
+    pub wet: f32,
+    #[msg]
+    pub size: f32,
+
+    #[lens(ignore)]
+    #[data(ignore)]
+    effect: Arc<StudioReverb>,
+}
+
+impl StudioReverbView {
+    pub fn new(cx: &mut Context, effect: Arc<StudioReverb>) -> Handle<Self> {
+        Self {
+            size: effect.size,
+            wet: effect.wet,
+            effect,
+        }
+        .build(cx, |cx| {
+            HStack::new(cx, |cx| {
+                HStack::new(cx, |cx| {
+                    Knob::new(cx, 1.0, Self::size, false)
+                        .on_changing(|cx, val| cx.emit(Message::Size(val)))
+                        .class("size-knob");
+                    Label::new(cx, "Room Size");
+                })
+                .class("studio-reverb-knob-group");
+                HStack::new(cx, |cx| {
+                    Knob::new(cx, 1.0, Self::wet, false)
+                        .on_changing(|cx, val| cx.emit(Message::Wet(val)))
+                        .class("wet-knob");
+                    Label::new(cx, "Wet");
+                })
+                .class("studio-reverb-knob-group");
+            })
+            .class("studio-reverb");
+        })
+    }
+}
+
+impl View for StudioReverbView {
+    fn element(&self) -> Option<&'static str> {
+        Some("studio-reverb")
+    }
+
+    fn event(&mut self, cx: &mut EventContext, event: &mut Event) {
+        event.map(|e, _| {
+            let effect = unsafe { arc_to_mut(&self.effect) };
+            match e {
+                Message::Size(val) => {
+                    self.size = *val;
+                    effect.reverb.set_room_size(*val);
+                }
+                Message::Wet(val) => {
+                    self.wet = *val;
+                    effect.reverb.set_wet(*val);
+                }
+            }
+        });
     }
 }

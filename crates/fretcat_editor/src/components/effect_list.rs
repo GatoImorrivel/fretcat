@@ -24,10 +24,10 @@ impl EffectList {
                     |cx, _| {
                         let chain = ChainData::chain.get(cx);
 
-                        for (index, _) in chain.effects.iter().enumerate() {
-                            EffectHandle::new(cx, index).unwrap_or_else(|| {
-                                nih_log!("dropped effect {:?}", index);
-                            });
+                        for (index, effect) in chain.effects.iter().enumerate() {
+                            VStack::new(cx, |cx| {
+                                EffectHandle::new(cx, effect.clone(), index);
+                            }).height(Pixels(effect.height()));
                         }
                         VStack::new(cx, |cx| {
                             VStack::new(cx, |cx| {

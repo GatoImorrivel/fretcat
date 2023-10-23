@@ -1,5 +1,6 @@
 use core::fmt;
-use downcast_rs::{impl_downcast, Downcast};
+use std::sync::Arc;
+use downcast_rs::{impl_downcast, Downcast, DowncastSync};
 use dyn_clone::DynClone;
 use fretcat_macros::*;
 use nih_plug::vizia::prelude::*;
@@ -35,14 +36,9 @@ pub trait DynPartialEq {
     fn as_any(&self) -> &dyn Any;
 }
 
-pub trait AudioEffect: fmt::Debug + Send + Sync + DynClone + Downcast {
+pub trait AudioEffect: fmt::Debug + Send + Sync + DynClone + DowncastSync {
     fn process(&mut self, input_buffer: (&mut [f32], &mut [f32]));
-    #[allow(unused_variables)]
-    fn view(&self, cx: &mut Context, effect: usize) {}
-    #[allow(unused_variables)]
-    fn update(&mut self, event: &mut Event) -> Option<()> {
-        Some(())
-    }
+    fn view(&self, _cx: &mut Context, _effect: Arc<dyn AudioEffect>) {}
     fn height(&self) -> f32 {
         0.0
     }

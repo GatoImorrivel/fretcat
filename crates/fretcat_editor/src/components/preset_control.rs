@@ -70,7 +70,6 @@ impl View for PresetControl {
             PresetMessage::Save => {
                 let chain = ChainData::chain.get(cx);
 
-                let mappers: Vec<Box<dyn AudioEffect>> = self.current_preset.clone().into();
 
             }
             PresetMessage::TextChange(text) => {

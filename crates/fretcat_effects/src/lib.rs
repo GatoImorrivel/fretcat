@@ -2,6 +2,8 @@ mod chain;
 mod common;
 pub mod effects;
 
+use std::sync::Arc;
+
 use nih_plug::vizia::{
     image::{load_from_memory_with_format, DynamicImage, ImageFormat, imageops},
     prelude::*,
@@ -78,3 +80,8 @@ pub fn register_styles(cx: &mut Context) {
     cx.add_stylesheet(include_str!("../css/studio-reverb.css")).unwrap();
 }
 
+pub unsafe fn arc_to_mut<T>(arc: &Arc<T>) -> &mut T {
+    unsafe {
+        &mut *Arc::as_ptr(arc).cast_mut()
+    }
+}

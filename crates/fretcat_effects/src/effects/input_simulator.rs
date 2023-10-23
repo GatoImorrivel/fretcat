@@ -45,16 +45,4 @@ impl AudioEffect for InputSimulator {
             (*left, *right) = self.tick();
         });
     }
-
-    fn update(&mut self, event: &mut Event) -> Option<()> {
-        Some(())
-    }
-
-    fn view(&self, cx: &mut Context, effect: usize) {
-        
-    }
-
-    fn height(&self) -> f32 {
-        0.0
-    }
 }

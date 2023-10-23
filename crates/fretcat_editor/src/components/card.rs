@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, sync::Arc};
 
 use fretcat_effects::effects::{AudioEffect, Fuzz, Overdrive, StudioReverb};
 use nih_plug::vizia::prelude::*;
@@ -24,7 +24,6 @@ lazy_static::lazy_static! {
     };
 }
 
-
 #[derive(Lens, Clone, PartialEq, Data)]
 pub struct CardSystem {
     pub(crate) dragging: Option<Card>,
@@ -46,20 +45,18 @@ impl CardSystem {
         Binding::new(cx, CardSystem::is_dragging, |cx, bind| {
             let is_dragging = bind.get(cx);
             if is_dragging {
-                Binding::new(cx, CardSystem::cursor, move |cx, bind| {
-                    let cursor = bind.get(cx);
-                    let card = CardSystem::dragging.get(cx);
-                    VStack::new(cx, |cx| {
-                        if let Some(card) = card  {
-                            card.content(cx);
-                        }
-                    })
-                    .class("card-base")
-                    .width(Pixels(300.0))
-                    .position_type(PositionType::SelfDirected)
-                    .left(Pixels(cursor.0))
-                    .top(Pixels(cursor.1));
-                });
+                let card = CardSystem::dragging.get(cx);
+                VStack::new(cx, |cx| {
+                    if let Some(card) = card {
+                        card.content(cx);
+                    }
+                })
+                .background_color(Color::blue())
+                .class("card-base")
+                .width(Pixels(300.0))
+                .position_type(PositionType::SelfDirected)
+                .left(CardSystem::cursor.map(|cursor| Pixels(cursor.0)))
+                .top(CardSystem::cursor.map(|cursor| Pixels(cursor.1)));
             }
         });
     }
@@ -70,15 +67,17 @@ pub enum CardEvent {
 }
 
 impl Model for CardSystem {
-    fn event(&mut self, _cx: &mut EventContext, event: &mut Event) {
+    fn event(&mut self, cx: &mut EventContext, event: &mut Event) {
         event.map(|e, _| match e {
             WindowEvent::MouseMove(x, y) => {
-                self.cursor = (*x, *y);
+                if !x.is_nan() && !y.is_nan() {
+                    self.cursor = (*x / cx.scale_factor(), *y / cx.scale_factor());
+                }
             }
             WindowEvent::MouseUp(btn) => match btn {
                 MouseButton::Left => {
                     self.is_dragging = false;
-                } 
+                }
                 _ => {}
             },
             _ => {}
@@ -97,7 +96,7 @@ impl Model for CardSystem {
 pub struct Card {
     pub(crate) content: fn(&mut Context),
     pub(crate) drag: fn(&mut EventContext),
-    pub(crate) spawn: fn() -> Box<dyn AudioEffect>,
+    pub(crate) spawn: fn() -> Arc<dyn AudioEffect>,
 }
 
 impl Data for Card {
@@ -117,7 +116,7 @@ impl Card {
         VStack::new(cx, self.content).class("card-base");
     }
 
-    pub fn spawn(&self) -> Box<dyn AudioEffect> {
+    pub fn spawn(&self) -> Arc<dyn AudioEffect> {
         (self.spawn)()
     }
 }
@@ -138,7 +137,7 @@ pub const OVERDRIVE_CARD: Card = Card {
         ex.emit(CardEvent::DragChange(Some(OVERDRIVE_CARD)));
         ex.set_drop_data(ex.current());
     },
-    spawn: || Box::new(Overdrive::default()),
+    spawn: || Arc::new(Overdrive::default()),
 };
 
 pub const FUZZ_CARD: Card = Card {
@@ -157,7 +156,7 @@ pub const FUZZ_CARD: Card = Card {
         ex.emit(CardEvent::DragChange(Some(FUZZ_CARD)));
         ex.set_drop_data(ex.current());
     },
-    spawn: || Box::new(Fuzz::default()),
+    spawn: || Arc::new(Fuzz::default()),
 };
 
 pub const DISTORTION_CARD: Card = Card {
@@ -176,7 +175,7 @@ pub const DISTORTION_CARD: Card = Card {
         ex.emit(CardEvent::DragChange(Some(DISTORTION_CARD)));
         ex.set_drop_data(ex.current());
     },
-    spawn: || Box::new(Fuzz::default()),
+    spawn: || Arc::new(Fuzz::default()),
 };
 
 pub const REVERB_CARD: Card = Card {
@@ -195,5 +194,5 @@ pub const REVERB_CARD: Card = Card {
         ex.emit(CardEvent::DragChange(Some(REVERB_CARD)));
         ex.set_drop_data(ex.current());
     },
-    spawn: || Box::new(StudioReverb::default()),
+    spawn: || Arc::new(StudioReverb::default()),
 };

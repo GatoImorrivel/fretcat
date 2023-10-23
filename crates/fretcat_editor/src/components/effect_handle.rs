@@ -1,22 +1,21 @@
+use std::sync::Arc;
+
 use nih_plug::{vizia::prelude::*, nih_log, nih_dbg};
-use fretcat_effects::{ChainData, ChainCommand};
+use fretcat_effects::{ChainData, ChainCommand, effects::AudioEffect};
 
 use crate::components::{CardSystem, CardEvent, EffectList, EffectListEvent};
 
-#[derive(Debug, Clone)]
-pub struct EffectHandle {
-    index: usize,
-}
+#[derive(Debug, Clone, Copy, Data)]
+pub struct EffectHandle;
 
 impl EffectHandle {
-    pub fn new(cx: &mut Context, effect: usize) -> Option<()> {
-        let chain = ChainData::chain.get(cx);
-        let data = chain.query(effect)?;
+    pub fn new(cx: &mut Context, effect: Arc<dyn AudioEffect>, index: usize) -> Option<()> {
+        let height = effect.height();
         HStack::new(cx, move |cx| {
             VStack::new(cx, move |cx| {
                 Button::new(
                     cx,
-                    move |ex| ex.emit(ChainCommand::Remove(effect)),
+                    move |ex| ex.emit(ChainCommand::Remove(index)),
                     |cx| Label::new(cx, ""),
                 )
                 .class("delete-effect-btn")
@@ -24,7 +23,7 @@ impl EffectHandle {
                 Element::new(cx);
             })
             .on_drag(move |ex| {
-                ex.emit(EffectListEvent::DragChange(Some(effect)));
+                ex.emit(EffectListEvent::DragChange(Some(index)));
                 ex.set_drop_data(ex.current());
             })
             .class("effect-bar")
@@ -32,16 +31,11 @@ impl EffectHandle {
             .width(Stretch(3.0));
 
             VStack::new(cx, move |cx| {
-                Self {
-                    index: effect
-                }
-                .build(cx, |cx| {
-                    data.view(cx, effect);
-                });
+                effect.view(cx, effect.clone())
             })
             .width(Stretch(100.0))
             .height(Stretch(1.0))
-            .on_drop(move |ex, _| on_drop(ex, effect));
+            .on_drop(move |ex, _| on_drop(ex, index));
 
             Binding::new(
                 cx,
@@ -54,19 +48,19 @@ impl EffectHandle {
                             .position_type(PositionType::SelfDirected)
                             .width(Stretch(1.0))
                             .height(Percentage(50.0))
-                            .on_drop(move |ex, _| on_drop(ex, effect));
+                            .on_drop(move |ex, _| on_drop(ex, index));
                         Element::new(cx)
                             .position_type(PositionType::SelfDirected)
                             .width(Stretch(1.0))
                             .height(Percentage(50.0))
                             .top(Percentage(50.0))
-                            .on_drop(move |ex, _| on_drop(ex, effect + 1));
+                            .on_drop(move |ex, _| on_drop(ex, index + 1));
                     }
                 },
             );
         })
         .class("effect-handle")
-        .height(Pixels(data.height()))
+        .height(Pixels(height))
         .width(Stretch(1.0));
 
         Some(())
@@ -80,10 +74,6 @@ impl View for EffectHandle {
 
     fn event(&mut self, cx: &mut EventContext, event: &mut Event) {
         let chain = ChainData::as_mut_ex(cx);
-
-        if chain.effects.get(self.index).is_some() {
-            chain.effects.get_mut(self.index).unwrap().update(event);
-        }
     }
 }
 

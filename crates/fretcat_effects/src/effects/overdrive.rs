@@ -1,23 +1,21 @@
+use std::sync::Arc;
 use std::{f32::consts::PI, fmt::Debug};
 
+use fretcat_macros::{getter, Message};
 use nih_plug::util::db_to_gain_fast;
 use nih_plug::vizia::prelude::*;
-use fretcat_macros::{getter, Message};
 use serde::{Deserialize, Serialize};
 
-use crate::{ChainData, NUM_CHANNELS};
+use crate::{arc_to_mut, ChainData, NUM_CHANNELS};
 
 use crate::common::{map_normalized_value, Filter, FilterMode};
 
 use super::AudioEffect;
 
-#[derive(Debug, Clone, Message, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Overdrive {
-    #[msg]
     pub gain: f32,
-    #[msg]
     pub freq: f32,
-    #[msg]
     pub volume: f32,
     max_freq_hz: f32,
     min_freq_hz: f32,
@@ -57,56 +55,96 @@ impl AudioEffect for Overdrive {
             });
     }
 
-    fn view(&self, cx: &mut Context, effect: usize) {
-        HStack::new(cx, |cx| {
-            HStack::new(cx, |cx| {
-                Knob::new(cx, 1.0, getter!(gain), false)
-                    .on_changing(|cx, val| cx.emit(Message::Gain(val)))
-                    .class("gain-knob");
-                Label::new(cx, "Gain");
-            })
-            .class("overdrive-knob-group");
-            HStack::new(cx, |cx| {
-                Knob::new(cx, 1.0, getter!(freq), false)
-                    .on_changing(|cx, val| cx.emit(Message::Freq(val)))
-                    .class("tone-knob");
-                Label::new(cx, "Tone");
-            })
-            .class("overdrive-knob-group");
-            HStack::new(cx, |cx| {
-                Knob::new(cx, 1.0, getter!(volume), false)
-                    .on_changing(|cx, val| cx.emit(Message::Volume(val)))
-                    .class("volume-knob");
-                Label::new(cx, "Output Gain");
-            })
-            .class("overdrive-knob-group");
-        })
-        .class("overdrive");
-    }
-
-    fn update(&mut self, event: &mut Event) -> Option<()> {
-        event.map(|event, _| match event {
-            Message::Gain(val) => {
-                self.gain = *val;
-            }
-            Message::Freq(val) => {
-                self.freq = *val;
-                self.filter.iter_mut().for_each(|filter| {
-                    filter.recalculate_coeffs(
-                        map_normalized_value(*val, self.min_freq_hz, self.max_freq_hz),
-                        filter.q(),
-                    );
-                });
-            }
-            Message::Volume(val) => {
-                self.volume = *val;
-            }
-        });
-
-        Some(())
+    fn view(&self, cx: &mut Context, effect: Arc<dyn AudioEffect>) {
+        OverdriveView::new(cx, effect.into_any_arc().downcast::<Self>().unwrap());
     }
 
     fn height(&self) -> f32 {
         100.0
+    }
+}
+
+#[derive(Debug, Clone, Data, Lens, Message)]
+pub struct OverdriveView {
+    #[msg]
+    pub gain: f32,
+    #[msg]
+    pub freq: f32,
+    #[msg]
+    pub volume: f32,
+
+    #[lens(ignore)]
+    #[data(ignore)]
+    effect: Arc<Overdrive>,
+}
+
+impl OverdriveView {
+    pub fn new(cx: &mut Context, effect: Arc<Overdrive>) -> Handle<Self> {
+        Self {
+            gain: effect.gain,
+            freq: effect.freq,
+            volume: effect.volume,
+            effect,
+        }
+        .build(cx, |cx| {
+            HStack::new(cx, |cx| {
+                HStack::new(cx, |cx| {
+                    Binding::new(cx, Self::gain, |cx, bind| {
+                        Knob::new(cx, 1.0, bind, false)
+                            .on_changing(|cx, val| cx.emit(Message::Gain(val)))
+                            .class("gain-knob");
+                        Label::new(cx, "Gain");
+                    });
+                })
+                .class("overdrive-knob-group");
+                HStack::new(cx, |cx| {
+                    Knob::new(cx, 1.0, Self::freq, false)
+                        .on_changing(|cx, val| cx.emit(Message::Freq(val)))
+                        .class("tone-knob");
+                    Label::new(cx, "Tone");
+                })
+                .class("overdrive-knob-group");
+                HStack::new(cx, |cx| {
+                    Knob::new(cx, 1.0, Self::volume, false)
+                        .on_changing(|cx, val| cx.emit(Message::Volume(val)))
+                        .class("volume-knob");
+                    Label::new(cx, "Output Gain");
+                })
+                .class("overdrive-knob-group");
+            })
+            .class("overdrive");
+        })
+    }
+}
+
+impl View for OverdriveView {
+    fn element(&self) -> Option<&'static str> {
+        Some("overdrive")
+    }
+
+    fn event(&mut self, cx: &mut EventContext, event: &mut Event) {
+        event.map(|event, _| {
+            let effect = unsafe { arc_to_mut(&self.effect) };
+            match event {
+                Message::Gain(val) => {
+                    self.gain = *val;
+                    effect.gain = *val;
+                }
+                Message::Freq(val) => {
+                    self.freq = *val;
+                    effect.freq = *val;
+                    effect.filter.iter_mut().for_each(|filter| {
+                        filter.recalculate_coeffs(
+                            map_normalized_value(*val, effect.min_freq_hz, effect.max_freq_hz),
+                            filter.q(),
+                        );
+                    });
+                }
+                Message::Volume(val) => {
+                    self.volume = *val;
+                    effect.volume = *val;
+                }
+            }
+        });
     }
 }

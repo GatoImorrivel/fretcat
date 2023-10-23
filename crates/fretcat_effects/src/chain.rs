@@ -1,20 +1,27 @@
-use std::{sync::Arc, time::{Instant, Duration}};
+use std::{
+    ops::DerefMut,
+    sync::Arc,
+    time::{Duration, Instant},
+};
 
 use downcast_rs::Downcast;
 use indexmap::IndexMap;
-use nih_plug::{nih_log, vizia::prelude::*, util::gain_to_db_fast};
+use nih_plug::{nih_log, util::gain_to_db_fast, vizia::prelude::*};
 
 #[cfg(feature = "simulate")]
 use crate::effects::InputSimulator;
 
 #[allow(unused_imports)]
 use crate::effects::{AudioEffect, Overdrive, StudioReverb};
-use crate::{effects::{PostFX, PreFX, Gain}, common::rms};
+use crate::{
+    common::rms,
+    effects::{Gain, PostFX, PreFX},
+};
 
 pub const NUM_CHANNELS: usize = 2;
 
-pub type Query<'a> = &'a Box<dyn AudioEffect>;
-pub type QueryMut<'a> = &'a mut Box<dyn AudioEffect>;
+pub type Query<'a> = &'a Arc<dyn AudioEffect>;
+pub type QueryMut<'a> = &'a mut Arc<dyn AudioEffect>;
 
 #[derive(Debug, Lens, Clone)]
 pub struct ChainData {
@@ -57,21 +64,19 @@ impl Model for ChainData {
 
 #[derive(Debug, Clone)]
 pub enum ChainCommand {
-    Insert(Box<dyn AudioEffect>),
-    InsertAt(usize, Box<dyn AudioEffect>),
+    Insert(Arc<dyn AudioEffect>),
+    InsertAt(usize, Arc<dyn AudioEffect>),
     Remove(usize),
     Swap(usize, usize),
 }
 
 #[derive(Debug, Clone)]
 pub struct Chain {
-    pub effects: Vec<Box<dyn AudioEffect>>,
+    pub effects: Vec<Arc<dyn AudioEffect>>,
     pub pre_fx: IndexMap<PreFX, Box<dyn AudioEffect>>,
     pub post_fx: IndexMap<PostFX, Box<dyn AudioEffect>>,
     pub in_avg_amplitude: (f32, f32),
     pub out_avg_amplitude: (f32, f32),
-    pub clock: Instant,
-    pub previous_duration: Duration
 }
 
 impl Chain {
@@ -87,9 +92,11 @@ impl Chain {
 
             self.in_avg_amplitude = Self::get_rms((&*left, &*right));
 
-            self.effects
-                .iter_mut()
-                .for_each(|e| e.process((&mut *left, &mut *right)));
+            self.effects.iter_mut().for_each(|e| {
+                let e = { &mut *Arc::as_ptr(e).cast_mut() };
+                e.process((&mut *left, &mut *right))
+            });
+
             self.post_fx
                 .iter_mut()
                 .for_each(|(_, fx)| fx.process((&mut *left, &mut *right)));
@@ -99,9 +106,7 @@ impl Chain {
     }
 
     #[inline]
-    fn get_rms(
-        buffer: (&[f32], &[f32]),
-    ) -> (f32, f32) {
+    fn get_rms(buffer: (&[f32], &[f32])) -> (f32, f32) {
         (
             gain_to_db_fast(rms(buffer.0)),
             gain_to_db_fast(rms(buffer.1)),
@@ -119,7 +124,7 @@ impl Chain {
     }
 
     #[inline]
-    pub fn insert(&mut self, audio_effect: Box<dyn AudioEffect>) -> usize {
+    pub fn insert(&mut self, audio_effect: Arc<dyn AudioEffect>) -> usize {
         self.effects.push(audio_effect);
         self.effects
             .clone()
@@ -131,7 +136,7 @@ impl Chain {
     }
 
     #[inline]
-    pub fn insert_at(&mut self, index: usize, audio_effect: Box<dyn AudioEffect>) {
+    pub fn insert_at(&mut self, index: usize, audio_effect: Arc<dyn AudioEffect>) {
         self.effects.insert(index, audio_effect);
     }
 
@@ -187,12 +192,14 @@ impl Default for Chain {
             post_fx: IndexMap::new(),
             in_avg_amplitude: (0.0, 0.0),
             out_avg_amplitude: (0.0, 0.0),
-            clock: Instant::now(),
-            previous_duration: Duration::ZERO
         };
 
-        chain.pre_fx.insert(PreFX("in_gain"), Box::new(Gain::default()));
-        chain.post_fx.insert(PostFX("out_gain"), Box::new(Gain::default()));
+        chain
+            .pre_fx
+            .insert(PreFX("in_gain"), Box::new(Gain::default()));
+        chain
+            .post_fx
+            .insert(PostFX("out_gain"), Box::new(Gain::default()));
 
         #[cfg(feature = "simulate")]
         {

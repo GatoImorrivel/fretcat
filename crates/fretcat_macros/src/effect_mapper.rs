@@ -43,7 +43,7 @@ fn derive_enum(
 
             into_ifs.push(quote! {
                 if let #enum_name::#variant_ident(val) = self {
-                    return Ok(Box::new(val));
+                    return Ok(Arc::new(val));
                 }
             });
         } else {
@@ -52,20 +52,20 @@ fn derive_enum(
     }
 
     let res = quote! {
-        impl TryFrom<Box<dyn AudioEffect>> for #enum_name {
+        impl TryFrom<Arc<dyn AudioEffect>> for #enum_name {
             type Error = MapperError;
 
-            fn try_from(value: Box<dyn AudioEffect>) -> Result<Self, Self::Error> {
+            fn try_from(value: Arc<dyn AudioEffect>) -> Result<Self, Self::Error> {
                 #(#from_ifs)*
 
                 Err(Self::Error::NotFound)
             }
         }
 
-        impl TryInto<Box<dyn AudioEffect>> for Mapper {
+        impl TryInto<Arc<dyn AudioEffect>> for Mapper {
             type Error = MapperError;
 
-            fn try_into(self) -> Result<Box<dyn AudioEffect>, Self::Error> {
+            fn try_into(self) -> Result<Arc<dyn AudioEffect>, Self::Error> {
                 #(#into_ifs)*
 
                 Err(Self::Error::NotFound)

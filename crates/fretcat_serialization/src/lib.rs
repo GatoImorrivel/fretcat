@@ -131,12 +131,12 @@ impl From<&Chain> for Preset {
     }
 }
 
-impl Into<Vec<Box<dyn AudioEffect>>> for Preset {
-    fn into(self) -> Vec<Box<dyn AudioEffect>> {
+impl Into<Vec<Arc<dyn AudioEffect>>> for Preset {
+    fn into(self) -> Vec<Arc<dyn AudioEffect>> {
         self.effects
             .into_iter()
-            .fold(Vec::<Box<dyn AudioEffect>>::new(), |mut acc, mapper| {
-                let effect: Box<dyn AudioEffect> = mapper.try_into().unwrap();
+            .fold(Vec::<Arc<dyn AudioEffect>>::new(), |mut acc, mapper| {
+                let effect: Arc<dyn AudioEffect> = mapper.try_into().unwrap();
                 acc.push(effect);
                 acc
             })
