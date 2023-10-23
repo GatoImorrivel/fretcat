@@ -20,5 +20,5 @@ serde = { version = "1.0", features = ["derive"] }
 # are merged into upstream Vizia. This also excludes the `embedded_fonts`
 # feature.
 # vizia = { git = "https://github.com/vizia/vizia", rev = "100502c33621c07be59eb218bab92e5f45b4e0c9", default_features = false, features = ["baseview", "clipboard", "x11"] }
-vizia = { path = "../vizia", default_features = false, features = ["baseview", "clipboard", "x11"] }
+vizia = { path = "../vizia", default-features = false, features = ["baseview", "clipboard", "x11"] }
 # vizia = { path = "../../vizia", default_features = false, features = ["baseview", "clipboard", "x11"] }

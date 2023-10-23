@@ -94,6 +94,7 @@ impl_res_simple!(FontStretch);
 impl_res_clone!(Translate);
 impl_res_clone!(Scale);
 impl_res_clone!(Position);
+impl_res_simple!(PointerEvents);
 
 impl<L> Res<L::Target> for L
 where
@@ -113,7 +114,7 @@ where
         F: 'static + Fn(&mut EventContext, L::Target),
     {
         cx.with_current(entity, |cx| {
-            Binding::new(cx, self.clone(), move |cx, val| {
+            Binding::new(cx, *self, move |cx, val| {
                 if let Some(v) = val.get_val_fallible(cx) {
                     let cx = &mut EventContext::new_with_current(cx, entity);
                     (closure)(cx, v);

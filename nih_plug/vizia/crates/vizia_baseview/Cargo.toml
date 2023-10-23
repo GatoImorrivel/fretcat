@@ -12,7 +12,7 @@ vizia_core = { path = "../vizia_core" }
 vizia_input = { path = "../vizia_input" }
 vizia_id = { path = "../vizia_id" }
 
-baseview = { path = "../../../baseview", features = ["opengl"]}
-raw-window-handle = "0.4.2"
+baseview = { path = "../../../baseview", features = ["opengl"] }
+raw-window-handle = "0.5.2"
 femtovg = "0.7.0"
 lazy_static = "1.4.0"
