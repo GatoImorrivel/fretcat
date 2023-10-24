@@ -1,8 +1,6 @@
 use std::marker::PhantomData;
 
 use nih_plug::{
-    prelude::Vst3Plugin,
-    util::{gain_to_db, gain_to_db_fast, gain_to_db_fast_epsilon},
     vizia::prelude::*,
 };
 
@@ -21,7 +19,7 @@ impl<L: Lens<Target = (f32, f32)>> View for AudioSlider<L> {
         Some("audio-slider")
     }
 
-    fn event(&mut self, cx: &mut EventContext, event: &mut Event) {
+    fn event(&mut self, _cx: &mut EventContext, event: &mut Event) {
         event.map(|e, _| match e {
             AudioSliderMessage::Gain(val) => {
                 self.gain = *val;

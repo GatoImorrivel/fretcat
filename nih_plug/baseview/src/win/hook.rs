@@ -7,7 +7,7 @@ use winapi::ctypes::c_int;
 use winapi::shared::minwindef::{WPARAM, LPARAM, LRESULT, UINT};
 use winapi::shared::windef::{HHOOK, HWND};
 use winapi::um::processthreadsapi::GetCurrentThreadId;
-use winapi::um::winuser::{CallNextHookEx, SetWindowsHookExW, MSG, WH_GETMESSAGE, HC_ACTION, PM_REMOVE, GetFocus, WM_KEYDOWN};
+use winapi::um::winuser::{CallNextHookEx, SetWindowsHookExW, MSG, WH_GETMESSAGE, HC_ACTION, PM_REMOVE};
 
 use crate::Event;
 

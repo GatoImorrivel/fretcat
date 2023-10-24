@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use nih_plug::{vizia::prelude::*, nih_log, nih_dbg};
+use nih_plug::{vizia::prelude::*};
 use fretcat_effects::{ChainData, ChainCommand, effects::AudioEffect};
 
 use crate::components::{CardSystem, CardEvent, EffectList, EffectListEvent};
@@ -72,8 +72,8 @@ impl View for EffectHandle {
         Some("effect-handle")        
     }
 
-    fn event(&mut self, cx: &mut EventContext, event: &mut Event) {
-        let chain = ChainData::as_mut_ex(cx);
+    fn event(&mut self, cx: &mut EventContext, _event: &mut Event) {
+        let _chain = ChainData::as_mut_ex(cx);
     }
 }
 

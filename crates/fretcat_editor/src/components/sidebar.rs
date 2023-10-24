@@ -1,9 +1,9 @@
 use fretcat_effects::{
-    effects::{Gain, PreFX, PostFX},
+    effects::{Gain, PostFX, PreFX},
     ChainData,
 };
-use fretcat_serialization::PresetCategory;
-use nih_plug::{util::MINUS_INFINITY_DB, vizia::prelude::*};
+use fretcat_serialization::{PresetCategory, PRESET_CATEOGORY_LIST};
+use nih_plug::vizia::prelude::*;
 use strum::IntoEnumIterator;
 
 use super::{accordion::Accordion, audio_slider::AudioSlider, EffectKind, EFFECT_CARDS};
@@ -138,16 +138,25 @@ impl Sidebar {
                             });
                         }
                         SidebarTab::Preset => {
-                            let preset_kinds = PresetCategory::iter()
-                                .map(|category| category.to_string())
-                                .collect::<Vec<_>>();
                             VStack::new(cx, |cx| {
-                                preset_kinds.into_iter().for_each(|kind| {
-                                    Accordion::new(cx, move |cx| Label::new(cx, &kind), |cx| {
-                                        Label::new(cx, "Hi").color(Color::white());
-                                    });
-                                });
-                            }).row_between(Pixels(0.0));
+                                List::new(
+                                    cx,
+                                    StaticLens::<Vec<String>>::new(PRESET_CATEOGORY_LIST.as_ref()),
+                                    |cx, _, category| {
+                                        Accordion::new(
+                                            cx,
+                                            move |cx| Label::new(cx, &category.get(cx)),
+                                            |cx| {
+                                                Label::new(cx, "Hi").color(Color::white());
+                                            },
+                                        );
+                                    },
+                                )
+                                .row_between(Pixels(1.0))
+                                .height(Stretch(1.0));
+                            })
+                            .row_between(Pixels(0.0))
+                            .height(Stretch(1.0));
                         }
                     })
                     .class("content");

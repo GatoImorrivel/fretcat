@@ -52,7 +52,7 @@ impl View for Accordion {
         Some("accordion")
     }
 
-    fn event(&mut self, cx: &mut EventContext, event: &mut Event) {
+    fn event(&mut self, _cx: &mut EventContext, event: &mut Event) {
         event.map(|event, _| match event {
             AccordionMessage::Toggle => {
                 self.is_open = !self.is_open;

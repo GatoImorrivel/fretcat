@@ -1,5 +1,3 @@
-use nih_plug::vizia::prelude::*;
-
 use super::AudioEffect;
 
 #[derive(Debug, Clone)]

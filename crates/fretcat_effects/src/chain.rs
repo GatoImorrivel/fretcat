@@ -1,15 +1,12 @@
 use std::{
-    ops::DerefMut,
     sync::Arc,
-    time::{Duration, Instant},
 };
 
 use downcast_rs::Downcast;
 use indexmap::IndexMap;
-use nih_plug::{nih_log, util::gain_to_db_fast, vizia::prelude::*};
+use nih_plug::{util::gain_to_db_fast, vizia::prelude::*};
 
-#[cfg(feature = "simulate")]
-use crate::effects::InputSimulator;
+
 
 #[allow(unused_imports)]
 use crate::effects::{AudioEffect, Overdrive, StudioReverb};

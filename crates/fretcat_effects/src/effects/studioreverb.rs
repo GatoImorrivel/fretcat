@@ -1,12 +1,12 @@
 use std::sync::Arc;
 
 use crate::{arc_to_mut, common::Freeverb};
-use fretcat_macros::{getter, Message};
+use fretcat_macros::{Message};
 use nih_plug::vizia::prelude::*;
 
 use super::AudioEffect;
 
-use crate::ChainData;
+
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct StudioReverb {
@@ -91,7 +91,7 @@ impl View for StudioReverbView {
         Some("studio-reverb")
     }
 
-    fn event(&mut self, cx: &mut EventContext, event: &mut Event) {
+    fn event(&mut self, _cx: &mut EventContext, event: &mut Event) {
         event.map(|e, _| {
             let effect = unsafe { arc_to_mut(&self.effect) };
             match e {

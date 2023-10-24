@@ -1,10 +1,10 @@
 use std::sync::Arc;
 
-use fretcat_macros::{getter, Message};
+use fretcat_macros::{Message};
 use nih_plug::vizia::prelude::*;
 use serde::{Deserialize, Serialize};
 
-use crate::{arc_to_mut, ChainData};
+use crate::{arc_to_mut};
 
 use super::AudioEffect;
 
@@ -20,7 +20,7 @@ impl Default for Fuzz {
 }
 
 impl AudioEffect for Fuzz {
-    fn process(&mut self, input_buffer: (&mut [f32], &mut [f32])) {}
+    fn process(&mut self, _input_buffer: (&mut [f32], &mut [f32])) {}
 
     fn view(&self, cx: &mut Context, effect: Arc<dyn AudioEffect>) {
         FuzzView::new(cx, effect.into_any_arc().downcast::<Self>().unwrap());

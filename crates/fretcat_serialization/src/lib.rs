@@ -5,9 +5,10 @@ mod tests;
 use std::{fs, path::{Path, PathBuf}, sync::Arc};
 
 use fretcat_effects::{effects::AudioEffect, Chain};
+use lazy_static::lazy_static;
 use mapper::Mapper;
 use serde::{Deserialize, Serialize};
-use strum::{EnumIter, Display};
+use strum::{EnumIter, Display, IntoEnumIterator};
 
 #[derive(Debug, Default, Clone, Copy, Serialize, Deserialize, EnumIter, Display)]
 pub enum PresetCategory {
@@ -16,6 +17,10 @@ pub enum PresetCategory {
     Ambient,
     Rock,
     Jazzy
+}
+
+lazy_static! {
+    pub static ref PRESET_CATEOGORY_LIST: Vec<String> = PresetCategory::iter().map(|category| category.to_string()).collect::<Vec<_>>();
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -63,7 +68,6 @@ impl Preset {
     }
 
     pub fn get_preset_path(&self) -> PathBuf {
-        let home = home::home_dir().unwrap();
         let formatted = format!("{}/{}.json", Self::get_preset_dir().display(), self.name);
         Path::new(&formatted).to_owned()
     }

@@ -1,6 +1,6 @@
-use fretcat_macros::Message;
 
-use nih_plug::{vizia::prelude::*, util::db_to_gain_fast, nih_log};
+
+use nih_plug::util::db_to_gain_fast;
 
 use super::AudioEffect;
 

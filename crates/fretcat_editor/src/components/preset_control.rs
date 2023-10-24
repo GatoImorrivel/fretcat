@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use fretcat_effects::{ChainData, Chain, effects::AudioEffect};
+use fretcat_effects::{ChainData, Chain};
 use fretcat_serialization::Preset;
 pub use nih_plug::vizia::prelude::*;
 
@@ -68,7 +68,7 @@ impl View for PresetControl {
     fn event(&mut self, cx: &mut EventContext, event: &mut Event) {
         event.map(|event, _| match event {
             PresetMessage::Save => {
-                let chain = ChainData::chain.get(cx);
+                let _chain = ChainData::chain.get(cx);
 
 
             }

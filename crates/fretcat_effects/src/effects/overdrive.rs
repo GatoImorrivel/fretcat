@@ -1,12 +1,12 @@
 use std::sync::Arc;
 use std::{f32::consts::PI, fmt::Debug};
 
-use fretcat_macros::{getter, Message};
+use fretcat_macros::{Message};
 use nih_plug::util::db_to_gain_fast;
 use nih_plug::vizia::prelude::*;
 use serde::{Deserialize, Serialize};
 
-use crate::{arc_to_mut, ChainData, NUM_CHANNELS};
+use crate::{arc_to_mut, NUM_CHANNELS};
 
 use crate::common::{map_normalized_value, Filter, FilterMode};
 
@@ -122,7 +122,7 @@ impl View for OverdriveView {
         Some("overdrive")
     }
 
-    fn event(&mut self, cx: &mut EventContext, event: &mut Event) {
+    fn event(&mut self, _cx: &mut EventContext, event: &mut Event) {
         event.map(|event, _| {
             let effect = unsafe { arc_to_mut(&self.effect) };
             match event {

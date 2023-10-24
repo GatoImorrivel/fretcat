@@ -1,8 +1,8 @@
 use core::fmt;
 use std::sync::Arc;
-use downcast_rs::{impl_downcast, Downcast, DowncastSync};
+use downcast_rs::{impl_downcast, DowncastSync};
 use dyn_clone::DynClone;
-use fretcat_macros::*;
+
 use nih_plug::vizia::prelude::*;
 
 // Distortions
