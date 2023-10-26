@@ -1,6 +1,7 @@
 use nih_plug::vizia::prelude::*;
 
-use crate::darken;
+use crate::common::darken;
+
 
 #[derive(Debug, Clone, Copy, Data, PartialEq, Eq)]
 pub enum MessageKind {

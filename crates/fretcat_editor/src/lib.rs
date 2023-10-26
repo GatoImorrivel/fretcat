@@ -1,36 +1,29 @@
 mod components;
+mod systems;
+mod common;
 
-use std::sync::{Arc};
+use std::sync::Arc;
 
+use common::{EDITOR_WIDTH, EDITOR_HEIGHT, register_styles, EFFECT_CARDS};
 use fretcat_effects::{ChainData, Chain};
-
 
 use nih_plug::prelude::*;
 use nih_plug::vizia::prelude::*;
 use nih_plug::{create_vizia_editor, ViziaState, ViziaTheming};
 
-use components::*;
+use crate::systems::*;
+use crate::components::*;
 
 pub type EditorState = ViziaState;
-
-const EDITOR_WIDTH: u32 = 1260;
-const EDITOR_HEIGHT: u32 = 848;
 
 pub fn default_state() -> Arc<EditorState> {
     EditorState::new(|| (EDITOR_WIDTH, EDITOR_HEIGHT))
 }
 
-#[allow(unused_parens)]
-pub type InitFlags = (Arc<Chain>, EditorData);
-
-#[derive(Debug, Clone, Lens, Default)]
-pub struct EditorData {
-}
-
-impl Model for EditorData {}
+pub type InitFlags = Arc<Chain>;
 
 pub fn create(
-    #[allow(unused_parens)] (chain, editor_data): InitFlags,
+    chain: InitFlags,
     editor_state: Arc<ViziaState>,
 ) -> Option<Box<dyn Editor>> {
     create_vizia_editor(editor_state, ViziaTheming::Custom, move |cx, _| {
@@ -39,7 +32,6 @@ pub fn create(
         }
         .build(cx);
 
-        editor_data.clone().build(cx);
         fretcat_effects::register_fonts(cx);
         fretcat_effects::register_images(cx);
         fretcat_effects::register_styles(cx);
@@ -49,54 +41,15 @@ pub fn create(
         MessageSystem::init(cx);
 
         HStack::new(cx, |cx| {
-            VStack::new(cx, |cx| {
-                Sidebar::new(cx);
-            })
-            .class("sidebar-wrapper");
-            VStack::new(cx, |cx| {
-                VStack::new(cx, |cx| {
-                    PresetControl::new(cx, Some(ChainData::chain));
-                })
-                .class("preset-control-wrapper");
-                VStack::new(cx, |cx| {
-                    EffectList::new(cx);
-                    MessageSystem::view(cx);
-                })
-                .class("effect-list-wrapper");
-            })
-            .class("right-wrapper");
+            Sidebar::new(cx);
+
+            CardList::new(cx);
+            PresetList::new(cx);
+
+            EffectList::new(cx, ChainData::chain);
         })
         .class("main");
 
         CardSystem::view(cx);
     })
-}
-
-fn register_styles(cx: &mut Context) {
-    cx.add_stylesheet(include_str!("../css/editor.css"))
-        .unwrap();
-    cx.add_stylesheet(include_str!("../css/effect-list.css"))
-        .unwrap();
-    cx.add_stylesheet(include_str!("../css/effect-handle.css"))
-        .unwrap();
-    cx.add_stylesheet(include_str!("../css/sidebar.css"))
-        .unwrap();
-    cx.add_stylesheet(include_str!("../css/preset-control.css"))
-        .unwrap();
-    cx.add_stylesheet(include_str!("../css/audio-slider.css"))
-        .unwrap();
-    cx.add_stylesheet(include_str!("../css/cards.css"))
-        .unwrap();
-    cx.add_stylesheet(include_str!("../css/message-system.css"))
-        .unwrap();
-}
-
-pub fn darken(color: &Color, factor: f64) -> Color {
-    let factor = factor.max(0.0).min(1.0);
-
-    let darkened_red = (color.r() as f64 * factor) as u8;
-    let darkened_green = (color.g() as f64 * factor) as u8;
-    let darkened_blue = (color.b() as f64 * factor) as u8;
-
-    Color::rgba(darkened_red, darkened_green, darkened_blue, color.a())
 }

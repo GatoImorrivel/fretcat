@@ -1,8 +1,12 @@
 
+use std::sync::Arc;
+
 use nih_plug::vizia::prelude::*;
 
-use super::{effect_handle::EffectHandle, CardSystem, CardEvent};
-use fretcat_effects::{ChainCommand, ChainData};
+use crate::systems::{CardSystem, CardEvent};
+
+use super::effect_handle::EffectHandle;
+use fretcat_effects::{ChainCommand, Chain};
 
 #[derive(Debug, Lens, Clone, Copy)]
 pub struct EffectList {
@@ -15,19 +19,17 @@ pub enum EffectListEvent {
 }
 
 impl EffectList {
-    pub fn new(cx: &mut Context) {
-        Self { dragging: None, update_counter: 0 }.build(cx, |cx| {
-            ScrollView::new(cx, 0.0, 0.0, false, false, |cx| {
+    pub fn new<L: Lens<Target = Arc<Chain>>>(cx: &mut Context, lens: L) {
+        Self { dragging: None, update_counter: 0 }.build(cx, move |cx| {
+            ScrollView::new(cx, 0.0, 0.0, false, false, move |cx| {
                 Binding::new(
                     cx,
                     EffectList::update_counter,
-                    |cx, _| {
-                        let chain = ChainData::chain.get(cx);
+                    move |cx, _| {
+                        let chain = lens.get(cx);
 
                         for (index, effect) in chain.effects.iter().enumerate() {
-                            VStack::new(cx, |cx| {
-                                EffectHandle::new(cx, effect.clone(), index);
-                            }).height(Pixels(effect.height()));
+                            EffectHandle::new(cx, effect.clone(), index);
                         }
                         VStack::new(cx, |cx| {
                             VStack::new(cx, |cx| {

@@ -1,8 +1,8 @@
 use std::marker::PhantomData;
 
-use nih_plug::{
-    vizia::prelude::*,
-};
+use nih_plug::vizia::prelude::*;
+
+use crate::common::normalize;
 
 #[derive(Debug, Clone, Copy, Lens)]
 pub struct AudioSlider<L: Lens<Target = (f32, f32)>> {
@@ -57,32 +57,29 @@ impl<L: Lens<Target = (f32, f32)>> AudioSlider<L> {
                 .left(Percentage(-90.0))
                 .row_between(Stretch(1.0));
                 HStack::new(cx, |cx| {
-                    Binding::new(cx, lens, |cx, bind| {
-                        let channels = bind.get(cx);
-                        ZStack::new(cx, |cx| {
-                            Element::new(cx)
-                                .class("audio-slider-bg")
-                                .width(Stretch(1.0))
-                                .height(Stretch(1.0));
-                            Element::new(cx)
-                                .background_color(Color::black())
-                                .width(Stretch(1.0))
-                                .height(Percentage(
-                                    100.0 - normalize(channels.0, -100.0, 6.0, 0.0, 100.0),
-                                ));
-                        });
-                        ZStack::new(cx, |cx| {
-                            Element::new(cx)
-                                .class("audio-slider-bg")
-                                .width(Stretch(1.0))
-                                .height(Stretch(1.0));
-                            Element::new(cx)
-                                .background_color(Color::black())
-                                .width(Stretch(1.0))
-                                .height(Percentage(
-                                    100.0 - normalize(channels.1, -100.0, 6.0, 0.0, 100.0),
-                                ));
-                        });
+                    ZStack::new(cx, |cx| {
+                        Element::new(cx)
+                            .class("audio-slider-bg")
+                            .width(Stretch(1.0))
+                            .height(Stretch(1.0));
+                        Element::new(cx)
+                            .background_color(Color::black())
+                            .width(Stretch(1.0))
+                            .height(lens.map(|channels| {
+                                Percentage(100.0 - normalize(channels.0, -100.0, 6.0, 0.0, 100.0))
+                            }));
+                    });
+                    ZStack::new(cx, |cx| {
+                        Element::new(cx)
+                            .class("audio-slider-bg")
+                            .width(Stretch(1.0))
+                            .height(Stretch(1.0));
+                        Element::new(cx)
+                            .background_color(Color::black())
+                            .width(Stretch(1.0))
+                            .height(lens.map(|channels| {
+                                Percentage(100.0 - normalize(channels.1, -100.0, 6.0, 0.0, 100.0))
+                            }));
                     });
                 })
                 .height(Pixels(height))
@@ -92,22 +89,11 @@ impl<L: Lens<Target = (f32, f32)>> AudioSlider<L> {
                     .range(-60.0..6.0)
                     .height(Pixels(height))
                     .width(Stretch(1.0))
-                    .on_changing(move |ex, val|  {
+                    .on_changing(move |ex, val| {
                         (on_changing)(ex, val);
                         ex.emit(AudioSliderMessage::Gain(val));
                     });
             });
         });
     }
-}
-
-#[inline]
-fn normalize(value: f32, min_input: f32, max_input: f32, min_output: f32, max_output: f32) -> f32 {
-    let clamped_value = value.max(min_input).min(max_input);
-
-    let input_range = max_input - min_input;
-    let output_range = max_output - min_output;
-    let normalized = (clamped_value - min_input) * output_range / input_range + min_output;
-
-    normalized
 }

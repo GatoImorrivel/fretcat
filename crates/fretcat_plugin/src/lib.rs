@@ -1,6 +1,5 @@
 mod params;
 
-use fretcat_editor::EditorData;
 pub use nih_plug;
 use nih_plug::prelude::*;
 
@@ -15,7 +14,6 @@ use fretcat_testing::INPUT_SIMULATOR;
 pub struct Fretcat {
     params: Arc<FretcatParams>,
     chain: Arc<Chain>,
-    editor_data: EditorData,
 }
 
 impl Default for Fretcat {
@@ -23,7 +21,6 @@ impl Default for Fretcat {
         Self {
             params: Arc::new(FretcatParams::default()),
             chain: Arc::new(Chain::default()),
-            editor_data: EditorData::default(),
         }
     }
 }
@@ -54,8 +51,7 @@ impl Plugin for Fretcat {
     }
 
     fn editor(&mut self, _async_executor: AsyncExecutor<Self>) -> Option<Box<dyn Editor>> {
-        #[allow(unused_parens)]
-        fretcat_editor::create((self.chain.clone(), self.editor_data.clone()), self.params.editor_state.clone())
+        fretcat_editor::create(self.chain.clone(), self.params.editor_state.clone())
     }
 
     fn initialize(
