@@ -1,32 +1,14 @@
 .main {
     width: 100%;
     height: 100%;
-}
+    col-between: 2%;
 
-.sidebar-wrapper {
-    width: 5s;
-    background-color: #1f1f1f;
-    z-index: 3;
-}
+    child-left: 1%;
+    child-right: 1%;
 
-.preset-control-wrapper {
-    height: 1s;
-}
+    child-top: 3%;
+    child-bottom: 3%;
 
-.effect-list-wrapper {
-    height: 10s;
-    child-left: 2%;
-    child-right: 2%;
-}
-
-.right-wrapper {
-    width: 12s;
-    background-color: #1f1f1f;
-    box-shadow:  10px 10px 20px #181818;
-    z-index: 2;
-    row-between: 1%;
-}
-
-button:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 9px 9px 18px #222222 inset,
+                -9px -9px 18px #383838 inset;
 }

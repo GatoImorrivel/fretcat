@@ -33,18 +33,30 @@ impl CardList {
                                 cx,
                                 move |ex| ex.emit(CardListMessage::ChangeKind(kind.clone())),
                                 move |cx| Label::new(cx, &kind.to_string()),
+                            )
+                            .class("kind-btn")
+                            .toggle_class(
+                                "kind-selected-btn",
+                                Self::current_kind.map(move |tab| *tab == kind),
                             );
                         }
-                    });
+                    })
+                    .class("kind-btn-row");
                 }
-            });
+            })
+            .height(Stretch(1.0))
+            .class("kind-btn-wrapper");
 
-            VStack::new(cx, |cx| {
-                let cards = EFFECT_CARDS.get(&Self::current_kind.get(cx)).unwrap();
+            Binding::new(cx, Self::current_kind, |cx, bind| {
+                VStack::new(cx, |cx| {
+                    let cards = EFFECT_CARDS.get(&bind.get(cx)).unwrap();
 
-                for card in cards {
-                    card.render(cx);
-                }
+                    for card in cards {
+                        card.render(cx);
+                    }
+                })
+                .height(Stretch(5.0))
+                .row_between(Percentage(3.0));
             });
         })
     }
@@ -53,5 +65,13 @@ impl CardList {
 impl View for CardList {
     fn element(&self) -> Option<&'static str> {
         Some("card-list")
+    }
+
+    fn event(&mut self, _cx: &mut EventContext, event: &mut Event) {
+        event.map(|event, _| match event {
+            CardListMessage::ChangeKind(val) => {
+                self.current_kind = *val;
+            }
+        });
     }
 }

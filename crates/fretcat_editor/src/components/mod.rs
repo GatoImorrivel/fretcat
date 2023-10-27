@@ -8,7 +8,7 @@ mod audio_slider;
 mod accordion;
 
 pub use effect_list::{EffectList, EffectListEvent};
-pub use sidebar::Sidebar;
+pub use sidebar::{Sidebar, SidebarTab, SidebarMessage};
 pub use preset_control::PresetControl;
 pub use card_list::*;
 pub use preset_list::*;

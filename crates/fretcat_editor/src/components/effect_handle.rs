@@ -37,26 +37,27 @@ impl EffectHandle {
                 VStack::new(cx, move |cx| effect.view(cx, effect.clone()))
                     .width(Stretch(100.0))
                     .height(Stretch(1.0))
+                    .overflow(Overflow::Hidden)
                     .on_drop(move |ex, _| on_drop(ex, index));
 
                 Element::new(cx)
                     .position_type(PositionType::SelfDirected)
                     .width(Stretch(1.0))
                     .height(Percentage(50.0))
-                    .visibility(CardSystem::is_dragging)
+                    .display(CardSystem::is_dragging)
                     .on_drop(move |ex, _| on_drop(ex, index));
                 Element::new(cx)
                     .position_type(PositionType::SelfDirected)
                     .width(Stretch(1.0))
                     .height(Percentage(50.0))
                     .top(Percentage(50.0))
-                    .visibility(CardSystem::is_dragging)
+                    .display(CardSystem::is_dragging)
                     .on_drop(move |ex, _| on_drop(ex, index + 1));
             })
             .class("effect-handle")
             .height(Pixels(height))
             .width(Stretch(1.0));
-        })
+        }).overflow(Overflow::Hidden)
     }
 }
 

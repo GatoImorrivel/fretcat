@@ -8,7 +8,8 @@ use crate::systems::*;
 pub const EDITOR_WIDTH: u32 = 1260;
 pub const EDITOR_HEIGHT: u32 = 848;
 
-
+pub const MAIN_COLOR: Color = Color::rgb(48, 47, 47);
+ 
 lazy_static::lazy_static! {
     pub static ref EFFECT_CARDS: HashMap<EffectKind, Vec<Card>> = {
         let mut hashmap: HashMap<EffectKind, Vec<Card>> = HashMap::new();
@@ -67,6 +68,8 @@ pub fn register_styles(cx: &mut Context) {
     cx.add_stylesheet(include_str!("../css/cards.css"))
         .unwrap();
     cx.add_stylesheet(include_str!("../css/message-system.css"))
+        .unwrap();
+    cx.add_stylesheet(include_str!("../css/card-list.css"))
         .unwrap();
 }
 

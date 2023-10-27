@@ -22,40 +22,36 @@ pub struct Sidebar {
     pub selected_kind: EffectKind,
 }
 
-enum SidebarMessage {
+pub enum SidebarMessage {
     ChangeTab(SidebarTab),
-    ChangeSelectedKind(EffectKind),
 }
 
 impl Sidebar {
-    pub fn new(cx: &mut Context) -> Handle<Self> {
+    pub fn new(cx: &mut Context, current_tab: SidebarTab) -> Handle<Self> {
         Self {
-            current_tab: SidebarTab::Effect,
+            current_tab,
             selected_kind: EffectKind::Distortion,
         }
         .build(cx, |cx| {
             VStack::new(cx, |cx| {
-                Button::new(
-                    cx,
-                    |ex| ex.emit(SidebarMessage::ChangeTab(SidebarTab::Effect)),
-                    |cx| Label::new(cx, "󰡀"),
-                )
-                .class("tab-btn")
-                .bind(Self::current_tab, |mut view, bind| {
-                    let current_tab = bind.get(view.context());
-                    view.toggle_class("tab-selected-kind", current_tab == SidebarTab::Effect);
-                });
+                VStack::new(cx, |cx| {
+                    Button::new(
+                        cx,
+                        |ex| ex.emit(SidebarMessage::ChangeTab(SidebarTab::Effect)),
+                        |cx| Label::new(cx, "󰡀"),
+                    )
+                    .class("tab-btn")
+                    .toggle_class("tab-selected-btn", Self::current_tab.map(|tab| *tab == SidebarTab::Effect));
 
-                Button::new(
-                    cx,
-                    |ex| ex.emit(SidebarMessage::ChangeTab(SidebarTab::Preset)),
-                    |cx| Label::new(cx, ""),
-                )
-                .class("tab-btn")
-                .bind(Self::current_tab, |mut view, bind| {
-                    let current_tab = bind.get(view.context());
-                    view.toggle_class("tab-selected-kind", current_tab == SidebarTab::Preset);
-                });
+                    Button::new(
+                        cx,
+                        |ex| ex.emit(SidebarMessage::ChangeTab(SidebarTab::Preset)),
+                        |cx| Label::new(cx, ""),
+                    )
+                    .class("tab-btn")
+                    .toggle_class("tab-selected-btn", Self::current_tab.map(|tab| *tab == SidebarTab::Preset));
+                })
+                .class("sidebar-buttons-wrapper").height(Percentage(15.0));
 
                 VStack::new(cx, |cx| {
                     AudioSlider::new(
@@ -87,7 +83,7 @@ impl Sidebar {
                 })
                 .child_space(Stretch(1.0))
                 .row_between(Stretch(1.0))
-                .height(Stretch(1.0))
+                .height(Percentage(85.0))
                 .width(Stretch(1.0));
             })
             .class("bar");
@@ -104,9 +100,6 @@ impl View for Sidebar {
         event.map(|event, _| match event {
             SidebarMessage::ChangeTab(tab) => {
                 self.current_tab = *tab;
-            }
-            SidebarMessage::ChangeSelectedKind(kin) => {
-                self.selected_kind = *kin;
             }
         });
     }

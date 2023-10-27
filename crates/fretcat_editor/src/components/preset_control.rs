@@ -8,7 +8,7 @@ pub use nih_plug::vizia::prelude::*;
 pub struct PresetControl {
     pub preset_name: String,
     pub current_preset: Preset,
-    pub color: Color,
+    color: Color,
 }
 
 pub enum PresetMessage {
@@ -18,7 +18,7 @@ pub enum PresetMessage {
 }
 
 impl PresetControl {
-    pub fn new<L: Lens<Target = Arc<Chain>>>(cx: &mut Context, lens: Option<L>) {
+    pub fn new<L: Lens<Target = Arc<Chain>>>(cx: &mut Context, lens: Option<L>) -> Handle<Self> {
         let current_preset = if let Some(lens) = lens {
             let chain = lens.get(cx);
             Preset::from(chain)
@@ -56,7 +56,7 @@ impl PresetControl {
                 )
                 .class("save-btn");
             });
-        });
+        })
     }
 }
 

@@ -42,8 +42,6 @@ pub const OVERDRIVE_CARD: Card = Card {
                 .color(Color::rgb(232, 86, 215))
                 .font_size(75.0);
         })
-        .border_width(Pixels(2.0))
-        .border_color(Color::rgb(232, 86, 215))
         .child_space(Stretch(1.0));
     },
     drag: |ex| {
@@ -61,8 +59,6 @@ pub const FUZZ_CARD: Card = Card {
                 .color(Color::rgb(232, 142, 57))
                 .font_size(75.0);
         })
-        .border_width(Pixels(2.0))
-        .border_color(Color::rgb(232, 142, 57))
         .child_space(Stretch(1.0));
     },
     drag: |ex| {
@@ -80,8 +76,6 @@ pub const DISTORTION_CARD: Card = Card {
                 .color(Color::rgb(232, 57, 57))
                 .font_size(40.0);
         })
-        .border_width(Pixels(2.0))
-        .border_color(Color::rgb(232, 57, 57))
         .child_space(Stretch(1.0));
     },
     drag: |ex| {
@@ -99,8 +93,6 @@ pub const REVERB_CARD: Card = Card {
                 .color(Color::rgb(232, 57, 57))
                 .font_size(40.0);
         })
-        .border_width(Pixels(2.0))
-        .border_color(Color::rgb(232, 57, 57))
         .child_space(Stretch(1.0));
     },
     drag: |ex| {
