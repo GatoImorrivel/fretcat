@@ -2,7 +2,7 @@ mod mapper;
 #[cfg(test)]
 mod tests;
 
-use std::{fs, path::{Path, PathBuf}, sync::Arc};
+use std::{fs, path::{Path, PathBuf}, sync::Arc, io};
 
 use fretcat_effects::{effects::AudioEffect, Chain};
 use lazy_static::lazy_static;
@@ -63,10 +63,10 @@ impl Preset {
         self.effects.clone()
     }
 
-    pub fn save(&self) {
+    pub fn save(&self) -> io::Result<()> {
         let json = serde_json::to_string_pretty(self).unwrap();
 
-        fs::write(self.get_preset_path(), json).unwrap();
+        fs::write(self.get_preset_path(), json)
     }
 
     pub fn get_preset_dir() -> PathBuf {

@@ -4,7 +4,7 @@ use fretcat_effects::{ChainData, Chain};
 use fretcat_serialization::Preset;
 pub use nih_plug::vizia::prelude::*;
 
-use crate::systems::MessageEvent;
+use crate::systems::{MessageEvent, Message};
 
 #[derive(Debug, Clone, Lens)]
 pub struct PresetControl {
@@ -17,6 +17,7 @@ pub enum PresetMessage {
     New,
     Save,
     Delete,
+    ChangePreset(Preset),
     TextChange(String),
     ChangeColor(Color),
 }
@@ -87,31 +88,62 @@ impl View for PresetControl {
         event.map(|event, _| match event {
             PresetMessage::New => {
                 let chain = ChainData::chain.get(cx);
-                let preset = Preset::from(chain);
+                let mut preset = Preset::from(chain);
+                preset.set_name(self.preset_name.to_owned());
 
                 if self.current_preset != preset {
-                    
+                    cx.emit(MessageEvent::Warning("There are unsaved changes".to_owned()));
+                    return;
                 }
 
+                self.current_preset = Preset::default();
+                ChainData::as_mut_ex(cx).effects = vec![];
             }
             PresetMessage::Save => {
                 let chain = ChainData::chain.get(cx);
-                let preset = Preset::from(chain);
+                let mut preset = Preset::from(chain);
+                preset.set_name(self.preset_name.to_owned());
+                self.current_preset.set_name(self.preset_name.to_owned());
 
                 if self.current_preset.already_exists() {
                     cx.emit(MessageEvent::Error("This preset already exists".to_owned()));
                     return;
                 }
 
-                preset.save();
+                if let Ok(_) = preset.save() {
+                    cx.emit(MessageEvent::Info("Saved successfully".to_owned()));
+                    self.current_preset = preset;
+                } else {
+                    cx.emit(MessageEvent::Error("Failed to save preset".to_owned()));
+                }
             }
             PresetMessage::Delete => {
+                let chain = ChainData::chain.get(cx);
+                let preset = Preset::from(chain);
 
+                if self.current_preset != preset {
+                    cx.emit(MessageEvent::Warning("There are unsaved changes".to_owned()));
+                    return;
+                }
+
+                self.current_preset = Preset::default();
+                ChainData::as_mut_ex(cx).effects = vec![];
+            }
+            PresetMessage::ChangePreset(incoming_preset) => {
+                let chain = ChainData::chain.get(cx);
+                let mut preset = Preset::from(chain);
+                preset.set_name(self.preset_name.to_owned());
+
+                if self.current_preset != preset {
+                    cx.emit(MessageEvent::Warning("There are unsaved changes".to_owned()));
+                    return;
+                }
+
+                self.current_preset = incoming_preset.clone();
             }
             PresetMessage::TextChange(text) => {
                 if text.len() > 0 {
                     self.preset_name = text.to_owned();
-                    self.current_preset.set_name(text.to_owned());
                 }
             }
             PresetMessage::ChangeColor(color) => {
