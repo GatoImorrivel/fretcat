@@ -58,7 +58,7 @@ pub fn create(chain: InitFlags, editor_state: Arc<ViziaState>) -> Option<Box<dyn
         MessageSystem::init(cx);
 
         HStack::new(cx, |cx| {
-            Sidebar::new(cx, EditorData::current_tab.get(cx)).width(Stretch(1.0));
+            Sidebar::new(cx, EditorData::current_tab.get(cx)).width(Stretch(0.7));
 
             CardList::new(cx)
                 .width(Stretch(3.5))

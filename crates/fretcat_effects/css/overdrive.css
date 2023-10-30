@@ -35,10 +35,6 @@
     color: rgb(232, 86, 215);
 }
 
-.overdrive-knob-group > knob {
-    box-shadow: -1px -1px 8px #110220;
-}
-
 .overdrive-knob-group {
     child-top: 2s;
 }

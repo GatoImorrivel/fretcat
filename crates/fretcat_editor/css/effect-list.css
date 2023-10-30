@@ -6,12 +6,12 @@ effect-list .new-effect-indicator {
 }
 
 effect-list .new-effect-indicator > vstack {
-    border: 2px rgb(35, 35, 35);
+    border: 2px #121212;
     border-radius: 25px;
     child-space: 1s;
 }
 
 effect-list .new-effect-indicator > vstack label {
     font-size: 100;
-    color: rgb(35, 35, 35);
+    color: #121212;
 }
