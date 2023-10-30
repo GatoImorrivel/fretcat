@@ -1,26 +1,19 @@
-card-list .kind-btn-wrapper {
-}
-
 card-list .kind-btn {
     border-radius: 20px;
-    background-image: linear-gradient(135deg, #323131 0%, #2E2D2D 100%);
-    box-shadow:
-        4px 4px 10px 0px rgba(34, 33, 33, 0.90),
-        -4px -4px 8px 0px rgba(62, 61, 61, 0.90),
-        4px -4px 8px 0px rgba(34, 33, 33, 0.20),
-        -4px 4px 8px 0px rgba(34, 33, 33, 0.20);
+    background-color: transparent;
+    background-image: linear-gradient(135deg, #2b2b2b 0%, #1c1c1c 100%); 
     border-color: transparent;
     width: 1s;
-    height: 1s;
+    height: 50px;
+}
+
+card-list .kind-btn-row {
+    col-between: 2%;
 }
 
 card-list .kind-selected-btn {
-    background-color: #302F2F;
-    box-shadow:
-        4px 4px 10px 0px rgba(34, 33, 33, 0.90) inset,
-        -4px -4px 8px 0px rgba(62, 61, 61, 0.90) inset,
-        4px -4px 8px 0px rgba(34, 33, 33, 0.20) inset,
-        -4px 4px 8px 0px rgba(34, 33, 33, 0.20) inset;
+    border-color: whitesmoke;
+    border-width: 2px;
 }
 
 card-list .kind-btn label {

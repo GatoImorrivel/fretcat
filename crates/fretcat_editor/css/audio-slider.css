@@ -14,5 +14,5 @@ audio-slider slider .thumb {
     border-radius: 0px;
     height: 2%;
     width: 105%;
-    background-color: #2f2f2f;
+    background-color: rgb(35, 35, 35);
 }

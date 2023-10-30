@@ -22,6 +22,14 @@ pub struct Overdrive {
     filter: [Filter; NUM_CHANNELS],
 }
 
+impl PartialEq for Overdrive {
+    fn eq(&self, other: &Self) -> bool {
+        self.gain == other.gain &&
+        self.freq == other.freq &&
+        self.volume == other.volume
+    }
+}
+
 impl Default for Overdrive {
     fn default() -> Self {
         let min_freq_hz = 1000.0;

@@ -4,6 +4,8 @@ use fretcat_effects::{ChainData, Chain};
 use fretcat_serialization::Preset;
 pub use nih_plug::vizia::prelude::*;
 
+use crate::systems::MessageEvent;
+
 #[derive(Debug, Clone, Lens)]
 pub struct PresetControl {
     pub preset_name: String,
@@ -12,7 +14,9 @@ pub struct PresetControl {
 }
 
 pub enum PresetMessage {
+    New,
     Save,
+    Delete,
     TextChange(String),
     ChangeColor(Color),
 }
@@ -49,12 +53,26 @@ impl PresetControl {
                         });
                 })
                 .class("name-wrapper");
-                Button::new(
-                    cx,
-                    |ex| ex.emit(PresetMessage::Save),
-                    |cx| Label::new(cx, "󰆓"),
-                )
-                .class("save-btn");
+                HStack::new(cx, |cx| {
+                    Button::new(
+                        cx,
+                        |ex| ex.emit(PresetMessage::Save),
+                        |cx| Label::new(cx, "+"),
+                    )
+                    .class("save-btn");
+                    Button::new(
+                        cx,
+                        |ex| ex.emit(PresetMessage::Save),
+                        |cx| Label::new(cx, "󰆓"),
+                    )
+                    .class("save-btn");
+                    Button::new(
+                        cx,
+                        |ex| ex.emit(PresetMessage::Save),
+                        |cx| Label::new(cx, ""),
+                    )
+                    .class("save-btn");
+                }).child_space(Stretch(1.0)).col_between(Stretch(1.0));
             });
         })
     }
@@ -67,9 +85,27 @@ impl View for PresetControl {
 
     fn event(&mut self, cx: &mut EventContext, event: &mut Event) {
         event.map(|event, _| match event {
-            PresetMessage::Save => {
-                let _chain = ChainData::chain.get(cx);
+            PresetMessage::New => {
+                let chain = ChainData::chain.get(cx);
+                let preset = Preset::from(chain);
 
+                if self.current_preset != preset {
+                    
+                }
+
+            }
+            PresetMessage::Save => {
+                let chain = ChainData::chain.get(cx);
+                let preset = Preset::from(chain);
+
+                if self.current_preset.already_exists() {
+                    cx.emit(MessageEvent::Error("This preset already exists".to_owned()));
+                    return;
+                }
+
+                preset.save();
+            }
+            PresetMessage::Delete => {
 
             }
             PresetMessage::TextChange(text) => {

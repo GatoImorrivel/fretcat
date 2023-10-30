@@ -1,4 +1,4 @@
-use std::marker::PhantomData;
+use std::{fmt::format, marker::PhantomData};
 
 use nih_plug::vizia::prelude::*;
 
@@ -35,6 +35,11 @@ impl<L: Lens<Target = (f32, f32)>> AudioSlider<L> {
             _p: PhantomData,
         }
         .build(cx, |cx| {
+            Label::new(cx, Self::gain.map(|gain| format!("{:.1}db", gain)))
+                .font_family(vec![FamilyOwned::Name("Montserrat".to_owned())])
+                .color(Color::white())
+                .font_size(12.0)
+                .text_align(TextAlign::Center);
             ZStack::new(cx, |cx| {
                 HStack::new(cx, |cx| {
                     ZStack::new(cx, |cx| {

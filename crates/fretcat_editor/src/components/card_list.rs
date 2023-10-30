@@ -44,7 +44,7 @@ impl CardList {
                     .class("kind-btn-row");
                 }
             })
-            .height(Stretch(1.0))
+            .height(Percentage(15.0))
             .class("kind-btn-wrapper");
 
             Binding::new(cx, Self::current_kind, |cx, bind| {
@@ -55,7 +55,7 @@ impl CardList {
                         card.render(cx);
                     }
                 })
-                .height(Stretch(5.0))
+                .height(Percentage(85.0))
                 .row_between(Percentage(3.0));
             });
         })

@@ -1,14 +1,10 @@
-.effect-handle {
-    box-shadow: 7px 7px 18px 0px rgba(36, 35, 35, 0.90); 
-}
-
-.effect-bar {
+effect-handle .effect-bar {
     background-color: #0f0f0f;
     col-between: 1s;
     cursor: grab;
 }
 
-.effect-bar button {
+effect-handle .effect-bar button {
     color: white;
     width: 20pt;
     height: 20pt;
@@ -18,12 +14,12 @@
     border-radius: 0px;
 }
 
-.effect-bar button:hover {
+effect-handle .effect-bar button:hover {
     color: red;
     background-color: #0f0f0f;
 }
 
-.drag-indicator {
+effect-handle .drag-indicator {
     color: white;
     font-size: 20;
 }

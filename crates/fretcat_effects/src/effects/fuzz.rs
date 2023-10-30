@@ -8,7 +8,7 @@ use crate::{arc_to_mut};
 
 use super::AudioEffect;
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq)]
 pub struct Fuzz {
     pub volume: f32,
 }

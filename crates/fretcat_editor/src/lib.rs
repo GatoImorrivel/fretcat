@@ -4,7 +4,7 @@ mod systems;
 
 use std::sync::Arc;
 
-use common::{register_styles, EDITOR_HEIGHT, EDITOR_WIDTH, EFFECT_CARDS, MAIN_COLOR};
+use common::{register_styles, EDITOR_HEIGHT, EDITOR_WIDTH};
 use fretcat_effects::{Chain, ChainData};
 
 use nih_plug::prelude::*;
@@ -24,7 +24,7 @@ pub type InitFlags = Arc<Chain>;
 
 #[derive(Debug, Lens, Clone)]
 pub struct EditorData {
-    pub(crate) current_tab: SidebarTab
+    pub(crate) current_tab: SidebarTab,
 }
 
 impl Model for EditorData {
@@ -45,8 +45,9 @@ pub fn create(chain: InitFlags, editor_state: Arc<ViziaState>) -> Option<Box<dyn
         .build(cx);
 
         EditorData {
-            current_tab: SidebarTab::Effect
-        }.build(cx);
+            current_tab: SidebarTab::Effect,
+        }
+        .build(cx);
 
         fretcat_effects::register_fonts(cx);
         fretcat_effects::register_images(cx);
@@ -57,20 +58,27 @@ pub fn create(chain: InitFlags, editor_state: Arc<ViziaState>) -> Option<Box<dyn
         MessageSystem::init(cx);
 
         HStack::new(cx, |cx| {
-            Sidebar::new(cx, EditorData::current_tab.get(cx)).width(Stretch(0.7))
-                .background_color(MAIN_COLOR);
+            Sidebar::new(cx, EditorData::current_tab.get(cx)).width(Stretch(1.0));
 
-            CardList::new(cx).width(Stretch(3.5)).display(EditorData::current_tab.map(|tab| *tab == SidebarTab::Effect));
-            PresetList::new(cx).width(Stretch(3.5)).display(EditorData::current_tab.map(|tab| *tab == SidebarTab::Preset));
+            CardList::new(cx)
+                .width(Stretch(3.5))
+                .row_between(Percentage(2.0))
+                .display(EditorData::current_tab.map(|tab| *tab == SidebarTab::Effect));
+            PresetList::new(cx)
+                .width(Stretch(3.5))
+                .row_between(Percentage(2.0))
+                .display(EditorData::current_tab.map(|tab| *tab == SidebarTab::Preset));
 
             VStack::new(cx, |cx| {
-                PresetControl::new(cx, Some(ChainData::chain)).height(Stretch(1.0)).z_index(200);
+                PresetControl::new(cx, Some(ChainData::chain))
+                    .height(Stretch(1.0))
+                    .z_index(200);
                 EffectList::new(cx, ChainData::chain).height(Stretch(6.0));
             })
+            .row_between(Percentage(3.0))
             .width(Stretch(10.0));
         })
-        .class("main")
-        .background_color(MAIN_COLOR);
+        .class("main");
 
         CardSystem::view(cx);
     })

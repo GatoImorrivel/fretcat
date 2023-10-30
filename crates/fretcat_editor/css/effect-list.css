@@ -1,16 +1,17 @@
-.new-effect-indicator {
+effect-list .new-effect-indicator {
     width: 100%;
     max-width: 1s;
     min-height: 200pt;
     child-space: 10px;
 }
 
-.new-effect-indicator > vstack {
-    border: 2px #2f2f2f;
+effect-list .new-effect-indicator > vstack {
+    border: 2px rgb(35, 35, 35);
+    border-radius: 25px;
     child-space: 1s;
 }
 
-.new-effect-indicator > vstack label {
+effect-list .new-effect-indicator > vstack label {
     font-size: 100;
-    color: #2f2f2f;
+    color: rgb(35, 35, 35);
 }

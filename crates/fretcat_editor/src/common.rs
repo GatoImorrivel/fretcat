@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use nih_plug::vizia::prelude::*;
+use nih_plug::vizia::{prelude::*, image::{ImageFormat, load_from_memory_with_format, DynamicImage}};
 use strum::{EnumIter, IntoEnumIterator};
 
 use crate::systems::*;
@@ -9,7 +9,7 @@ pub const EDITOR_WIDTH: u32 = 1260;
 pub const EDITOR_HEIGHT: u32 = 848;
 
 pub const MAIN_COLOR: Color = Color::rgb(48, 47, 47);
- 
+
 lazy_static::lazy_static! {
     pub static ref EFFECT_CARDS: HashMap<EffectKind, Vec<Card>> = {
         let mut hashmap: HashMap<EffectKind, Vec<Card>> = HashMap::new();
@@ -34,7 +34,7 @@ pub enum EffectKind {
     Distortion,
     Delay,
     Dynamics,
-    Reverb
+    Reverb,
 }
 
 impl EffectKind {
@@ -65,8 +65,7 @@ pub fn register_styles(cx: &mut Context) {
         .unwrap();
     cx.add_stylesheet(include_str!("../css/audio-slider.css"))
         .unwrap();
-    cx.add_stylesheet(include_str!("../css/cards.css"))
-        .unwrap();
+    cx.add_stylesheet(include_str!("../css/cards.css")).unwrap();
     cx.add_stylesheet(include_str!("../css/message-system.css"))
         .unwrap();
     cx.add_stylesheet(include_str!("../css/card-list.css"))
@@ -85,7 +84,13 @@ pub fn darken(color: &Color, factor: f64) -> Color {
 }
 
 #[inline]
-pub fn normalize(value: f32, min_input: f32, max_input: f32, min_output: f32, max_output: f32) -> f32 {
+pub fn normalize(
+    value: f32,
+    min_input: f32,
+    max_input: f32,
+    min_output: f32,
+    max_output: f32,
+) -> f32 {
     let clamped_value = value.max(min_input).min(max_input);
 
     let input_range = max_input - min_input;

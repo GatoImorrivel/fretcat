@@ -15,6 +15,13 @@ pub struct StudioReverb {
     reverb: Freeverb,
 }
 
+impl PartialEq for StudioReverb {
+    fn eq(&self, other: &Self) -> bool {
+        self.wet == other.wet &&
+        self.size == other.size
+    }
+}
+
 impl Default for StudioReverb {
     fn default() -> Self {
         Self {

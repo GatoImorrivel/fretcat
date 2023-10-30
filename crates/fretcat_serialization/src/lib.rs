@@ -10,7 +10,7 @@ use mapper::Mapper;
 use serde::{Deserialize, Serialize};
 use strum::{EnumIter, Display, IntoEnumIterator};
 
-#[derive(Debug, Default, Clone, Copy, Serialize, Deserialize, EnumIter, Display)]
+#[derive(Debug, Default, Clone, Copy, Serialize, Deserialize, EnumIter, Display, PartialEq)]
 pub enum PresetCategory {
     #[default]
     User,
@@ -19,11 +19,20 @@ pub enum PresetCategory {
     Jazzy
 }
 
+impl PresetCategory {
+    pub fn variants() -> Vec<Self> {
+        PresetCategory::iter().fold(vec![], |mut acc, kind| {
+            acc.push(kind);
+            acc
+        })
+    }
+}
+
 lazy_static! {
     pub static ref PRESET_CATEOGORY_LIST: Vec<String> = PresetCategory::iter().map(|category| category.to_string()).collect::<Vec<_>>();
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct Preset {
     name: String,
     category: PresetCategory,

@@ -14,7 +14,6 @@ pub struct EffectHandle;
 impl EffectHandle {
     pub fn new(cx: &mut Context, effect: Arc<dyn AudioEffect>, index: usize) -> Handle<Self> {
         Self.build(cx, |cx| {
-            let height = effect.height();
             HStack::new(cx, move |cx| {
                 VStack::new(cx, move |cx| {
                     Button::new(
@@ -55,7 +54,6 @@ impl EffectHandle {
                     .on_drop(move |ex, _| on_drop(ex, index + 1));
             })
             .class("effect-handle")
-            .height(Pixels(height))
             .width(Stretch(1.0));
         }).overflow(Overflow::Hidden)
     }

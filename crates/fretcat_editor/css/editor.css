@@ -9,6 +9,5 @@
     child-top: 3%;
     child-bottom: 3%;
 
-    box-shadow: 9px 9px 18px #222222 inset,
-                -9px -9px 18px #383838 inset;
+    background-image: url("editor-background");
 }
