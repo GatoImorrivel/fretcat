@@ -1,7 +1,8 @@
+use std::{fmt::Debug, sync::Arc};
+
 use nih_plug::vizia::prelude::*;
 
 use crate::common::darken;
-
 
 #[derive(Debug, Clone, Copy, Data, PartialEq, Eq)]
 pub enum MessageKind {
@@ -10,11 +11,24 @@ pub enum MessageKind {
     Info,
 }
 
-#[derive(Debug, Clone, Data)]
+#[derive(Clone, Data)]
 pub struct Message {
     message: String,
     kind: MessageKind,
     color: Color,
+
+    #[data(ignore)]
+    custom_content: Option<Arc<dyn Fn(&mut Context) + Send + Sync>>,
+}
+
+impl Debug for Message {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Message")
+            .field("message", &self.message)
+            .field("kind", &self.kind)
+            .field("color", &self.color)
+            .finish()
+    }
 }
 
 const MESSAGE_OPACITY: u8 = 200;
@@ -22,15 +36,12 @@ const MESSAGE_WIDTH: f32 = 300.0;
 const MESSAGE_HEIGHT: f32 = 30.0;
 
 impl Message {
-    pub fn new<S: AsRef<str>>(
-        message: S,
-        kind: MessageKind,
-        color: Color,
-    ) -> Self {
+    pub fn new<S: AsRef<str>>(message: S, kind: MessageKind, color: Color) -> Self {
         Self {
             message: message.as_ref().to_owned(),
             kind,
             color,
+            custom_content: None
         }
     }
 
@@ -57,6 +68,11 @@ impl Message {
             Color::rgba(235, 154, 33, MESSAGE_OPACITY),
         )
     }
+
+    pub fn with_custom_content(mut self, custom_content: Option<Arc<dyn Fn(&mut Context) + Send + Sync>>) -> Self {
+        self.custom_content = custom_content;
+        self
+    }
 }
 
 #[derive(Debug, Clone, Lens)]
@@ -66,10 +82,7 @@ pub struct MessageSystem {
 
 impl MessageSystem {
     pub fn init(cx: &mut Context) {
-        Self {
-            messages: vec![],
-        }
-        .build(cx);
+        Self { messages: vec![] }.build(cx);
     }
 
     pub fn view(cx: &mut Context) {
@@ -79,7 +92,12 @@ impl MessageSystem {
             VStack::new(cx, |cx| {
                 for (index, message) in messages.into_iter().enumerate() {
                     HStack::new(cx, |cx| {
-                        Label::new(cx, &message.message).class("message-text").color(darken(&message.color, 0.1));
+                        Label::new(cx, &message.message)
+                            .class("message-text")
+                            .color(darken(&message.color, 0.1));
+                        if let Some(content) = message.custom_content {
+                            (content)(cx);
+                        }
                         Button::new(
                             cx,
                             move |cx| {
@@ -110,6 +128,7 @@ pub enum MessageEvent {
     Error(String),
     Warning(String),
     Close(usize),
+    Custom(Message),
 }
 
 impl Model for MessageSystem {
@@ -126,6 +145,9 @@ impl Model for MessageSystem {
             }
             MessageEvent::Close(index) => {
                 self.messages.remove(*index);
+            }
+            MessageEvent::Custom(msg) => {
+                self.messages.push(msg.clone());
             }
         });
     }

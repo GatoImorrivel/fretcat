@@ -6,6 +6,7 @@ mod card_list;
 mod preset_list;
 mod audio_slider;
 mod accordion;
+mod mono_control;
 
 pub use effect_list::{EffectList, EffectListEvent};
 pub use sidebar::{Sidebar, SidebarTab, SidebarMessage};

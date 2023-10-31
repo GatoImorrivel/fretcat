@@ -1,7 +1,7 @@
 use std::sync::Arc;
 use std::{f32::consts::PI, fmt::Debug};
 
-use fretcat_macros::{Message};
+use fretcat_macros::Message;
 use nih_plug::util::db_to_gain_fast;
 use nih_plug::vizia::prelude::*;
 use serde::{Deserialize, Serialize};
@@ -24,9 +24,7 @@ pub struct Overdrive {
 
 impl PartialEq for Overdrive {
     fn eq(&self, other: &Self) -> bool {
-        self.gain == other.gain &&
-        self.freq == other.freq &&
-        self.volume == other.volume
+        self.gain == other.gain && self.freq == other.freq && self.volume == other.volume
     }
 }
 
@@ -97,12 +95,10 @@ impl OverdriveView {
         .build(cx, |cx| {
             HStack::new(cx, |cx| {
                 HStack::new(cx, |cx| {
-                    Binding::new(cx, Self::gain, |cx, bind| {
-                        Knob::new(cx, 1.0, bind, false)
-                            .on_changing(|cx, val| cx.emit(Message::Gain(val)))
-                            .class("gain-knob");
-                        Label::new(cx, "Gain");
-                    });
+                    Knob::new(cx, 1.0, Self::gain, false)
+                        .on_changing(|cx, val| cx.emit(Message::Gain(val)))
+                        .class("gain-knob");
+                    Label::new(cx, "Gain");
                 })
                 .class("overdrive-knob-group");
                 HStack::new(cx, |cx| {

@@ -12,7 +12,7 @@ use nih_plug::{util::gain_to_db_fast, vizia::prelude::*};
 use crate::effects::{AudioEffect, Overdrive, StudioReverb};
 use crate::{
     common::rms,
-    effects::{Gain, PostFX, PreFX},
+    effects::{Gain, PostFX, PreFX, Mono},
 };
 
 pub const NUM_CHANNELS: usize = 2;
@@ -191,6 +191,9 @@ impl Default for Chain {
             out_avg_amplitude: (0.0, 0.0),
         };
 
+        chain
+            .pre_fx
+            .insert(PreFX("mono"), Box::new(Mono::default()));
         chain
             .pre_fx
             .insert(PreFX("in_gain"), Box::new(Gain::default()));

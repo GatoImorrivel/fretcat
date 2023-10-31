@@ -71,6 +71,7 @@ impl Plugin for Fretcat {
         _aux: &mut AuxiliaryBuffers,
         _context: &mut impl ProcessContext<Self>,
     ) -> ProcessStatus {
+        let transport = _context.transport();
         let chain = unsafe {
             &mut *Arc::as_ptr(&self.chain).cast_mut()
         };

@@ -57,7 +57,7 @@ impl PresetControl {
                 HStack::new(cx, |cx| {
                     Button::new(
                         cx,
-                        |ex| ex.emit(PresetMessage::Save),
+                        |ex| ex.emit(PresetMessage::New),
                         |cx| Label::new(cx, "+"),
                     )
                     .class("save-btn");
@@ -69,7 +69,7 @@ impl PresetControl {
                     .class("save-btn");
                     Button::new(
                         cx,
-                        |ex| ex.emit(PresetMessage::Save),
+                        |ex| ex.emit(PresetMessage::Delete),
                         |cx| Label::new(cx, ""),
                     )
                     .class("save-btn");
@@ -106,7 +106,12 @@ impl View for PresetControl {
                 self.current_preset.set_name(self.preset_name.to_owned());
 
                 if self.current_preset.already_exists() {
-                    cx.emit(MessageEvent::Error("This preset already exists".to_owned()));
+                    let msg = Message::make_error("This preset already exists").with_custom_content(Some(Arc::new(|cx| {
+                        Button::new(cx, |ex| {}, |cx| {
+                            Label::new(cx, "Cum")
+                        });
+                    })));
+                    cx.emit(MessageEvent::Custom(msg));
                     return;
                 }
 

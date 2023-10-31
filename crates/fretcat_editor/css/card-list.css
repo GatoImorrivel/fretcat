@@ -11,7 +11,7 @@ card-list .kind-btn-row {
 }
 
 card-list .kind-selected-btn {
-    border-color: whitesmoke;
+    border-color: rgba(252, 145, 46, 1);
     border-width: 2px;
 }
 

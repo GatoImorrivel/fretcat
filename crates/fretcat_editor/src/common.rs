@@ -1,6 +1,9 @@
 use std::collections::HashMap;
 
-use nih_plug::vizia::{prelude::*, image::{ImageFormat, load_from_memory_with_format, DynamicImage}};
+use nih_plug::vizia::{
+    image::{load_from_memory_with_format, DynamicImage, ImageFormat},
+    prelude::*,
+};
 use strum::{EnumIter, IntoEnumIterator};
 
 use crate::systems::*;
@@ -69,6 +72,8 @@ pub fn register_styles(cx: &mut Context) {
     cx.add_stylesheet(include_str!("../css/message-system.css"))
         .unwrap();
     cx.add_stylesheet(include_str!("../css/card-list.css"))
+        .unwrap();
+    cx.add_stylesheet(include_str!("../css/mono-control.css"))
         .unwrap();
 }
 

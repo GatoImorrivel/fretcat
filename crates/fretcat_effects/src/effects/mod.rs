@@ -9,6 +9,7 @@ use nih_plug::vizia::prelude::*;
 mod fuzz;
 mod gain;
 mod overdrive;
+mod mono;
 
 // Reverbs
 mod studioreverb;
@@ -22,6 +23,7 @@ pub use fuzz::Fuzz;
 pub use gain::Gain;
 pub use overdrive::Overdrive;
 pub use studioreverb::StudioReverb;
+pub use mono::{Mono, MonoState};
 
 #[derive(Debug, Hash, PartialEq, Eq, Clone, Copy, Data)]
 pub struct PreFX(pub &'static str);

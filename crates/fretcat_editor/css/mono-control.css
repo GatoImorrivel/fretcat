@@ -1,0 +1,31 @@
+mono-control button {
+    background-color: #363636; 
+    border-radius: 0px;
+    border-color: transparent;
+    border-width: 0px;
+    font-family: "Montserrat";
+    width: 1s;
+    height: 1s;
+    border-radius: 5px;
+    child-space: 1s;
+}
+
+mono-control > vstack {
+    row-between: 2px;
+}
+
+mono-control label {
+    font-size: 11;
+    color: #e3e3e3;
+    text-align: center;
+    transform: translate(1px, 0px);
+}
+
+mono-control .selected-state {
+    border-color: rgba(252, 145, 46, 1);
+    border-width: 2px;
+}
+
+mono-control .off-btn {
+    font-family: "Symbols Nerd Font Mono";
+}

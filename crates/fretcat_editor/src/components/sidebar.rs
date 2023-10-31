@@ -6,7 +6,7 @@ use nih_plug::vizia::prelude::*;
 
 use crate::common::EffectKind;
 
-use super::audio_slider::AudioSlider;
+use super::{audio_slider::AudioSlider, mono_control::MonoControl};
 
 const KIND_PER_ROW: usize = 2;
 
@@ -55,6 +55,12 @@ impl Sidebar {
                     "tab-selected-btn",
                     Self::current_tab.map(|tab| *tab == SidebarTab::Preset),
                 );
+
+                MonoControl::new(cx)
+                    .width(Stretch(1.0))
+                    .height(Pixels(100.0))
+                    .child_left(Stretch(0.5))
+                    .child_right(Stretch(0.5));
             })
             .class("sidebar-buttons-wrapper")
             .height(Percentage(15.0));
