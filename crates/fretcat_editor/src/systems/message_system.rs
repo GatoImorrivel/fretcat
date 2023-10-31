@@ -18,7 +18,7 @@ pub struct Message {
     color: Color,
 
     #[data(ignore)]
-    custom_content: Option<Arc<dyn Fn(&mut Context) + Send + Sync>>,
+    custom_content: Option<Arc<dyn Fn(&mut Context, usize) + Send + Sync>>,
 }
 
 impl Debug for Message {
@@ -69,7 +69,7 @@ impl Message {
         )
     }
 
-    pub fn with_custom_content(mut self, custom_content: Option<Arc<dyn Fn(&mut Context) + Send + Sync>>) -> Self {
+    pub fn with_custom_content(mut self, custom_content: Option<Arc<dyn Fn(&mut Context, usize) + Send + Sync>>) -> Self {
         self.custom_content = custom_content;
         self
     }
@@ -94,9 +94,9 @@ impl MessageSystem {
                     HStack::new(cx, |cx| {
                         Label::new(cx, &message.message)
                             .class("message-text")
-                            .color(darken(&message.color, 0.1));
+                            .color(Color::whitesmoke());
                         if let Some(content) = message.custom_content {
-                            (content)(cx);
+                            (content)(cx, index);
                         }
                         Button::new(
                             cx,

@@ -59,6 +59,10 @@ impl Preset {
         false
     }
 
+    pub fn set_mappers(&mut self, mappers: Vec<Mapper>) {
+        self.effects = mappers;
+    }
+
     pub fn cloned_mappers(&self) -> Vec<Mapper> {
         self.effects.clone()
     }

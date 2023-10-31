@@ -1,10 +1,10 @@
 use std::sync::Arc;
 
-use fretcat_effects::{ChainData, Chain};
+use fretcat_effects::{Chain, ChainData};
 use fretcat_serialization::Preset;
 pub use nih_plug::vizia::prelude::*;
 
-use crate::systems::{MessageEvent, Message};
+use crate::systems::{Message, MessageEvent};
 
 #[derive(Debug, Clone, Lens)]
 pub struct PresetControl {
@@ -17,6 +17,7 @@ pub enum PresetMessage {
     New,
     Save,
     Delete,
+    Overwrite(Arc<Preset>),
     ChangePreset(Preset),
     TextChange(String),
     ChangeColor(Color),
@@ -73,7 +74,9 @@ impl PresetControl {
                         |cx| Label::new(cx, ""),
                     )
                     .class("save-btn");
-                }).child_space(Stretch(1.0)).col_between(Stretch(1.0));
+                })
+                .child_space(Stretch(1.0))
+                .col_between(Stretch(1.0));
             });
         })
     }
@@ -92,7 +95,9 @@ impl View for PresetControl {
                 preset.set_name(self.preset_name.to_owned());
 
                 if self.current_preset != preset {
-                    cx.emit(MessageEvent::Warning("There are unsaved changes".to_owned()));
+                    cx.emit(MessageEvent::Warning(
+                        "There are unsaved changes".to_owned(),
+                    ));
                     return;
                 }
 
@@ -106,11 +111,21 @@ impl View for PresetControl {
                 self.current_preset.set_name(self.preset_name.to_owned());
 
                 if self.current_preset.already_exists() {
-                    let msg = Message::make_error("This preset already exists").with_custom_content(Some(Arc::new(|cx| {
-                        Button::new(cx, |ex| {}, |cx| {
-                            Label::new(cx, "Cum")
-                        });
-                    })));
+                    let preset = Arc::new(preset);
+                    let current = cx.current();
+                    nih_plug::nih_dbg!("{}", cx.current());
+                    let msg = Message::make_error("This preset already exists")
+                        .with_custom_content(Some(Arc::new(move |cx, index| {
+                            let p = preset.clone();
+                            Button::new(
+                                cx,
+                                move |ex| {
+                                    ex.emit(MessageEvent::Close(index));
+                                },
+                                |cx| Label::new(cx, "Overwrite?").color(Color::whitesmoke()),
+                            )
+                            .class("overwrite-ask");
+                        })));
                     cx.emit(MessageEvent::Custom(msg));
                     return;
                 }
@@ -127,12 +142,25 @@ impl View for PresetControl {
                 let preset = Preset::from(chain);
 
                 if self.current_preset != preset {
-                    cx.emit(MessageEvent::Warning("There are unsaved changes".to_owned()));
+                    cx.emit(MessageEvent::Warning(
+                        "There are unsaved changes".to_owned(),
+                    ));
                     return;
                 }
 
                 self.current_preset = Preset::default();
                 ChainData::as_mut_ex(cx).effects = vec![];
+            }
+            PresetMessage::Overwrite(val) => {
+                nih_plug::nih_log!("Receibed");
+                self.current_preset.set_name(val.get_name().to_owned());
+                self.current_preset.set_mappers(val.cloned_mappers());
+
+                if let Ok(_) = self.current_preset.save() {
+                    cx.emit(MessageEvent::Info("Overwrite was succesful".to_owned()));
+                } else {
+                    cx.emit(MessageEvent::Error("Failed to overwrite preset".to_owned()));
+                }
             }
             PresetMessage::ChangePreset(incoming_preset) => {
                 let chain = ChainData::chain.get(cx);
@@ -140,7 +168,9 @@ impl View for PresetControl {
                 preset.set_name(self.preset_name.to_owned());
 
                 if self.current_preset != preset {
-                    cx.emit(MessageEvent::Warning("There are unsaved changes".to_owned()));
+                    cx.emit(MessageEvent::Warning(
+                        "There are unsaved changes".to_owned(),
+                    ));
                     return;
                 }
 

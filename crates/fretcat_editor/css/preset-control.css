@@ -32,6 +32,13 @@ preset-control {
     font-family: "Symbols Nerd Font Mono";
 }
 
+.overwrite-ask {
+    background-color: transparent;
+    border-width: 0px;
+    border-color: whitesmoke;
+    font-weight: bolder;
+}
+
 .save-btn label {
     color: #e3e3e3;
     font-size: 40;
