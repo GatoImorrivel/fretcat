@@ -120,6 +120,11 @@ impl View for PresetControl {
                             Button::new(
                                 cx,
                                 move |ex| {
+                                    ex.emit(
+                                        Event::new(PresetMessage::Overwrite(p.clone()))
+                                            .origin(Entity::root())
+                                            .propagate(Propagation::Subtree),
+                                    );
                                     ex.emit(MessageEvent::Close(index));
                                 },
                                 |cx| Label::new(cx, "Overwrite?").color(Color::whitesmoke()),

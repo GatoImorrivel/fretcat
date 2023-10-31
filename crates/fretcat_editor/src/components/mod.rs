@@ -10,6 +10,6 @@ mod mono_control;
 
 pub use effect_list::{EffectList, EffectListEvent};
 pub use sidebar::{Sidebar, SidebarTab, SidebarMessage};
-pub use preset_control::PresetControl;
+pub use preset_control::{PresetControl, PresetMessage};
 pub use card_list::*;
 pub use preset_list::*;

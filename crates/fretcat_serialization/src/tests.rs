@@ -7,7 +7,7 @@ fn test_preset_serialization() {
     let chain = Chain::default();
     let mut preset_original = Preset::from(&chain);
     preset_original.set_name("Test");
-    preset_original.save();
+    preset_original.save().unwrap();
 
     let preset_loaded = Preset::load("Test").unwrap();
     println!("{:#?}", preset_loaded);

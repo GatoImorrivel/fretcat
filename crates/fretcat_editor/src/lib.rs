@@ -34,6 +34,10 @@ impl Model for EditorData {
                 self.current_tab = *tab;
             }
         });
+
+        event.map::<PresetMessage, _>(|event, _ | match event {
+            _ => nih_plug::nih_log!("RECEIVED")
+        });
     }
 }
 
