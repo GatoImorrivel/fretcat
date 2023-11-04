@@ -4,6 +4,10 @@
     width: 1s;
 }
 
+overdrive .knob-tick {
+    background-color: #fafafa;
+}
+
 .overdrive knob {
     width: 100px;
     height: 100px;

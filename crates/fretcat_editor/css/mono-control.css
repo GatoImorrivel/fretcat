@@ -26,6 +26,10 @@ mono-control .selected-state {
     border-width: 2px;
 }
 
+mono-control .selected-state.off-btn label {
+    transform: translate(0px, 0px);
+}
+
 mono-control .off-btn {
     font-family: "Symbols Nerd Font Mono";
 }

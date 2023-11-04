@@ -1,6 +1,6 @@
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 
-use fretcat_effects::{Chain, ChainData};
+use fretcat_effects::{Chain, ChainCommand, ChainData};
 use fretcat_serialization::Preset;
 pub use nih_plug::vizia::prelude::*;
 
@@ -8,8 +8,8 @@ use crate::systems::{Message, MessageEvent};
 
 #[derive(Debug, Clone, Lens)]
 pub struct PresetControl {
-    pub preset_name: String,
-    pub current_preset: Preset,
+    pub preset_name: Arc<Mutex<String>>,
+    pub current_preset: Arc<Mutex<Preset>>,
     color: Color,
 }
 
@@ -17,7 +17,6 @@ pub enum PresetMessage {
     New,
     Save,
     Delete,
-    Overwrite(Arc<Preset>),
     ChangePreset(Preset),
     TextChange(String),
     ChangeColor(Color),
@@ -32,27 +31,31 @@ impl PresetControl {
             Preset::default()
         };
         Self {
-            preset_name: "Untitled".to_owned(),
+            preset_name: Arc::new(Mutex::new("Untitled".to_owned())),
             color: Color::transparent(),
-            current_preset,
+            current_preset: Arc::new(Mutex::new(current_preset)),
         }
         .build(cx, |cx| {
             HStack::new(cx, |cx| {
                 HStack::new(cx, |cx| {
-                    Textbox::new_multiline(cx, Self::preset_name, true)
-                        .class("preset-name")
-                        .on_edit(|cx, str| {
-                            cx.emit(PresetMessage::TextChange(str));
-                        })
-                        .on_submit(|ex, _, _| {
-                            ex.emit(PresetMessage::ChangeColor(Color::transparent()));
-                        })
-                        .on_press_down(|ex| {
-                            ex.emit(PresetMessage::ChangeColor(Color::whitesmoke()));
-                        })
-                        .bind(Self::color, |me, bind| {
-                            me.caret_color(bind.0);
-                        });
+                    Textbox::new_multiline(
+                        cx,
+                        Self::preset_name.map(|lock| lock.lock().unwrap().clone()),
+                        true,
+                    )
+                    .class("preset-name")
+                    .on_edit(|cx, str| {
+                        cx.emit(PresetMessage::TextChange(str));
+                    })
+                    .on_submit(|ex, _, _| {
+                        ex.emit(PresetMessage::ChangeColor(Color::transparent()));
+                    })
+                    .on_press_down(|ex| {
+                        ex.emit(PresetMessage::ChangeColor(Color::whitesmoke()));
+                    })
+                    .bind(Self::color, |me, bind| {
+                        me.caret_color(bind.0);
+                    });
                 })
                 .class("name-wrapper");
                 HStack::new(cx, |cx| {
@@ -65,7 +68,7 @@ impl PresetControl {
                     Button::new(
                         cx,
                         |ex| ex.emit(PresetMessage::Save),
-                        |cx| Label::new(cx, "󰆓"),
+                        |cx| Label::new(cx, "󰆓").on_press(|ex| ex.emit(PresetMessage::Save)),
                     )
                     .class("save-btn");
                     Button::new(
@@ -80,6 +83,50 @@ impl PresetControl {
             });
         })
     }
+
+    fn unsaved_changes(
+        cx: &mut Context,
+        index: usize,
+        name: Arc<Mutex<String>>,
+        current: Arc<Mutex<Preset>>,
+        new: Preset,
+    ) {
+        Button::new(
+            cx,
+            move |ex| {
+                let mut current = current.lock().unwrap();
+                *current = new.clone();
+                *name.lock().unwrap() = current.get_name().to_owned();
+                ex.emit(ChainCommand::Load(new.clone().into()));
+                ex.emit(MessageEvent::Close(index));
+            },
+            |cx| Label::new(cx, "Discard changes?").color(Color::whitesmoke()),
+        );
+    }
+
+    fn overwrite(
+        cx: &mut Context,
+        index: usize,
+        name: Arc<Mutex<String>>,
+        current: Arc<Mutex<Preset>>,
+        new: Preset,
+    ) {
+        Button::new(
+            cx,
+            move |ex| {
+                let mut current = current.lock().unwrap();
+                *name.lock().unwrap() = new.get_name().to_owned();
+                *current = new.clone();
+                if let Ok(_) = current.save() {
+                    ex.emit(MessageEvent::Info("Overwriten succesfully".to_owned()));
+                } else {
+                    ex.emit(MessageEvent::Error("Failed to overwrite".to_owned()));
+                }
+                ex.emit(MessageEvent::Close(index));
+            },
+            |cx| Label::new(cx, "Overwrite?").color(Color::whitesmoke()),
+        );
+    }
 }
 
 impl View for PresetControl {
@@ -92,98 +139,109 @@ impl View for PresetControl {
             PresetMessage::New => {
                 let chain = ChainData::chain.get(cx);
                 let mut preset = Preset::from(chain);
-                preset.set_name(self.preset_name.to_owned());
+                preset.set_name(self.preset_name.lock().unwrap().clone());
 
-                if self.current_preset != preset {
-                    cx.emit(MessageEvent::Warning(
-                        "There are unsaved changes".to_owned(),
+                if *self.current_preset.lock().unwrap() != preset {
+                    let name = self.preset_name.clone();
+                    let current = self.current_preset.clone();
+                    cx.emit(MessageEvent::Custom(
+                        Message::make_warning("There are unsaved changes").with_custom_content(
+                            move |cx, index| {
+                                Self::unsaved_changes(
+                                    cx,
+                                    index,
+                                    name.clone(),
+                                    current.clone(),
+                                    Preset::default(),
+                                )
+                            },
+                        ),
                     ));
                     return;
                 }
 
-                self.current_preset = Preset::default();
-                ChainData::as_mut_ex(cx).effects = vec![];
+                let default = Preset::default();
+                *self.current_preset.lock().unwrap() = default.clone();
+                *self.preset_name.lock().unwrap() = default.get_name().to_owned();
+                cx.emit(ChainCommand::Clear);
             }
             PresetMessage::Save => {
                 let chain = ChainData::chain.get(cx);
                 let mut preset = Preset::from(chain);
-                preset.set_name(self.preset_name.to_owned());
-                self.current_preset.set_name(self.preset_name.to_owned());
+                preset.set_name(self.preset_name.lock().unwrap().clone());
 
-                if self.current_preset.already_exists() {
-                    let preset = Arc::new(preset);
-                    let current = cx.current();
-                    nih_plug::nih_dbg!("{}", cx.current());
-                    let msg = Message::make_error("This preset already exists")
-                        .with_custom_content(Some(Arc::new(move |cx, index| {
-                            let p = preset.clone();
-                            Button::new(
-                                cx,
-                                move |ex| {
-                                    ex.emit(
-                                        Event::new(PresetMessage::Overwrite(p.clone()))
-                                            .origin(Entity::root())
-                                            .propagate(Propagation::Subtree),
-                                    );
-                                    ex.emit(MessageEvent::Close(index));
-                                },
-                                |cx| Label::new(cx, "Overwrite?").color(Color::whitesmoke()),
-                            )
-                            .class("overwrite-ask");
-                        })));
-                    cx.emit(MessageEvent::Custom(msg));
+                if preset.already_exists() {
+                    let current = self.current_preset.clone();
+                    let name = self.preset_name.clone();
+                    let new = preset.clone();
+                    cx.emit(Event::new(MessageEvent::Custom(
+                        Message::make_warning("This preset already exists").with_custom_content(
+                            move |cx, index| {
+                                Self::overwrite(
+                                    cx,
+                                    index,
+                                    name.clone(),
+                                    current.clone(),
+                                    new.clone(),
+                                )
+                            },
+                        ),
+                    )));
                     return;
                 }
 
                 if let Ok(_) = preset.save() {
                     cx.emit(MessageEvent::Info("Saved successfully".to_owned()));
-                    self.current_preset = preset;
+                    *self.preset_name.lock().unwrap() = preset.get_name().to_owned();
+                    *self.current_preset.lock().unwrap() = preset;
                 } else {
                     cx.emit(MessageEvent::Error("Failed to save preset".to_owned()));
                 }
             }
             PresetMessage::Delete => {
-                let chain = ChainData::chain.get(cx);
-                let preset = Preset::from(chain);
-
-                if self.current_preset != preset {
-                    cx.emit(MessageEvent::Warning(
-                        "There are unsaved changes".to_owned(),
-                    ));
+                let mut current = self.current_preset.lock().unwrap();
+                if let Ok(_) = current.delete() {
+                    cx.emit(MessageEvent::Info("Deleted succesfully".to_owned()));
+                } else {
+                    cx.emit(MessageEvent::Error("Failed to delete preset".to_owned()));
                     return;
                 }
 
-                self.current_preset = Preset::default();
-                ChainData::as_mut_ex(cx).effects = vec![];
-            }
-            PresetMessage::Overwrite(val) => {
-                nih_plug::nih_log!("Receibed");
-                self.current_preset.set_name(val.get_name().to_owned());
-                self.current_preset.set_mappers(val.cloned_mappers());
-
-                if let Ok(_) = self.current_preset.save() {
-                    cx.emit(MessageEvent::Info("Overwrite was succesful".to_owned()));
-                } else {
-                    cx.emit(MessageEvent::Error("Failed to overwrite preset".to_owned()));
-                }
+                let default = Preset::default();
+                *current = default.clone();
+                *self.preset_name.lock().unwrap() = default.get_name().to_owned();
+                cx.emit(ChainCommand::Clear);
             }
             PresetMessage::ChangePreset(incoming_preset) => {
                 let chain = ChainData::chain.get(cx);
                 let mut preset = Preset::from(chain);
-                preset.set_name(self.preset_name.to_owned());
+                preset.set_name(self.preset_name.lock().unwrap().clone());
 
-                if self.current_preset != preset {
-                    cx.emit(MessageEvent::Warning(
-                        "There are unsaved changes".to_owned(),
-                    ));
+                if *self.current_preset.lock().unwrap() != preset {
+                    let current = self.current_preset.clone();
+                    let name = self.preset_name.clone();
+                    let new = incoming_preset.clone();
+                    cx.emit(Event::new(MessageEvent::Custom(
+                        Message::make_warning("Unsaved changes").with_custom_content(
+                            move |cx, index| {
+                                Self::unsaved_changes(
+                                    cx,
+                                    index,
+                                    name.clone(),
+                                    current.clone(),
+                                    new.clone(),
+                                )
+                            },
+                        ),
+                    )));
                     return;
                 }
 
-                self.current_preset = incoming_preset.clone();
+                *self.current_preset.lock().unwrap() = incoming_preset.clone();
             }
             PresetMessage::TextChange(text) => {
                 if text.len() > 0 {
-                    self.preset_name = text.to_owned();
+                    *self.preset_name.lock().unwrap() = text.to_owned();
                 }
             }
             PresetMessage::ChangeColor(color) => {

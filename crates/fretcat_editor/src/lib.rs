@@ -34,15 +34,11 @@ impl Model for EditorData {
                 self.current_tab = *tab;
             }
         });
-
-        event.map::<PresetMessage, _>(|event, _ | match event {
-            _ => nih_plug::nih_log!("RECEIVED")
-        });
     }
 }
 
 pub fn create(chain: InitFlags, editor_state: Arc<ViziaState>) -> Option<Box<dyn Editor>> {
-    create_vizia_editor(editor_state, ViziaTheming::Custom, move |cx, _| {
+    create_vizia_editor(editor_state, ViziaTheming::None, move |cx, _| {
         ChainData {
             chain: chain.clone(),
         }

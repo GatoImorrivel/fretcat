@@ -55,14 +55,17 @@ impl Sidebar {
                     "tab-selected-btn",
                     Self::current_tab.map(|tab| *tab == SidebarTab::Preset),
                 );
-
-                MonoControl::new(cx)
-                    .width(Stretch(1.0))
-                    .height(Pixels(100.0))
-                    .child_left(Stretch(0.5))
-                    .child_right(Stretch(0.5));
             })
             .class("sidebar-buttons-wrapper")
+            .height(Percentage(14.0));
+
+            VStack::new(cx, |cx| {
+                MonoControl::new(cx)
+                    .width(Stretch(1.0))
+                    .child_left(Stretch(0.2))
+                    .child_right(Stretch(0.2))
+                    .height(Percentage(100.0));
+            })
             .height(Percentage(15.0));
 
             VStack::new(cx, |cx| {
@@ -94,8 +97,8 @@ impl Sidebar {
                 );
             })
             .child_space(Stretch(0.5))
-            .row_between(Stretch(1.0))
-            .height(Percentage(85.0))
+            .row_between(Percentage(10.0))
+            .height(Percentage(75.0))
             .width(Stretch(1.0));
         })
     }

@@ -1,12 +1,8 @@
-use std::{
-    sync::Arc,
-};
+use std::sync::Arc;
 
 use downcast_rs::Downcast;
 use indexmap::IndexMap;
 use nih_plug::{util::gain_to_db_fast, vizia::prelude::*};
-
-
 
 #[allow(unused_imports)]
 use crate::effects::{AudioEffect, Overdrive, StudioReverb};
@@ -55,6 +51,12 @@ impl Model for ChainData {
                     chain.effects.swap(*e1, *e2);
                 }
             }
+            ChainCommand::Clear => {
+                chain.effects = vec![];
+            }
+            ChainCommand::Load(effects) => {
+                chain.load(effects.clone());
+            }
         });
     }
 }
@@ -65,6 +67,8 @@ pub enum ChainCommand {
     InsertAt(usize, Arc<dyn AudioEffect>),
     Remove(usize),
     Swap(usize, usize),
+    Load(Vec<Arc<dyn AudioEffect>>),
+    Clear
 }
 
 #[derive(Debug, Clone)]
@@ -118,6 +122,11 @@ impl Chain {
     #[inline]
     pub fn get_post_fx<T: AudioEffect>(&mut self, fx: &PostFX) -> Option<&mut T> {
         self.post_fx.get_mut(fx)?.downcast_mut::<T>()
+    }
+
+    #[inline]
+    pub fn load(&mut self, effects: Vec<Arc<dyn AudioEffect>>) {
+        self.effects = effects;
     }
 
     #[inline]

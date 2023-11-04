@@ -2,8 +2,6 @@ use std::{fmt::Debug, sync::Arc};
 
 use nih_plug::vizia::prelude::*;
 
-use crate::common::darken;
-
 #[derive(Debug, Clone, Copy, Data, PartialEq, Eq)]
 pub enum MessageKind {
     Error,
@@ -32,7 +30,6 @@ impl Debug for Message {
 }
 
 const MESSAGE_OPACITY: u8 = 200;
-const MESSAGE_WIDTH: f32 = 300.0;
 const MESSAGE_HEIGHT: f32 = 30.0;
 
 impl Message {
@@ -69,8 +66,8 @@ impl Message {
         )
     }
 
-    pub fn with_custom_content(mut self, custom_content: Option<Arc<dyn Fn(&mut Context, usize) + Send + Sync>>) -> Self {
-        self.custom_content = custom_content;
+    pub fn with_custom_content(mut self, custom_content: impl Fn(&mut Context, usize) + Send + Sync + 'static) -> Self {
+        self.custom_content = Some(Arc::new(custom_content));
         self
     }
 }

@@ -5,7 +5,7 @@ use nih_plug::vizia::prelude::*;
 use crate::systems::{CardEvent, CardSystem};
 
 use super::effect_handle::EffectHandle;
-use fretcat_effects::{Chain, ChainCommand};
+use fretcat_effects::{effects::AudioEffect, Chain, ChainCommand};
 
 #[derive(Debug, Lens, Clone, Copy)]
 pub struct EffectList {
@@ -14,7 +14,7 @@ pub struct EffectList {
 }
 
 pub enum EffectListEvent {
-    DragChange(Option<usize>),
+    DragChange(Option<usize>)
 }
 
 impl EffectList {
@@ -24,6 +24,12 @@ impl EffectList {
             update_counter: 0,
         }
         .build(cx, move |cx| {
+            cx.add_listener(|view: &mut EffectList, cx, event| {
+                event.map::<ChainCommand, _>(|_, _| {
+                    view.update_counter += 1;
+                })
+            });
+
             ScrollView::new(cx, 0.0, 0.0, false, false, move |cx| {
                 Binding::new(cx, EffectList::update_counter, move |cx, _| {
                     let chain = lens.get(cx);
@@ -66,10 +72,6 @@ impl View for EffectList {
             EffectListEvent::DragChange(effect) => {
                 self.dragging = effect.clone();
             }
-        });
-
-        event.map::<ChainCommand, _>(|event, _| match event {
-            _ => self.update_counter += 1,
         });
     }
 }

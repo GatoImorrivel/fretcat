@@ -3,7 +3,7 @@ preset-control {
     background-color: #121212;
 }
 
-.name-wrapper textbox {
+preset-control .name-wrapper textbox {
     color: white;
     background-color: transparent;
     border-color: transparent;
@@ -13,14 +13,14 @@ preset-control {
     width: 100%;
 }
 
-.name-wrapper {
+preset-control .name-wrapper {
     child-space: 1s;
     child-left: 10pt;
     max-height: 1s;
     overflow: hidden;
 }
 
-.save-btn {
+preset-control .save-btn {
     width: 60px;
     height: 60px;
     border-width: 0px;
@@ -39,9 +39,9 @@ preset-control {
     font-weight: bolder;
 }
 
-.save-btn label {
+preset-control .save-btn label {
     color: #e3e3e3;
-    font-size: 40;
+    font-size: 30;
 }
 
 preset-control > hstack {

@@ -73,6 +73,15 @@ impl Preset {
         fs::write(self.get_preset_path(), json)
     }
 
+    pub fn delete(&self) -> io::Result<()> {
+        fs::remove_file(self.get_preset_path())
+    }
+
+    pub fn overwrite(&self) -> io::Result<()> {
+        self.delete()?;
+        self.save()
+    }
+
     pub fn get_preset_dir() -> PathBuf {
         let home = home::home_dir().unwrap();
         fs::create_dir_all(format!("{}/Documents/Fretcat", home.display())).unwrap();
