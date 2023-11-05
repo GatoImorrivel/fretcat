@@ -37,10 +37,7 @@ impl Card {
 pub const OVERDRIVE_CARD: Card = Card {
     content: |cx| {
         VStack::new(cx, |cx| {
-            Label::new(cx, "Drive")
-                .font_family(vec![FamilyOwned::Name("Saturday".to_owned())])
-                .color(Color::rgb(232, 86, 215))
-                .font_size(75.0);
+            Label::new(cx, "Drive");
         })
         .child_space(Stretch(1.0));
     },
@@ -54,10 +51,7 @@ pub const OVERDRIVE_CARD: Card = Card {
 pub const FUZZ_CARD: Card = Card {
     content: |cx| {
         VStack::new(cx, |cx| {
-            Label::new(cx, "Fuzz")
-                .font_family(vec![FamilyOwned::Name("Get Now".to_owned())])
-                .color(Color::rgb(232, 142, 57))
-                .font_size(75.0);
+            Label::new(cx, "Fuzz");
         })
         .child_space(Stretch(1.0));
     },
@@ -71,10 +65,7 @@ pub const FUZZ_CARD: Card = Card {
 pub const DISTORTION_CARD: Card = Card {
     content: |cx| {
         VStack::new(cx, |cx| {
-            Label::new(cx, "DISTORTION")
-                .font_family(vec![FamilyOwned::Name("Hatch".to_owned())])
-                .color(Color::rgb(232, 57, 57))
-                .font_size(40.0);
+            Label::new(cx, "Distortion");
         })
         .child_space(Stretch(1.0));
     },
@@ -88,10 +79,7 @@ pub const DISTORTION_CARD: Card = Card {
 pub const REVERB_CARD: Card = Card {
     content: |cx| {
         VStack::new(cx, |cx| {
-            Label::new(cx, "Studio Reverb")
-                .font_family(vec![FamilyOwned::Name("Saturday".to_owned())])
-                .color(Color::rgb(232, 57, 57))
-                .font_size(40.0);
+            Label::new(cx, "Studio Reverb");
         })
         .child_space(Stretch(1.0));
     },

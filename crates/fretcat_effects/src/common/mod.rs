@@ -4,11 +4,13 @@ mod comb;
 mod delayline;
 mod filter;
 mod reverb;
+mod adsr;
 
 pub use self::{
     allpass::AllPass,
     filter::{Filter, FilterMode},
-    reverb::Freeverb
+    reverb::Freeverb,
+    adsr::Envelope
 };
 
 

@@ -1,9 +1,14 @@
 audio-slider .audio-slider-bg {
     background-image: linear-gradient(0deg, rgba(49,255,60,1) 0%, rgba(255,236,62,1) 75%, rgba(255,52,52,1) 85%);
+    border-width: 0px;
 }
 
 audio-slider slider .active {
     background-color: transparent;
+}
+
+audio-slider .audio-slider-mask {
+    background-image: linear-gradient(0deg, black, black);
 }
 
 audio-slider slider zstack {

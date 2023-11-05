@@ -126,6 +126,7 @@ pub enum MessageEvent {
     Warning(String),
     Close(usize),
     Custom(Message),
+    ClearAll
 }
 
 impl Model for MessageSystem {
@@ -145,6 +146,9 @@ impl Model for MessageSystem {
             }
             MessageEvent::Custom(msg) => {
                 self.messages.push(msg.clone());
+            }
+            MessageEvent::ClearAll => {
+                self.messages.clear();
             }
         });
     }

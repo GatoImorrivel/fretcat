@@ -8,7 +8,7 @@ use nih_plug::{util::gain_to_db_fast, vizia::prelude::*};
 use crate::effects::{AudioEffect, Overdrive, StudioReverb};
 use crate::{
     common::rms,
-    effects::{Gain, PostFX, PreFX, Mono},
+    effects::{Gain, Mono, NoiseGate, PostFX, PreFX},
 };
 
 pub const NUM_CHANNELS: usize = 2;
@@ -52,7 +52,7 @@ impl Model for ChainData {
                 }
             }
             ChainCommand::Clear => {
-                chain.effects = vec![];
+                chain.effects.clear();
             }
             ChainCommand::Load(effects) => {
                 chain.load(effects.clone());
@@ -68,7 +68,7 @@ pub enum ChainCommand {
     Remove(usize),
     Swap(usize, usize),
     Load(Vec<Arc<dyn AudioEffect>>),
-    Clear
+    Clear,
 }
 
 #[derive(Debug, Clone)]
@@ -207,13 +207,17 @@ impl Default for Chain {
             .pre_fx
             .insert(PreFX("in_gain"), Box::new(Gain::default()));
         chain
-            .post_fx
-            .insert(PostFX("out_gain"), Box::new(Gain::default()));
+            .pre_fx
+            .insert(PreFX("noise_gate"), Box::new(NoiseGate::default()));
 
         #[cfg(feature = "simulate")]
         {
             //chain.pre_fx.insert(PreFX("input-simulator"), Box::new(InputSimulator::default()));
         }
+
+        chain
+            .post_fx
+            .insert(PostFX("out_gain"), Box::new(Gain::default()));
 
         chain
     }

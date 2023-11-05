@@ -10,6 +10,7 @@ mod fuzz;
 mod gain;
 mod overdrive;
 mod mono;
+mod noise_gate;
 
 // Reverbs
 mod studioreverb;
@@ -24,6 +25,7 @@ pub use gain::Gain;
 pub use overdrive::Overdrive;
 pub use studioreverb::StudioReverb;
 pub use mono::{Mono, MonoState};
+pub use noise_gate::NoiseGate;
 
 #[derive(Debug, Hash, PartialEq, Eq, Clone, Copy, Data)]
 pub struct PreFX(pub &'static str);

@@ -4,7 +4,7 @@ preset-control {
 }
 
 preset-control .name-wrapper textbox {
-    color: white;
+    color: #e3e3e3;
     background-color: transparent;
     border-color: transparent;
     font-size: 36;
@@ -36,7 +36,23 @@ preset-control .save-btn {
     background-color: transparent;
     border-width: 0px;
     border-color: whitesmoke;
-    font-weight: bolder;
+}
+
+preset-control .noise-gate-knob-wrapper {
+    width: 60px;
+    height: 60px;
+    background-color: transparent;
+    child-space: 1s;
+}
+
+preset-control .noise-gate-knob {
+    background-image: linear-gradient(135deg, #363636 0%, #303030 100%); 
+    width: 100%;
+    height: 100%;
+}
+
+preset-control .noise-gate-knob .knob-tick {
+    background-color: #e3e3e3;
 }
 
 preset-control .save-btn label {

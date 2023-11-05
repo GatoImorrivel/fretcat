@@ -23,7 +23,6 @@ impl EffectHandle {
                     )
                     .class("delete-effect-btn")
                     .font_family(vec![FamilyOwned::Name("Symbols Nerd Font Mono".to_owned())]);
-                    Element::new(cx);
                 })
                 .on_drag(move |ex| {
                     ex.emit(EffectListEvent::DragChange(Some(index)));
@@ -37,6 +36,7 @@ impl EffectHandle {
                     .width(Stretch(100.0))
                     .height(Stretch(1.0))
                     .overflow(Overflow::Hidden)
+                    .class("effect-container")
                     .on_drop(move |ex, _| on_drop(ex, index));
 
                 Element::new(cx)

@@ -1,22 +1,31 @@
+effect-handle {
+    border-radius: 20px;
+}
+
+effect-handle .effect-container {
+    border-radius: 20px;
+}
+
 effect-handle .effect-bar {
     background-color: #0f0f0f;
     col-between: 1s;
     cursor: grab;
+    border-top-left-radius: 15px;
+    border-bottom-left-radius: 15px;
 }
 
 effect-handle .effect-bar button {
     color: white;
     width: 20pt;
     height: 20pt;
-    background-color: #0f0f0f;
+    background-color: transparent;
     border-width: 0px;
     border-color: transparent;
-    border-radius: 0px;
+    border-radius: 20px;
 }
 
 effect-handle .effect-bar button:hover {
     color: red;
-    background-color: #0f0f0f;
 }
 
 effect-handle .drag-indicator {

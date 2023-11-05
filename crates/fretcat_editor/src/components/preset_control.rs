@@ -1,6 +1,9 @@
 use std::sync::{Arc, Mutex};
 
-use fretcat_effects::{Chain, ChainCommand, ChainData};
+use fretcat_effects::{
+    effects::{NoiseGate, PreFX},
+    Chain, ChainCommand, ChainData,
+};
 use fretcat_serialization::Preset;
 pub use nih_plug::vizia::prelude::*;
 
@@ -10,6 +13,7 @@ use crate::systems::{Message, MessageEvent};
 pub struct PresetControl {
     pub preset_name: Arc<Mutex<String>>,
     pub current_preset: Arc<Mutex<Preset>>,
+    pub noise_gate: f32,
     color: Color,
 }
 
@@ -20,6 +24,7 @@ pub enum PresetMessage {
     ChangePreset(Preset),
     TextChange(String),
     ChangeColor(Color),
+    NoiseGate(f32),
 }
 
 impl PresetControl {
@@ -34,6 +39,7 @@ impl PresetControl {
             preset_name: Arc::new(Mutex::new("Untitled".to_owned())),
             color: Color::transparent(),
             current_preset: Arc::new(Mutex::new(current_preset)),
+            noise_gate: 0.0,
         }
         .build(cx, |cx| {
             HStack::new(cx, |cx| {
@@ -59,6 +65,11 @@ impl PresetControl {
                 })
                 .class("name-wrapper");
                 HStack::new(cx, |cx| {
+                    ZStack::new(cx, |cx| {
+                        Knob::new(cx, 0.0, Self::noise_gate, false)
+                            .class("noise-gate-knob")
+                            .on_changing(|ex, val| ex.emit(PresetMessage::NoiseGate(val)));
+                    }).class("noise-gate-knob-wrapper");
                     Button::new(
                         cx,
                         |ex| ex.emit(PresetMessage::New),
@@ -68,7 +79,7 @@ impl PresetControl {
                     Button::new(
                         cx,
                         |ex| ex.emit(PresetMessage::Save),
-                        |cx| Label::new(cx, "󰆓").on_press(|ex| ex.emit(PresetMessage::Save)),
+                        |cx| Label::new(cx, "󰆓"),
                     )
                     .class("save-btn");
                     Button::new(
@@ -98,7 +109,7 @@ impl PresetControl {
                 *current = new.clone();
                 *name.lock().unwrap() = current.get_name().to_owned();
                 ex.emit(ChainCommand::Load(new.clone().into()));
-                ex.emit(MessageEvent::Close(index));
+                ex.emit(MessageEvent::ClearAll);
             },
             |cx| Label::new(cx, "Discard changes?").color(Color::whitesmoke()),
         );
@@ -122,7 +133,7 @@ impl PresetControl {
                 } else {
                     ex.emit(MessageEvent::Error("Failed to overwrite".to_owned()));
                 }
-                ex.emit(MessageEvent::Close(index));
+                ex.emit(MessageEvent::ClearAll);
             },
             |cx| Label::new(cx, "Overwrite?").color(Color::whitesmoke()),
         );
@@ -168,13 +179,13 @@ impl View for PresetControl {
             PresetMessage::Save => {
                 let chain = ChainData::chain.get(cx);
                 let mut preset = Preset::from(chain);
-                preset.set_name(self.preset_name.lock().unwrap().clone());
+                preset.set_name(self.preset_name.lock().unwrap().to_owned());
 
                 if preset.already_exists() {
                     let current = self.current_preset.clone();
                     let name = self.preset_name.clone();
                     let new = preset.clone();
-                    cx.emit(Event::new(MessageEvent::Custom(
+                    cx.emit(MessageEvent::Custom(
                         Message::make_warning("This preset already exists").with_custom_content(
                             move |cx, index| {
                                 Self::overwrite(
@@ -186,7 +197,7 @@ impl View for PresetControl {
                                 )
                             },
                         ),
-                    )));
+                    ));
                     return;
                 }
 
@@ -246,6 +257,13 @@ impl View for PresetControl {
             }
             PresetMessage::ChangeColor(color) => {
                 self.color = *color;
+            }
+            PresetMessage::NoiseGate(val) => {
+                self.noise_gate = *val;
+                ChainData::as_mut_ex(cx)
+                    .get_pre_fx::<NoiseGate>(&PreFX("noise_gate"))
+                    .unwrap()
+                    .set_threshold(*val);
             }
         });
     }

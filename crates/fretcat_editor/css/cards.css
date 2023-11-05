@@ -4,3 +4,10 @@
     border-radius: 20px; 
     background-color: #121212;
 }
+
+.card-base label {
+    font-size: 30;
+    font-family: "Major Mono Display";
+    color: rgba(252, 145, 46, 1);
+    font-weight: heavy;
+}

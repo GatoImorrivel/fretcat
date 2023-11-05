@@ -48,7 +48,7 @@ impl<L: Lens<Target = (f32, f32)>> AudioSlider<L> {
                             .width(Stretch(1.0))
                             .height(Stretch(1.0));
                         Element::new(cx)
-                            .background_color(Color::black())
+                            .class("audio-slider-mask")
                             .width(Stretch(1.0))
                             .height(lens.map(|channels| {
                                 Percentage(100.0 - normalize(channels.0, -100.0, 6.0, 0.0, 100.0))
@@ -60,7 +60,7 @@ impl<L: Lens<Target = (f32, f32)>> AudioSlider<L> {
                             .width(Stretch(1.0))
                             .height(Stretch(1.0));
                         Element::new(cx)
-                            .background_color(Color::black())
+                            .class("audio-slider-mask")
                             .width(Stretch(1.0))
                             .height(lens.map(|channels| {
                                 Percentage(100.0 - normalize(channels.1, -100.0, 6.0, 0.0, 100.0))
@@ -69,7 +69,7 @@ impl<L: Lens<Target = (f32, f32)>> AudioSlider<L> {
                 })
                 .height(Pixels(height))
                 .width(Stretch(1.0))
-                .col_between(Percentage(5.0));
+                .col_between(Pixels(5.0));
                 Slider::new(cx, Self::gain)
                     .range(-60.0..6.0)
                     .height(Pixels(height))

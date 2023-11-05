@@ -17,10 +17,8 @@ pub fn register_fonts(cx: &mut Context) {
     cx.add_font_mem(include_bytes!(
         "../../assets/fonts/SymbolsNerdFontMono-Regular.ttf"
     ));
-    cx.add_font_mem(include_bytes!("../../assets/fonts/Saturday.otf"));
+    cx.add_font_mem(include_bytes!("../../assets/fonts/MajorMonoDisplay-Regular.ttf"));
     cx.add_font_mem(include_bytes!("../../assets/fonts/Montserrat.ttf"));
-    cx.add_font_mem(include_bytes!("../../assets/fonts/Get Now.otf"));
-    cx.add_font_mem(include_bytes!("../../assets/fonts/Hatch.ttf"));
 }
 
 pub fn register_images(cx: &mut Context) {

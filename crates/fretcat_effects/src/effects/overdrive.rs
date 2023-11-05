@@ -100,23 +100,22 @@ impl OverdriveView {
                         .class("gain-knob");
                     Label::new(cx, "Gain");
                 })
-                .class("overdrive-knob-group");
+                .class("knob-group");
                 HStack::new(cx, |cx| {
                     Knob::new(cx, 1.0, Self::freq, false)
                         .on_changing(|cx, val| cx.emit(Message::Freq(val)))
                         .class("tone-knob");
                     Label::new(cx, "Tone");
                 })
-                .class("overdrive-knob-group");
+                .class("knob-group");
                 HStack::new(cx, |cx| {
                     Knob::new(cx, 1.0, Self::volume, false)
                         .on_changing(|cx, val| cx.emit(Message::Volume(val)))
                         .class("volume-knob");
                     Label::new(cx, "Output Gain");
                 })
-                .class("overdrive-knob-group");
-            })
-            .class("overdrive");
+                .class("knob-group");
+            });
         })
     }
 }
