@@ -38,7 +38,7 @@ impl Message {
             message: message.as_ref().to_owned(),
             kind,
             color,
-            custom_content: None
+            custom_content: None,
         }
     }
 
@@ -66,7 +66,10 @@ impl Message {
         )
     }
 
-    pub fn with_custom_content(mut self, custom_content: impl Fn(&mut Context, usize) + Send + Sync + 'static) -> Self {
+    pub fn with_custom_content(
+        mut self,
+        custom_content: impl Fn(&mut Context, usize) + Send + Sync + 'static,
+    ) -> Self {
         self.custom_content = Some(Arc::new(custom_content));
         self
     }
@@ -78,44 +81,65 @@ pub struct MessageSystem {
 }
 
 impl MessageSystem {
-    pub fn init(cx: &mut Context) {
-        Self { messages: vec![] }.build(cx);
-    }
+    pub fn new(cx: &mut Context) -> Handle<Self> {
+        Self { messages: vec![] }.build(cx, |cx| {
+            cx.add_listener(|view: &mut Self, ex, event| {
+                event.map(|event, _| match event {
+                    MessageEvent::Info(str) => {
+                        view.messages.push(Message::make_info(str));
+                    }
+                    MessageEvent::Error(str) => {
+                        view.messages.push(Message::make_error(str));
+                    }
+                    MessageEvent::Warning(str) => {
+                        view.messages.push(Message::make_warning(str));
+                    }
+                    MessageEvent::Close(index) => {
+                        view.messages.remove(*index);
+                    }
+                    MessageEvent::Custom(msg) => {
+                        view.messages.push(msg.clone());
+                    }
+                    MessageEvent::ClearAll => {
+                        view.messages.clear();
+                    }
+                });
+            });
 
-    pub fn view(cx: &mut Context) {
-        Binding::new(cx, Self::messages, |cx, bind| {
-            let messages = bind.get(cx);
-            let height = messages.len() as f32 * MESSAGE_HEIGHT;
-            VStack::new(cx, |cx| {
-                for (index, message) in messages.into_iter().enumerate() {
-                    HStack::new(cx, |cx| {
-                        Label::new(cx, &message.message)
-                            .class("message-text")
-                            .color(Color::whitesmoke());
-                        if let Some(content) = message.custom_content {
-                            (content)(cx, index);
-                        }
-                        Button::new(
-                            cx,
-                            move |cx| {
-                                cx.emit(MessageEvent::Close(index));
-                            },
-                            |cx| Label::new(cx, ""),
-                        )
-                        .class("message-close-btn");
-                    })
-                    .class("message-body")
-                    .width(Stretch(1.0))
-                    .height(Pixels(MESSAGE_HEIGHT))
-                    .background_color(message.color);
-                }
-            })
-            .position_type(PositionType::SelfDirected)
-            .row_between(Pixels(5.0))
-            .top(Stretch(1.0))
-            .height(Pixels(height + 10.0))
-            .width(Stretch(1.0));
-        });
+            Binding::new(cx, Self::messages, |cx, bind| {
+                let messages = bind.get(cx);
+                let height = messages.len() as f32 * MESSAGE_HEIGHT;
+                VStack::new(cx, |cx| {
+                    for (index, message) in messages.into_iter().enumerate() {
+                        HStack::new(cx, |cx| {
+                            Label::new(cx, &message.message)
+                                .class("message-text")
+                                .color(Color::whitesmoke());
+                            if let Some(content) = message.custom_content {
+                                (content)(cx, index);
+                            }
+                            Button::new(
+                                cx,
+                                move |cx| {
+                                    cx.emit(MessageEvent::Close(index));
+                                },
+                                |cx| Label::new(cx, ""),
+                            )
+                            .class("message-close-btn");
+                        })
+                        .class("message-body")
+                        .width(Stretch(1.0))
+                        .height(Pixels(MESSAGE_HEIGHT))
+                        .background_color(message.color);
+                    }
+                })
+                .position_type(PositionType::SelfDirected)
+                .row_between(Pixels(5.0))
+                .top(Stretch(1.0))
+                .height(Pixels(height + 10.0))
+                .width(Stretch(1.0));
+            });
+        })
     }
 }
 
@@ -126,30 +150,11 @@ pub enum MessageEvent {
     Warning(String),
     Close(usize),
     Custom(Message),
-    ClearAll
+    ClearAll,
 }
 
-impl Model for MessageSystem {
-    fn event(&mut self, _cx: &mut EventContext, event: &mut Event) {
-        event.map(|event, _| match event {
-            MessageEvent::Info(str) => {
-                self.messages.push(Message::make_info(str));
-            }
-            MessageEvent::Error(str) => {
-                self.messages.push(Message::make_error(str));
-            }
-            MessageEvent::Warning(str) => {
-                self.messages.push(Message::make_warning(str));
-            }
-            MessageEvent::Close(index) => {
-                self.messages.remove(*index);
-            }
-            MessageEvent::Custom(msg) => {
-                self.messages.push(msg.clone());
-            }
-            MessageEvent::ClearAll => {
-                self.messages.clear();
-            }
-        });
+impl View for MessageSystem {
+    fn element(&self) -> Option<&'static str> {
+        Some("message-system")
     }
 }

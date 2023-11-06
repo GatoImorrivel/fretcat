@@ -9,7 +9,7 @@ pub use nih_plug::vizia::prelude::*;
 
 use crate::systems::{Message, MessageEvent};
 
-use super::labeled_knob::{LabeledKnob, LabeledKnobModifier};
+use super::{labeled_knob::{LabeledKnob, LabeledKnobModifier}, PresetListEvent};
 
 #[derive(Debug, Clone, Lens)]
 pub struct PresetControl {
@@ -44,6 +44,14 @@ impl PresetControl {
             noise_gate: 0.0,
         }
         .build(cx, |cx| {
+            cx.add_listener(|view: &mut Self, ex, event| {
+                event.map(|event, _| match event {
+                    PresetMessage::ChangePreset(preset) => {
+                        view.change_preset(ex, preset.clone());
+                    }
+                    _ => {}
+                });
+            });
             HStack::new(cx, |cx| {
                 HStack::new(cx, |cx| {
                     Textbox::new_multiline(
@@ -66,14 +74,6 @@ impl PresetControl {
                     });
                 })
                 .class("name-wrapper");
-                LabeledKnob::new(
-                    cx,
-                    0.0,
-                    false,
-                    -20.0..20.0,
-                    super::labeled_knob::LabelSide::Left,
-                    "Noise gate",
-                );
                 HStack::new(cx, |cx| {
                     Button::new(
                         cx,
@@ -100,9 +100,41 @@ impl PresetControl {
         })
     }
 
+    fn change_preset(&mut self, ex: &mut EventContext, mut preset: Preset) {
+        let effects = preset.load_effects().unwrap();
+        preset.set_mappers(effects);
+
+        let chain = ChainData::chain.get(ex);
+        let mut chain_preset = Preset::from(chain);
+        chain_preset.set_name(self.preset_name.lock().unwrap().to_owned());
+
+        if *self.current_preset.lock().unwrap() != chain_preset {
+            let current = self.current_preset.clone();
+            let name = self.preset_name.clone();
+            let new = preset.clone();
+            ex.emit(Event::new(MessageEvent::Custom(
+                Message::make_warning("Unsaved changes").with_custom_content(
+                    move |cx, _| {
+                        Self::unsaved_changes(
+                            cx,
+                            name.clone(),
+                            current.clone(),
+                            new.clone(),
+                        )
+                    },
+                ),
+            )).propagate(Propagation::Subtree));
+            return;
+        }
+
+        *self.current_preset.lock().unwrap() = preset.clone();
+        *self.preset_name.lock().unwrap() = preset.get_name().to_owned();
+        ex.emit(ChainCommand::Load(preset.clone().into()));
+        ex.emit(MessageEvent::ClearAll);
+    }
+
     fn unsaved_changes(
         cx: &mut Context,
-        index: usize,
         name: Arc<Mutex<String>>,
         current: Arc<Mutex<Preset>>,
         new: Preset,
@@ -122,7 +154,6 @@ impl PresetControl {
 
     fn overwrite(
         cx: &mut Context,
-        index: usize,
         name: Arc<Mutex<String>>,
         current: Arc<Mutex<Preset>>,
         new: Preset,
@@ -135,6 +166,7 @@ impl PresetControl {
                 *current = new.clone();
                 if let Ok(_) = current.save() {
                     ex.emit(MessageEvent::Info("Overwriten succesfully".to_owned()));
+                    ex.emit(PresetListEvent::Refresh);
                 } else {
                     ex.emit(MessageEvent::Error("Failed to overwrite".to_owned()));
                 }
@@ -162,10 +194,9 @@ impl View for PresetControl {
                     let current = self.current_preset.clone();
                     cx.emit(MessageEvent::Custom(
                         Message::make_warning("There are unsaved changes").with_custom_content(
-                            move |cx, index| {
+                            move |cx, _| {
                                 Self::unsaved_changes(
                                     cx,
-                                    index,
                                     name.clone(),
                                     current.clone(),
                                     Preset::default(),
@@ -192,10 +223,9 @@ impl View for PresetControl {
                     let new = preset.clone();
                     cx.emit(MessageEvent::Custom(
                         Message::make_warning("This preset already exists").with_custom_content(
-                            move |cx, index| {
+                            move |cx, _| {
                                 Self::overwrite(
                                     cx,
-                                    index,
                                     name.clone(),
                                     current.clone(),
                                     new.clone(),
@@ -208,6 +238,7 @@ impl View for PresetControl {
 
                 if let Ok(_) = preset.save() {
                     cx.emit(MessageEvent::Info("Saved successfully".to_owned()));
+                    cx.emit(PresetListEvent::Refresh);
                     *self.preset_name.lock().unwrap() = preset.get_name().to_owned();
                     *self.current_preset.lock().unwrap() = preset;
                 } else {
@@ -218,6 +249,7 @@ impl View for PresetControl {
                 let mut current = self.current_preset.lock().unwrap();
                 if let Ok(_) = current.delete() {
                     cx.emit(MessageEvent::Info("Deleted succesfully".to_owned()));
+                    cx.emit(PresetListEvent::Refresh);
                 } else {
                     cx.emit(MessageEvent::Error("Failed to delete preset".to_owned()));
                     return;
@@ -227,33 +259,7 @@ impl View for PresetControl {
                 *current = default.clone();
                 *self.preset_name.lock().unwrap() = default.get_name().to_owned();
                 cx.emit(ChainCommand::Clear);
-            }
-            PresetMessage::ChangePreset(incoming_preset) => {
-                let chain = ChainData::chain.get(cx);
-                let mut preset = Preset::from(chain);
-                preset.set_name(self.preset_name.lock().unwrap().clone());
-
-                if *self.current_preset.lock().unwrap() != preset {
-                    let current = self.current_preset.clone();
-                    let name = self.preset_name.clone();
-                    let new = incoming_preset.clone();
-                    cx.emit(Event::new(MessageEvent::Custom(
-                        Message::make_warning("Unsaved changes").with_custom_content(
-                            move |cx, index| {
-                                Self::unsaved_changes(
-                                    cx,
-                                    index,
-                                    name.clone(),
-                                    current.clone(),
-                                    new.clone(),
-                                )
-                            },
-                        ),
-                    )));
-                    return;
-                }
-
-                *self.current_preset.lock().unwrap() = incoming_preset.clone();
+                cx.emit(PresetListEvent::Refresh);
             }
             PresetMessage::TextChange(text) => {
                 if text.len() > 0 {
@@ -270,6 +276,7 @@ impl View for PresetControl {
                     .unwrap()
                     .set_threshold(*val);
             }
+            _ => {}
         });
     }
 }

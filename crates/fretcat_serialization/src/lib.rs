@@ -9,8 +9,9 @@ use lazy_static::lazy_static;
 use mapper::Mapper;
 use serde::{Deserialize, Serialize};
 use strum::{EnumIter, Display, IntoEnumIterator};
+use nih_plug::vizia::prelude::Data;
 
-#[derive(Debug, Default, Clone, Copy, Serialize, Deserialize, EnumIter, Display, PartialEq)]
+#[derive(Debug, Default, Clone, Copy, Serialize, Deserialize, EnumIter, Display, PartialEq, Eq, Data)]
 pub enum PresetCategory {
     #[default]
     User,
@@ -40,6 +41,40 @@ pub struct Preset {
 }
 
 impl Preset {
+    pub fn fetch_presets_shallow() -> Vec<Preset> {
+        let paths = fs::read_dir(Self::get_preset_dir()).unwrap();
+        let mut presets = vec![];
+        for path in paths {
+            if let Ok(path) = path {
+                let json = fs::read_to_string(path.path()).unwrap();
+                let preset = serde_json::from_str::<Preset>(&json);
+                if let Ok(mut preset) = preset {
+                    preset.effects.clear();
+                    presets.push(preset);
+                }
+            }
+        }
+        presets
+    }
+
+    pub fn get_category(&self) -> PresetCategory {
+        self.category
+    }
+
+    pub fn load_effects(&self) -> Option<Vec<Mapper>> {
+        let json = match fs::read_to_string(self.get_preset_path()) {
+            Ok(content) => content,
+            Err(_) => return None
+        };
+
+        let preset = match serde_json::from_str::<Preset>(&json) {
+            Ok(preset) => preset,
+            Err(_) => return None
+        };
+
+        Some(preset.cloned_mappers())
+    }
+
     pub fn set_name<S: AsRef<str>>(&mut self, name: S) {
         self.name = name.as_ref().to_owned();
     }

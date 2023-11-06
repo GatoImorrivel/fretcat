@@ -77,6 +77,8 @@ pub fn register_styles(cx: &mut Context) {
         .unwrap();
     cx.add_stylesheet(include_str!("../css/labeled-knob.css"))
         .unwrap();
+    cx.add_stylesheet(include_str!("../css/preset-list.css"))
+        .unwrap();
 }
 
 #[inline]

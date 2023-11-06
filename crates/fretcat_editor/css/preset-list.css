@@ -1,0 +1,34 @@
+preset-list .kind-btn {
+    border-radius: 20px;
+    background-color: #121212;
+    border-color: transparent;
+    width: 1s;
+    height: 50px;
+}
+
+preset-list .kind-btn-row {
+    col-between: 2%;
+}
+
+preset-list .kind-selected-btn {
+    border-color: rgba(252, 145, 46, 1);
+    border-width: 2px;
+}
+
+preset-list .kind-btn label {
+    font-family: Montserrat;
+    color: #E3E3E3;
+}
+
+preset-list .preset-card {
+    width: 1s;
+    height: 50px;
+    background-color: red;
+    child-space: 1s;
+    border-radius: 15px;
+}
+
+preset-list .preset-card label {
+    font-family: Montserrat;
+    color: #E3E3E3;
+}

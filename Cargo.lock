@@ -1473,6 +1473,7 @@ dependencies = [
  "fretcat_macros",
  "home",
  "lazy_static",
+ "nih_plug 0.1.0",
  "serde",
  "serde_json",
  "strum",
