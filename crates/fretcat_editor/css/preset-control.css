@@ -38,23 +38,6 @@ preset-control .save-btn {
     border-color: whitesmoke;
 }
 
-preset-control .noise-gate-knob-wrapper {
-    width: 60px;
-    height: 60px;
-    background-color: transparent;
-    child-space: 1s;
-}
-
-preset-control .noise-gate-knob {
-    background-image: linear-gradient(135deg, #363636 0%, #303030 100%); 
-    width: 100%;
-    height: 100%;
-}
-
-preset-control .noise-gate-knob .knob-tick {
-    background-color: #e3e3e3;
-}
-
 preset-control .save-btn label {
     color: #e3e3e3;
     font-size: 30;

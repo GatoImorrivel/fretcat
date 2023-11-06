@@ -75,6 +75,8 @@ pub fn register_styles(cx: &mut Context) {
         .unwrap();
     cx.add_stylesheet(include_str!("../css/mono-control.css"))
         .unwrap();
+    cx.add_stylesheet(include_str!("../css/labeled-knob.css"))
+        .unwrap();
 }
 
 #[inline]

@@ -9,6 +9,8 @@ pub use nih_plug::vizia::prelude::*;
 
 use crate::systems::{Message, MessageEvent};
 
+use super::labeled_knob::{LabeledKnob, LabeledKnobModifier};
+
 #[derive(Debug, Clone, Lens)]
 pub struct PresetControl {
     pub preset_name: Arc<Mutex<String>>,
@@ -64,12 +66,15 @@ impl PresetControl {
                     });
                 })
                 .class("name-wrapper");
+                LabeledKnob::new(
+                    cx,
+                    0.0,
+                    false,
+                    -20.0..20.0,
+                    super::labeled_knob::LabelSide::Left,
+                    "Noise gate",
+                );
                 HStack::new(cx, |cx| {
-                    ZStack::new(cx, |cx| {
-                        Knob::new(cx, 0.0, Self::noise_gate, false)
-                            .class("noise-gate-knob")
-                            .on_changing(|ex, val| ex.emit(PresetMessage::NoiseGate(val)));
-                    }).class("noise-gate-knob-wrapper");
                     Button::new(
                         cx,
                         |ex| ex.emit(PresetMessage::New),

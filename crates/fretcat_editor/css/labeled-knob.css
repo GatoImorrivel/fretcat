@@ -1,0 +1,22 @@
+labeled-knob label {
+    font-family: "Montserrat";
+    color: #e3e3e3;
+}
+
+labeled-knob knob {
+    width: 60px;
+    height: 60px;
+    background-image: linear-gradient(135deg, #363636 0%, #303030 100%); 
+}
+
+labeled-knob knob .knob-tick {
+    background-color: #e3e3e3;
+}
+
+labeled-knob .knob-value {
+    font-size: medium;
+}
+
+labeled-knob .knob-name {
+    font-size: large;
+}

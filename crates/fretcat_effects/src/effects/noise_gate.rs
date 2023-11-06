@@ -7,7 +7,7 @@ use super::AudioEffect;
 #[derive(Debug, Clone, Copy, Deserialize, Serialize, Default)]
 pub struct NoiseGate {
     threshold: f32,
-    adsr: Envelope
+    adsr: [Envelope; 2]
 }
 
 impl NoiseGate {
@@ -18,6 +18,7 @@ impl NoiseGate {
 
 impl AudioEffect for NoiseGate {
     fn process(&mut self, input_buffer: (&mut [f32], &mut [f32])) {
-        
+        input_buffer.0.iter_mut().zip(input_buffer.1.iter_mut()).for_each(|(left, right)| {
+        });
     }
 }
