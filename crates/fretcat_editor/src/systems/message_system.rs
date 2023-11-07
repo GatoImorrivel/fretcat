@@ -87,9 +87,11 @@ impl MessageSystem {
                 event.map(|event, _| match event {
                     MessageEvent::Info(str) => {
                         view.messages.push(Message::make_info(str));
+                        ex.schedule_emit(MessageEvent::Close(view.messages.len() - 1), Instant::now() + Duration::from_secs(2));
                     }
                     MessageEvent::Error(str) => {
                         view.messages.push(Message::make_error(str));
+                        ex.schedule_emit(MessageEvent::Close(view.messages.len() - 1), Instant::now() + Duration::from_secs(2));
                     }
                     MessageEvent::Warning(str) => {
                         view.messages.push(Message::make_warning(str));
@@ -108,7 +110,7 @@ impl MessageSystem {
 
             Binding::new(cx, Self::messages, |cx, bind| {
                 let messages = bind.get(cx);
-                let height = messages.len() as f32 * MESSAGE_HEIGHT;
+                let height = messages.len() as f32 * MESSAGE_HEIGHT + 10.0;
                 VStack::new(cx, |cx| {
                     for (index, message) in messages.into_iter().enumerate() {
                         HStack::new(cx, |cx| {
@@ -133,13 +135,14 @@ impl MessageSystem {
                         .background_color(message.color);
                     }
                 })
-                .position_type(PositionType::SelfDirected)
+                .height(Pixels(height))
                 .row_between(Pixels(5.0))
-                .top(Stretch(1.0))
-                .height(Pixels(height + 10.0))
-                .width(Stretch(1.0));
+                .top(Stretch(1.0));
             });
         })
+        .position_type(PositionType::SelfDirected)
+        .height(Self::messages.map(|messages| Pixels(messages.len() as f32 * MESSAGE_HEIGHT + 10.0)))
+        .width(Stretch(1.0))
     }
 }
 

@@ -73,7 +73,7 @@ pub fn create(chain: InitFlags, editor_state: Arc<ViziaState>) -> Option<Box<dyn
                     .height(Stretch(1.0))
                     .z_index(200);
                 EffectList::new(cx, ChainData::chain).height(Stretch(6.0));
-                MessageSystem::new(cx).position_type(PositionType::SelfDirected);
+                MessageSystem::new(cx).top(Stretch(1.0));
             })
             .row_between(Percentage(3.0))
             .width(Stretch(10.0));

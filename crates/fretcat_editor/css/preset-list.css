@@ -23,12 +23,14 @@ preset-list .kind-btn label {
 preset-list .preset-card {
     width: 1s;
     height: 50px;
-    background-color: red;
     child-space: 1s;
     border-radius: 15px;
+    background-color: #121212;
+    border-color: transparent;
 }
 
 preset-list .preset-card label {
-    font-family: Montserrat;
-    color: #E3E3E3;
+    font-family: "Major Mono Display";
+    color: rgba(252, 145, 46, 1);
+    font-weight: heavy;
 }

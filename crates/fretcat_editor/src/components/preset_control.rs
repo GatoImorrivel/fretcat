@@ -7,9 +7,12 @@ use fretcat_effects::{
 use fretcat_serialization::Preset;
 pub use nih_plug::vizia::prelude::*;
 
-use crate::systems::{Message, MessageEvent};
+use crate::systems::{Message, MessageEvent, MessageSystem};
 
-use super::{labeled_knob::{LabeledKnob, LabeledKnobModifier}, PresetListEvent};
+use super::{
+    labeled_knob::{LabeledKnob, LabeledKnobModifier},
+    PresetListEvent,
+};
 
 #[derive(Debug, Clone, Lens)]
 pub struct PresetControl {
@@ -112,18 +115,13 @@ impl PresetControl {
             let current = self.current_preset.clone();
             let name = self.preset_name.clone();
             let new = preset.clone();
-            ex.emit(Event::new(MessageEvent::Custom(
-                Message::make_warning("Unsaved changes").with_custom_content(
-                    move |cx, _| {
-                        Self::unsaved_changes(
-                            cx,
-                            name.clone(),
-                            current.clone(),
-                            new.clone(),
-                        )
-                    },
-                ),
-            )).propagate(Propagation::Subtree));
+            ex.with_current(ex.current(), |ex| {
+                ex.emit(MessageEvent::Custom(
+                    Message::make_warning("Unsaved changes").with_custom_content(move |cx, _| {
+                        Self::unsaved_changes(cx, name.clone(), current.clone(), new.clone())
+                    }),
+                ));
+            });
             return;
         }
 
@@ -224,12 +222,7 @@ impl View for PresetControl {
                     cx.emit(MessageEvent::Custom(
                         Message::make_warning("This preset already exists").with_custom_content(
                             move |cx, _| {
-                                Self::overwrite(
-                                    cx,
-                                    name.clone(),
-                                    current.clone(),
-                                    new.clone(),
-                                )
+                                Self::overwrite(cx, name.clone(), current.clone(), new.clone())
                             },
                         ),
                     ));
