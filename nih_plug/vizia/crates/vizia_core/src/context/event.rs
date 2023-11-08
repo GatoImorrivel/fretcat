@@ -710,6 +710,19 @@ impl<'a> EventContext<'a> {
         self.style.needs_restyle();
     }
 
+    pub fn clear_styles(&mut self) {
+        self.style.remove_rules();
+        self.style.clear_style_rules();
+    }
+
+    pub fn add_stylesheet(&mut self, style: impl IntoCssStr) -> Result<(), std::io::Error> {
+        self.resource_manager.styles.push(Box::new(style));
+
+        self.reload_styles().expect("Failed to reload styles");
+
+        Ok(())
+    }
+
     /// Reloads the stylesheets linked to the application.
     pub fn reload_styles(&mut self) -> Result<(), std::io::Error> {
         if self.resource_manager.themes.is_empty() && self.resource_manager.styles.is_empty() {

@@ -7,11 +7,14 @@ mod hot_lib {
 
     #[lib_updated]
     pub fn was_updated() -> bool {}
+
+    #[lib_change_subscription]
+    pub fn subscribe() -> hot_lib_reloader::LibReloadObserver {}
 }
 use std::sync::{Arc, Mutex};
 
 use common::{EDITOR_HEIGHT, EDITOR_WIDTH};
-use fretcat_effects::{Chain, ChainData, ChainCommand};
+use fretcat_effects::{Chain, ChainCommand, ChainData};
 
 use fretcat_serialization::{Preset, ShallowPreset};
 use nih_plug::prelude::*;
@@ -30,12 +33,12 @@ pub fn default_state() -> Arc<EditorState> {
 #[derive(Debug, Lens, Clone)]
 pub struct EditorData {
     pub(crate) current_tab: SidebarTab,
-    pub(crate) current_preset: Arc<Mutex<Preset>>
+    pub(crate) current_preset: Arc<Mutex<Preset>>,
 }
 
 pub enum EditorEvent {
     LoadPreset(Preset),
-    LoadShallowPreset(ShallowPreset)
+    LoadShallowPreset(ShallowPreset),
 }
 
 impl Model for EditorData {
@@ -60,7 +63,11 @@ impl Model for EditorData {
     }
 }
 
-pub fn create(chain: Arc<Chain>, preset: Arc<Mutex<Preset>>, editor_state: Arc<ViziaState>) -> Option<Box<dyn Editor>> {
+pub fn create(
+    chain: Arc<Chain>,
+    preset: Arc<Mutex<Preset>>,
+    editor_state: Arc<ViziaState>,
+) -> Option<Box<dyn Editor>> {
     create_vizia_editor(editor_state, ViziaTheming::None, move |cx, _| {
         ChainData {
             chain: chain.clone(),
@@ -69,7 +76,7 @@ pub fn create(chain: Arc<Chain>, preset: Arc<Mutex<Preset>>, editor_state: Arc<V
 
         EditorData {
             current_tab: SidebarTab::Effect,
-            current_preset: preset.clone()
+            current_preset: preset.clone(),
         }
         .build(cx);
 
@@ -93,9 +100,7 @@ pub fn create(chain: Arc<Chain>, preset: Arc<Mutex<Preset>>, editor_state: Arc<V
                 .display(EditorData::current_tab.map(|tab| *tab == SidebarTab::Preset));
 
             VStack::new(cx, |cx| {
-                PresetControl::new(cx)
-                    .height(Stretch(1.0))
-                    .z_index(200);
+                PresetControl::new(cx).height(Stretch(1.0)).z_index(200);
                 EffectList::new(cx, ChainData::chain).height(Stretch(6.0));
                 MessageSystem::new(cx).top(Stretch(1.0));
             })
