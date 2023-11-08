@@ -1,4 +1,4 @@
-use std::{fmt::format, marker::PhantomData};
+use std::marker::PhantomData;
 
 use nih_plug::vizia::prelude::*;
 

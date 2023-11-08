@@ -5,7 +5,7 @@ use nih_plug::vizia::prelude::*;
 use crate::systems::{CardEvent, CardSystem};
 
 use super::effect_handle::EffectHandle;
-use fretcat_effects::{effects::AudioEffect, Chain, ChainCommand};
+use fretcat_effects::{Chain, ChainCommand};
 
 #[derive(Debug, Lens, Clone, Copy)]
 pub struct EffectList {
@@ -24,7 +24,7 @@ impl EffectList {
             update_counter: 0,
         }
         .build(cx, move |cx| {
-            cx.add_listener(|view: &mut EffectList, cx, event| {
+            cx.add_listener(|view: &mut EffectList, _cx, event| {
                 event.map::<ChainCommand, _>(|_, _| {
                     view.update_counter += 1;
                 })

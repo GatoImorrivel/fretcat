@@ -84,7 +84,7 @@ impl MessageSystem {
     pub fn new(cx: &mut Context) -> Handle<Self> {
         Self { messages: vec![] }
             .build(cx, |cx| {
-                cx.add_listener(|view: &mut Self, ex, event| {
+                cx.add_listener(|view: &mut Self, _ex, event| {
                     event.map(|event, _| match event {
                         MessageEvent::Info(str) => {
                             view.messages.push(Message::make_info(str));
@@ -149,6 +149,7 @@ impl MessageSystem {
 }
 
 #[derive(Debug, Clone)]
+#[allow(unused)]
 pub enum MessageEvent {
     Info(String),
     Error(String),

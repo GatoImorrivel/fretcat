@@ -1,5 +1,3 @@
-use std::sync::{Arc, Mutex};
-
 use fretcat_effects::{
     effects::{NoiseGate, PreFX},
     ChainData,
@@ -188,7 +186,6 @@ impl View for PresetControl {
                         .unwrap()
                         .set_threshold(*val);
                 }
-                _ => {}
             }
         });
     }

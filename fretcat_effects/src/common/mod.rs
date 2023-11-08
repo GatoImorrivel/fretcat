@@ -1,9 +1,16 @@
+#[allow(unused)]
 mod allpass;
+#[allow(unused)]
 mod coeffs;
+#[allow(unused)]
 mod comb;
+#[allow(unused)]
 mod delayline;
+#[allow(unused)]
 mod filter;
+#[allow(unused)]
 mod reverb;
+#[allow(unused)]
 mod adsr;
 
 use std::ops::Range;

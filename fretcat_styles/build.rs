@@ -1,7 +1,7 @@
 use std::env;
 use std::fs::{self, File};
-use std::io::{self, Write};
-use std::path::{Path, PathBuf};
+use std::io;
+use std::path::Path;
 
 fn concatenate_files_in_folder(folder_path: &str, output: &mut File) -> io::Result<()> {
     for entry in fs::read_dir(folder_path)? {

@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use fretcat_effects::{effects::AudioEffect, ChainCommand, ChainData};
+use fretcat_effects::{effects::AudioEffect, ChainCommand};
 use nih_plug::vizia::prelude::*;
 
 use crate::{

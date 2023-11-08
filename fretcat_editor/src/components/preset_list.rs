@@ -97,7 +97,7 @@ impl View for PresetList {
         Some("preset-list")
     }
 
-    fn event(&mut self, cx: &mut EventContext, event: &mut Event) {
+    fn event(&mut self, _cx: &mut EventContext, event: &mut Event) {
         event.map(|event, _| match event {
             PresetListEvent::ChangeCategory(category) => {
                 self.current_category = *category;

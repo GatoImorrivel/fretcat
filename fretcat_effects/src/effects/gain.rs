@@ -71,7 +71,7 @@ impl View for GainView {
         Some("gain-view")
     }
 
-    fn event(&mut self, cx: &mut EventContext, event: &mut Event) {
+    fn event(&mut self, _cx: &mut EventContext, event: &mut Event) {
         event.map(|event, _| match event {
             Message::Gain(val) => {
                 self.gain = *val;

@@ -1,6 +1,6 @@
-use proc_macro2::{Ident, Span};
+use proc_macro2::Ident;
 use quote::quote;
-use syn::{spanned::Spanned, Data, DataStruct, Fields};
+use syn::{spanned::Spanned, Data, DataStruct};
 
 pub(crate) fn derive_message_impl(
     input: syn::DeriveInput,

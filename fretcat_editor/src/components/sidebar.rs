@@ -8,8 +8,6 @@ use crate::common::EffectKind;
 
 use super::{audio_slider::AudioSlider, mono_control::MonoControl};
 
-const KIND_PER_ROW: usize = 2;
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Data)]
 pub enum SidebarTab {
     Effect,

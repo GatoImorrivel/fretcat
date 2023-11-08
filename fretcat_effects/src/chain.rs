@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use downcast_rs::Downcast;
 use indexmap::IndexMap;
-use nih_plug::{util::gain_to_db_fast, vizia::prelude::*, nih_log};
+use nih_plug::{util::gain_to_db_fast, vizia::prelude::*};
 
 #[allow(unused_imports)]
 use crate::effects::{AudioEffect, Overdrive, StudioReverb};
