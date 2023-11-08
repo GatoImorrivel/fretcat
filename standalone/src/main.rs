@@ -1,4 +1,4 @@
-use fretcat::fretcat_plugin::Fretcat;
+use fretcat::Fretcat;
 use fretcat::nih_plug::prelude::*;
 
 fn main() {

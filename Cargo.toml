@@ -5,11 +5,16 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [workspace]
-members = ["xtask", "standalone", "crates/*", "nih_plug"]
+members = ["xtask", "standalone", "fretcat_effects", "fretcat_editor", "fretcat_macros", "fretcat_serialization", "fretcat_styles", "nih_plug"]
 exclude = ["crates/assets"]
 
 [dependencies]
-fretcat_plugin = {path = "./crates/fretcat_plugin"}
+nih_plug = { git = "https://github.com/geom3trik/nih-plug.git", branch = "vizia-update", features = ["standalone", "assert_process_allocs"] }
+
+fretcat_effects = {path = "fretcat_effects"}
+fretcat_editor = {path = "fretcat_editor"}
+fretcat_styles = {path = "fretcat_styles"}
+fretcat_serialization = {path = "fretcat_serialization"}
 
 [lib]
 crate-type = ["cdylib", "lib"]

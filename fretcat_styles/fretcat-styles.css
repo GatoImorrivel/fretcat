@@ -1,0 +1,455 @@
+audio-slider .audio-slider-bg {
+    background-image: linear-gradient(0deg, rgba(49,255,60,1) 0%, rgba(255,236,62,1) 75%, rgba(255,52,52,1) 85%);
+    border-width: 0px;
+}
+
+audio-slider slider .active {
+    background-color: transparent;
+}
+
+audio-slider .audio-slider-mask {
+    background-image: linear-gradient(0deg, black, black);
+}
+
+audio-slider slider zstack {
+    background-color: transparent;
+}
+
+audio-slider slider .thumb {
+    border-radius: 0px;
+    height: 2%;
+    width: 105%;
+    background-color: rgb(35, 35, 35);
+}card-list .kind-btn {
+    border-radius: 20px;
+    background-color: #121212;
+    border-color: transparent;
+    width: 1s;
+    height: 50px;
+}
+
+card-list .kind-btn-row {
+    col-between: 2%;
+}
+
+card-list .kind-selected-btn {
+    border-color: rgba(252, 145, 46, 1);
+    border-width: 2px;
+}
+
+card-list .kind-btn label {
+    font-family: Montserrat;
+    color: #E3E3E3;
+}.card-base {
+    width: 1s;
+    height: 100px;
+    border-radius: 20px; 
+    background-color: #121212;
+}
+
+.card-base label {
+    font-size: 30;
+    font-family: "Major Mono Display";
+    color: rgba(252, 145, 46, 1);
+    font-weight: heavy;
+}
+.main {
+    width: 100%;
+    height: 100%;
+    col-between: 2%;
+
+    child-left: 1%;
+    child-right: 1%;
+
+    child-top: 3%;
+    child-bottom: 3%;
+
+    background-color: rgb(33, 33, 33);
+}
+
+button:hover {
+    border-width: 2px;
+    border-color: rgb(199, 119, 43);
+}effect-handle {
+    border-radius: 20px;
+}
+
+effect-handle .effect-container {
+    border-radius: 20px;
+}
+
+effect-handle .effect-bar {
+    background-color: #0f0f0f;
+    col-between: 1s;
+    cursor: grab;
+    border-top-left-radius: 15px;
+    border-bottom-left-radius: 15px;
+}
+
+effect-handle .effect-bar button {
+    color: white;
+    width: 20pt;
+    height: 20pt;
+    background-color: transparent;
+    border-width: 0px;
+    border-color: transparent;
+    border-radius: 20px;
+}
+
+effect-handle .effect-bar button:hover {
+    color: red;
+}
+
+effect-handle .drag-indicator {
+    color: white;
+    font-size: 20;
+}effect-list .new-effect-indicator {
+    width: 100%;
+    max-width: 1s;
+    min-height: 200pt;
+    child-space: 10px;
+}
+
+effect-list .new-effect-indicator > vstack {
+    border: 2px #121212;
+    border-radius: 25px;
+    child-space: 1s;
+}
+
+effect-list .new-effect-indicator > vstack label {
+    font-size: 100;
+    color: #121212;
+}.message-body {
+    child-top: 1s;
+    child-bottom: 1s;
+    col-between: 1s;
+    box-shadow:  8px 8px 15px #181818;
+}
+
+.message-close-btn {
+    background-color: transparent;
+    border-width: 0px;
+    child-space: 1s;
+    color: white;
+    font-family: 'Symbols Nerd Font Mono';
+}
+
+.message-text {
+    font-family: 'Montserrat';
+    left: 10px;
+}
+
+.message-close-btn:hover label {
+    color: black;
+}mono-control button {
+    background-color: #363636; 
+    border-radius: 0px;
+    border-color: transparent;
+    border-width: 0px;
+    font-family: "Montserrat";
+    width: 1s;
+    height: 1s;
+    border-radius: 5px;
+    child-space: 1s;
+}
+
+mono-control > vstack {
+    row-between: 2px;
+}
+
+mono-control label {
+    font-size: 11;
+    color: #e3e3e3;
+    text-align: center;
+    transform: translate(1px, 0px);
+}
+
+mono-control .selected-state {
+    border-color: rgba(252, 145, 46, 1);
+    border-width: 2px;
+}
+
+mono-control .selected-state.off-btn label {
+    transform: translate(0px, 0px);
+}
+
+mono-control .off-btn {
+    font-family: "Symbols Nerd Font Mono";
+}preset-control {
+    border-radius: 20px;
+    background-color: #121212;
+}
+
+preset-control .name-wrapper textbox {
+    color: #e3e3e3;
+    background-color: transparent;
+    border-color: transparent;
+    font-size: 36;
+    font-family: 'Montserrat';
+    border-width: 0px;
+    width: 100%;
+}
+
+preset-control .name-wrapper {
+    child-space: 1s;
+    child-left: 10pt;
+    max-height: 1s;
+    overflow: hidden;
+}
+
+preset-control .save-btn {
+    width: 60px;
+    height: 60px;
+    border-width: 0px;
+    border-color: transparent;
+    child-space: 1s;
+    background-image: linear-gradient(135deg, #363636 0%, #303030 100%); 
+    background-color: transparent;
+    border-radius: 51px;
+    font-family: "Symbols Nerd Font Mono";
+}
+
+.overwrite-ask {
+    background-color: transparent;
+    border-width: 0px;
+    border-color: whitesmoke;
+}
+
+preset-control .save-btn label {
+    color: #e3e3e3;
+    font-size: 30;
+}
+
+preset-control > hstack {
+    col-between: 1s;
+}preset-list .kind-btn {
+    border-radius: 20px;
+    background-color: #121212;
+    border-color: transparent;
+    width: 1s;
+    height: 50px;
+}
+
+preset-list .kind-btn-row {
+    col-between: 2%;
+}
+
+preset-list .kind-selected-btn {
+    border-color: rgba(252, 145, 46, 1);
+    border-width: 2px;
+}
+
+preset-list .kind-btn label {
+    font-family: Montserrat;
+    color: #E3E3E3;
+}
+
+preset-list .preset-card {
+    width: 1s;
+    height: 50px;
+    child-space: 1s;
+    border-radius: 15px;
+    background-color: #121212;
+    border-color: transparent;
+}
+
+preset-list .preset-card label {
+    font-family: "Major Mono Display";
+    color: rgba(252, 145, 46, 1);
+    font-weight: heavy;
+}sidebar {
+    width: 2s;
+    border-radius: 16px; 
+    background-color: #121212;
+}
+
+sidebar label {
+    font-size: xx-large;
+    transform: translate(-1px, -1px);
+}
+
+sidebar .sidebar-buttons-wrapper {
+    child-space: 5px;
+    row-between: 1s;
+}
+
+sidebar .tab-btn {
+    width: 1s;
+    height: 47.5px;
+    border-width: 0px;
+    border-color: transparent;
+    child-space: 1s;
+    background-image: linear-gradient(135deg, #363636 0%, #303030 100%); 
+    background-color: transparent;
+    border-radius: 50px;
+}
+
+sidebar .tab-btn label {
+    color: #e3e3e3;
+    text-align: center;
+    transform: translate(1px, 0px);
+    font-size: 30;
+}
+
+sidebar .tab-selected-btn {
+    border-color: rgba(252, 145, 46, 1);
+    border-width: 2px;
+}
+.fuzz {
+    background-image: url("fuzz-background");
+    overflow: hidden;
+    width: 1s;
+}
+
+.fuzz knob {
+    width: 100px;
+    height: 100px;
+}
+
+.fuzz .tone-knob {
+    width: 50px;
+    height: 50px;
+}
+
+.fuzz .volume-knob {
+    width: 75px;
+    height: 75px;
+}
+
+.fuzz label {
+    color: black;
+    font-size: 30;
+}
+
+.fuzz-knob-group .knob-head {
+    background-image: linear-gradient(180deg, rgb(0, 0, 0), rgb(23, 23, 23));
+    border-width: 0px;
+    background-color: transparent;
+}
+
+.fuzz-knob-group arctrack {
+    color: rgb(232, 142, 57);
+}
+
+.fuzz-knob-group > knob {
+    box-shadow: -1px -1px 8px #110220;
+}
+
+.fuzz-knob-group {
+    child-top: 2s;
+}
+
+.fuzz-knob-group:nth-child(1) {
+    width: 1s;
+}
+
+.fuzz-knob-group:nth-child(2) {
+    width: 2s;
+}
+
+.fuzz-knob-group:nth-child(3) {
+    width: 1s;
+}
+
+.fuzz-knob-group > knob {
+    border-radius: 100%;
+}overdrive {
+    overflow: hidden;
+    width: 1s;
+}
+
+overdrive .knob-tick {
+    background-color: #fafafa;
+}
+
+overdrive knob {
+    width: 100px;
+    height: 100px;
+}
+
+overdrive .tone-knob {
+    width: 50px;
+    height: 50px;
+}
+
+verdrive .volume-knob {
+    width: 75px;
+    height: 75px;
+}
+
+overdrive label {
+    color: black;
+    font-size: 30;
+}
+
+overdrive .knob-group .knob-head {
+    background-image: linear-gradient(180deg, rgb(39, 24, 37), rgb(41, 10, 37));
+    border-width: 0px;
+    background-color: transparent;
+}
+
+overdrive .knob-group arctrack {
+    color: rgb(232, 86, 215);
+}
+
+overdrive .knob-group {
+    child-top: 2s;
+}
+
+overdrive .knob-group:nth-child(1) {
+    width: 1s;
+}
+
+overdrive .knob-group:nth-child(2) {
+    width: 2s;
+}
+
+overdrive .knob-group:nth-child(3) {
+    width: 1s;
+}
+
+overdrive .knob-group > knob {
+    border-radius: 100%;
+}.studio-reverb {
+    background-image: url("reverb-background");
+    overflow: hidden;
+    width: 1s;
+}
+
+.studio-reverb .wet-knob {
+    width: 75px;
+    height: 75px;
+}
+
+.studio-reverb .size-knob {
+    width: 100px;
+    height: 100px;
+}
+
+.studio-reverb label {
+    color: whitesmoke;
+    font-family: "Montserrat";
+    font-size: 30;
+}
+
+.studio-reverb-knob-group .knob-head {
+    background-image: linear-gradient(180deg, rgb(0, 0, 0), rgb(24, 24, 24));
+    border-width: 0px;
+    background-color: transparent;
+}
+
+.studio-reverb-knob-group arctrack {
+    color: rgb(169, 58, 2);
+}
+
+.studio-reverb-knob-group > knob {
+    box-shadow: -1px -1px 8px #110220;
+}
+
+.studio-reverb-knob-group {
+    child-top: 2s;
+}
+
+.studio-reverb-knob-group > knob {
+    border-radius: 100%;
+}

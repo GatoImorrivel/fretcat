@@ -2,5 +2,5 @@
 xtask = "run --package xtask --release --"
 standalone-release = "run --package standalone --release --"
 standalone-debug = "run --package standalone --"
-debug = "watch -c -x standalone-debug"
-debug-release = "watch -c -x standalone-release"
+debug = "watch -c -i .ignore -x standalone-debug"
+debug-release = "watch -c -i .ignore -x standalone-release"
