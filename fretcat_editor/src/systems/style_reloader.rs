@@ -1,6 +1,6 @@
 use super::super::hot_lib;
 
-use nih_plug::{vizia::prelude::*, nih_log};
+use nih_plug::vizia::prelude::*;
 
 pub struct StyleReloader;
 
@@ -17,12 +17,20 @@ impl StyleReloader {
 impl Model for StyleReloader {
     fn event(&mut self, cx: &mut EventContext, event: &mut Event) {
         event.map(|event, _| match event {
-            StyleReloaderEvent::Reload => {
-                nih_log!("bolas");
+            ApplicationEvent::NewFrame => {
                 if hot_lib::was_updated() {
                     cx.clear_styles();
-                    cx.add_stylesheet(hot_lib::fretcat_styles()).unwrap();
+                    cx.emit(StyleReloaderEvent::Reload);
                 }
+            }
+        });
+
+        event.map(|event, _| match event {
+            StyleReloaderEvent::Reload => {
+                cx.add_stylesheet(hot_lib::fretcat_styles()).unwrap();
+                cx.needs_restyle();
+                cx.needs_relayout();
+                cx.needs_redraw();
             }
         });
     }

@@ -84,6 +84,7 @@ pub fn create(
         fretcat_effects::register_images(cx);
 
         cx.add_stylesheet(hot_lib::fretcat_styles()).unwrap();
+        StyleReloader::new(cx);
 
         CardSystem::init(cx);
 
