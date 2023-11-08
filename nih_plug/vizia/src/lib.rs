@@ -8,5 +8,5 @@ pub use vizia_core::*;
 pub mod prelude {
     pub use vizia_core::prelude::*;
 
-    pub use vizia_baseview::Application;
+    pub use vizia_baseview::{Application, ApplicationEvent};
 }

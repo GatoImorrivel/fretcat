@@ -165,6 +165,11 @@ where
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Data)]
+pub enum ApplicationEvent {
+    NewFrame,
+}
+
 pub(crate) struct ApplicationRunner {
     context: Context,
     should_redraw: bool,
@@ -210,6 +215,12 @@ impl ApplicationRunner {
     pub fn on_frame_update(&mut self, window: &mut Window) {
         let mut cx = BackendContext::new_with_event_manager(&mut self.context);
 
+        cx.send_event(
+            Event::new(ApplicationEvent::NewFrame)
+                .origin(Entity::root())
+                .propagate(Propagation::Subtree),
+        );
+
         while let Some(event) = queue_get() {
             cx.send_event(event);
         }
@@ -250,7 +261,9 @@ impl ApplicationRunner {
         // cx.style().needs_restyle();
         cx.process_data_updates();
 
-        let context = window.gl_context().expect("Window was created without OpenGL support");
+        let context = window
+            .gl_context()
+            .expect("Window was created without OpenGL support");
         unsafe { context.make_current() };
         cx.process_style_updates();
         unsafe { context.make_not_current() };
@@ -279,19 +292,30 @@ impl ApplicationRunner {
         }
 
         let mut update_modifiers = |modifiers: vizia_input::KeyboardModifiers| {
-            cx.modifiers()
-                .set(Modifiers::SHIFT, modifiers.contains(vizia_input::KeyboardModifiers::SHIFT));
-            cx.modifiers()
-                .set(Modifiers::CTRL, modifiers.contains(vizia_input::KeyboardModifiers::CONTROL));
-            cx.modifiers()
-                .set(Modifiers::LOGO, modifiers.contains(vizia_input::KeyboardModifiers::META));
-            cx.modifiers()
-                .set(Modifiers::ALT, modifiers.contains(vizia_input::KeyboardModifiers::ALT));
+            cx.modifiers().set(
+                Modifiers::SHIFT,
+                modifiers.contains(vizia_input::KeyboardModifiers::SHIFT),
+            );
+            cx.modifiers().set(
+                Modifiers::CTRL,
+                modifiers.contains(vizia_input::KeyboardModifiers::CONTROL),
+            );
+            cx.modifiers().set(
+                Modifiers::LOGO,
+                modifiers.contains(vizia_input::KeyboardModifiers::META),
+            );
+            cx.modifiers().set(
+                Modifiers::ALT,
+                modifiers.contains(vizia_input::KeyboardModifiers::ALT),
+            );
         };
 
         match event {
             baseview::Event::Mouse(event) => match event {
-                baseview::MouseEvent::CursorMoved { position, modifiers } => {
+                baseview::MouseEvent::CursorMoved {
+                    position,
+                    modifiers,
+                } => {
                     update_modifiers(modifiers);
 
                     // NOTE: We multiply by `self.window_scale_factor` and not by
@@ -412,8 +436,10 @@ impl ApplicationRunner {
 
                     cx.set_scale_factor(self.window_scale_factor * user_scale_factor);
 
-                    let physical_size =
-                        (window_info.physical_size().width, window_info.physical_size().height);
+                    let physical_size = (
+                        window_info.physical_size().width,
+                        window_info.physical_size().height,
+                    );
 
                     cx.set_window_size(physical_size.0 as f32, physical_size.1 as f32);
 
