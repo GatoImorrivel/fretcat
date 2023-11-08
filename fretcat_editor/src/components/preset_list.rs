@@ -1,15 +1,13 @@
-use fretcat_serialization::{Preset, PresetCategory};
+use fretcat_serialization::{Preset, PresetCategory, ShallowPreset};
 use nih_plug::vizia::prelude::*;
 
 use crate::EditorEvent;
-
-use super::PresetMessage;
 
 #[derive(Debug, Clone, Lens)]
 pub struct PresetList {
     pub(crate) current_category: PresetCategory,
     categories: Vec<PresetCategory>,
-    presets: Vec<Preset>,
+    presets: Vec<ShallowPreset>,
 }
 
 pub enum PresetListEvent {
@@ -77,7 +75,7 @@ impl PresetList {
                             let preset2 = preset.clone();
                             Button::new(
                                 cx,
-                                move |ex| ex.emit(EditorEvent::LoadPreset(preset.clone())),
+                                move |ex| ex.emit(EditorEvent::LoadShallowPreset(preset.clone())),
                                 move |cx| {
                                     Label::new(cx, preset2.get_name())
                                 },

@@ -36,13 +36,51 @@ lazy_static! {
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct Preset {
     name: String,
-    is_shallow_loaded: bool,
     category: PresetCategory,
     effects: Vec<Mapper>,
 }
 
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
+pub struct ShallowPreset {
+    name: String,
+    category: PresetCategory
+}
+
+impl ShallowPreset {
+    pub fn load(self) -> Preset {
+        self.into()
+    }
+
+    pub fn get_name(&self) -> &str {
+        &self.name
+    }
+
+    pub fn get_category(&self) -> PresetCategory {
+        self.category
+    }
+}
+
+impl From<Preset> for ShallowPreset {
+    fn from(value: Preset) -> Self {
+        Self {
+            name: value.get_name().to_owned(),
+            category: value.get_category()
+        }
+    }
+}
+
+impl Into<Preset> for ShallowPreset {
+    fn into(self) -> Preset {
+        let mut p = Preset::default();
+        p.set_name(self.name.to_owned());
+        p.category = self.category;
+        p.load_effects();
+        p
+    }
+}
+
 impl Preset {
-    pub fn fetch_presets_shallow() -> Vec<Preset> {
+    pub fn fetch_presets_shallow() -> Vec<ShallowPreset> {
         let paths = fs::read_dir(Self::get_preset_dir()).unwrap();
         let mut presets = vec![];
         for path in paths {
@@ -51,8 +89,7 @@ impl Preset {
                 let preset = serde_json::from_str::<Preset>(&json);
                 if let Ok(mut preset) = preset {
                     preset.effects.clear();
-                    preset.set_shallow_loaded(true);
-                    presets.push(preset);
+                    presets.push(ShallowPreset::from(preset));
                 }
             }
         }
@@ -68,14 +105,13 @@ impl Preset {
         let preset = serde_json::from_str::<Preset>(&json).unwrap();
 
         self.set_mappers(preset.cloned_mappers());
-        self.set_shallow_loaded(false);
     }
 
     pub fn set_name<S: AsRef<str>>(&mut self, name: S) {
         self.name = name.as_ref().to_owned();
     }
 
-    pub fn get_name(&self) -> &String {
+    pub fn get_name(&self) -> &str {
         &self.name
     }
 
@@ -88,14 +124,6 @@ impl Preset {
         }
 
         false
-    }
-
-    pub fn set_shallow_loaded(&mut self, is_shallow_loaded: bool) { 
-        self.is_shallow_loaded = is_shallow_loaded;
-    }
-
-    pub fn is_shallow_loaded(&self) -> bool {
-        self.is_shallow_loaded
     }
 
     pub fn set_mappers(&mut self, mappers: Vec<Mapper>) {
@@ -158,7 +186,6 @@ impl Default for Preset {
     fn default() -> Self {
         Self {
             name: "Untitled".to_owned(),
-            is_shallow_loaded: false,
             category: PresetCategory::default(),
             effects: vec![],
         }

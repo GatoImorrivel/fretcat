@@ -13,7 +13,7 @@ use std::sync::{Arc, Mutex};
 use common::{EDITOR_HEIGHT, EDITOR_WIDTH};
 use fretcat_effects::{Chain, ChainData, ChainCommand};
 
-use fretcat_serialization::Preset;
+use fretcat_serialization::{Preset, ShallowPreset};
 use nih_plug::prelude::*;
 use nih_plug::vizia::prelude::*;
 use nih_plug::{create_vizia_editor, ViziaState, ViziaTheming};
@@ -34,7 +34,8 @@ pub struct EditorData {
 }
 
 pub enum EditorEvent {
-    LoadPreset(Preset)
+    LoadPreset(Preset),
+    LoadShallowPreset(ShallowPreset)
 }
 
 impl Model for EditorData {
@@ -48,13 +49,12 @@ impl Model for EditorData {
         event.map(|event, _| match event {
             EditorEvent::LoadPreset(p) => {
                 *self.current_preset.lock().unwrap() = p.clone();
-                if p.is_shallow_loaded() {
-                    let mut p = p.clone();
-                    p.load_effects();
-                    cx.emit(ChainCommand::Load(p.clone().into()));
-                } else {
-                    cx.emit(ChainCommand::Load(p.clone().into()));
-                }
+                cx.emit(ChainCommand::Load(p.clone().into()));
+            }
+            EditorEvent::LoadShallowPreset(p) => {
+                let p = p.clone().load();
+                *self.current_preset.lock().unwrap() = p.clone();
+                cx.emit(ChainCommand::Load(p.into()));
             }
         });
     }
