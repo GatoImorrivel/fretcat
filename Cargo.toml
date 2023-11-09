@@ -13,8 +13,8 @@ nih_plug = { git = "https://github.com/geom3trik/nih-plug.git", branch = "vizia-
 
 fretcat_effects = {path = "fretcat_effects"}
 fretcat_editor = {path = "fretcat_editor"}
-fretcat_styles = {path = "fretcat_styles"}
 fretcat_serialization = {path = "fretcat_serialization"}
+fretcat_styles = {path = "fretcat_styles"}
 
 [lib]
 crate-type = ["cdylib", "lib"]

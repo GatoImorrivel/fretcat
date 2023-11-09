@@ -7,4 +7,4 @@ pub use card_system::*;
 pub use message_system::*;
 pub use card::*;
 
-pub use style_reloader::StyleReloader;
+pub use style_reloader::{StyleReloader, STYLES};
