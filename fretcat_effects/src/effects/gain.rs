@@ -18,7 +18,7 @@ impl Default for Gain {
 }
 
 impl AudioEffect for Gain {
-    fn process(&mut self, input_buffer: (&mut [f32], &mut [f32])) {
+    fn process(&mut self, input_buffer: (&mut [f32], &mut [f32]), transport: &nih_plug::prelude::Transport) {
         input_buffer
             .0
             .iter_mut()

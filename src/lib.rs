@@ -76,7 +76,7 @@ impl Plugin for Fretcat {
             &mut *Arc::as_ptr(&self.chain).cast_mut()
         };
 
-        chain.process(buffer.as_slice());
+        chain.process(buffer.as_slice(), transport);
 
         ProcessStatus::Normal
     }

@@ -17,7 +17,7 @@ impl NoiseGate {
 }
 
 impl AudioEffect for NoiseGate {
-    fn process(&mut self, input_buffer: (&mut [f32], &mut [f32])) {
+    fn process(&mut self, input_buffer: (&mut [f32], &mut [f32]), transport: &nih_plug::prelude::Transport) {
         input_buffer.0.iter_mut().zip(input_buffer.1.iter_mut()).for_each(|(left, right)| {
         });
     }

@@ -43,7 +43,7 @@ pub trait DynPartialEq {
 }
 
 pub trait AudioEffect: fmt::Debug + Send + Sync + DynClone + DowncastSync {
-    fn process(&mut self, input_buffer: (&mut [f32], &mut [f32]));
+    fn process(&mut self, input_buffer: (&mut [f32], &mut [f32]), transport: &nih_plug::prelude::Transport);
     fn view(&self, _cx: &mut Context, _effect: Arc<dyn AudioEffect>) {}
     fn height(&self) -> f32 {
         0.0

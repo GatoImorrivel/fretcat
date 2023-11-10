@@ -82,25 +82,25 @@ pub struct Chain {
 
 impl Chain {
     #[inline]
-    pub fn process(&mut self, buffer: &mut [&mut [f32]]) {
+    pub fn process(&mut self, buffer: &mut [&mut [f32]], transport: &nih_plug::prelude::Transport) {
         unsafe {
             let left: *mut &mut [f32] = std::mem::transmute(&mut buffer[0]);
             let right: *mut &mut [f32] = std::mem::transmute(&mut buffer[1]);
 
             self.pre_fx
                 .iter_mut()
-                .for_each(|(_, fx)| fx.process((&mut *left, &mut *right)));
+                .for_each(|(_, fx)| fx.process((&mut *left, &mut *right), transport));
 
             self.in_avg_amplitude = Self::get_rms((&*left, &*right));
 
             self.effects.iter_mut().for_each(|e| {
                 let e = { &mut *Arc::as_ptr(e).cast_mut() };
-                e.process((&mut *left, &mut *right))
+                e.process((&mut *left, &mut *right), transport)
             });
 
             self.post_fx
                 .iter_mut()
-                .for_each(|(_, fx)| fx.process((&mut *left, &mut *right)));
+                .for_each(|(_, fx)| fx.process((&mut *left, &mut *right), transport));
 
             self.out_avg_amplitude = Self::get_rms((&*left, &*right));
         }

@@ -20,7 +20,7 @@ impl Default for Fuzz {
 }
 
 impl AudioEffect for Fuzz {
-    fn process(&mut self, _input_buffer: (&mut [f32], &mut [f32])) {}
+    fn process(&mut self, _input_buffer: (&mut [f32], &mut [f32]), transport: &nih_plug::prelude::Transport) {}
 
     fn view(&self, cx: &mut Context, effect: Arc<dyn AudioEffect>) {
         FuzzView::new(cx, EffectHandle::<Self>::from(effect));
