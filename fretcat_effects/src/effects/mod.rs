@@ -11,6 +11,7 @@ mod gain;
 mod overdrive;
 mod mono;
 mod noise_gate;
+mod bit_crusher;
 
 // Reverbs
 mod studioreverb;
@@ -26,6 +27,7 @@ pub use overdrive::Overdrive;
 pub use studioreverb::StudioReverb;
 pub use mono::{Mono, MonoState};
 pub use noise_gate::NoiseGate;
+pub use bit_crusher::BitCrusher;
 
 #[derive(Debug, Hash, PartialEq, Eq, Clone, Copy, Data)]
 pub struct PreFX(pub &'static str);

@@ -56,7 +56,7 @@ impl LabeledKnob {
                 ZStack::new(cx, |cx| {
                     Knob::new(cx, normalized_value, Self::knob_value, centered)
                         .on_changing(|ex, val| ex.emit(LabeledKnobEvent::Value(val)));
-                    Label::new(cx, Self::real_value.map(|val| format!("{:.1}", val))).class("knob-value");
+                    Label::new(cx, Self::real_value.map(|val| format!("{:.0}", val))).class("knob-value");
                 }).child_space(Stretch(1.0));
                 if side == LabelSide::Right {
                     render_label(cx, label.as_ref());

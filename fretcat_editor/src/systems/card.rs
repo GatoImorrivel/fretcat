@@ -101,7 +101,7 @@ pub const BIT_CRUSHER_CARD: Card = Card {
         ex.emit(CardEvent::DragChange(Some(BIT_CRUSHER_CARD)));
         ex.set_drop_data(ex.current());
     },
-    spawn: || Arc::new(Fuzz::default()),
+    spawn: || Arc::new(BitCrusher::default()),
 };
 
 pub const REVERB_CARD: Card = Card {

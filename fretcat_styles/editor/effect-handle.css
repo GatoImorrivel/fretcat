@@ -2,10 +2,6 @@ effect-handle {
     border-radius: 20px;
 }
 
-effect-handle .effect-container {
-    border-radius: 20px;
-}
-
 effect-handle .effect-bar {
     background-color: #0f0f0f;
     col-between: 1s;

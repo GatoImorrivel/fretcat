@@ -1,0 +1,23 @@
+bit-crusher {
+    background-color: rgb(183, 17, 17);
+}
+
+bit-crusher labeled-knob knob {
+    width: 60px;
+    height: 60px;
+    background-image: linear-gradient(135deg, #363636 0%, #303030 100%); 
+    background-color: transparent;
+}
+
+bit-crusher labeled-knob {
+    width: 150px;
+}
+
+bit-crusher labeled-knob label {
+    font-family: Montserrat;
+    color: #e3e3e3;
+}
+
+bit-crusher labeled-knob knob .knob-tick {
+    background-color: #e3e3e3;
+}

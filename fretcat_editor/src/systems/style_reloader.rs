@@ -37,6 +37,7 @@ impl Model for StyleReloader {
                 if *HAS_RELOADED.lock().unwrap() {
                     cx.clear_styles();
                     cx.emit(StyleReloaderEvent::Reload);
+                    *HAS_RELOADED.lock().unwrap() = false;
                 }
             }
         });
@@ -45,6 +46,7 @@ impl Model for StyleReloader {
             StyleReloaderEvent::Reload => {
                 cx.add_stylesheet(CSS::from_string(STYLES.lock().unwrap().as_str())).unwrap();
                 cx.reload_styles().unwrap();
+                cx.needs_redraw();
             }
         });
     }
