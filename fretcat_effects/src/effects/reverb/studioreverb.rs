@@ -1,10 +1,8 @@
 use std::sync::Arc;
 
-use crate::{common::Freeverb, EffectHandle};
+use crate::{common::Freeverb, EffectHandle, effects::AudioEffect};
 use fretcat_macros::Message;
 use nih_plug::vizia::prelude::*;
-
-use super::AudioEffect;
 
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]

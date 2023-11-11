@@ -5,6 +5,8 @@ use std::{
 
 use nih_plug::vizia::prelude::*;
 
+use crate::common::normalize_value;
+
 #[derive(Lens)]
 pub struct LabeledKnob {
     knob_value: f32,
@@ -24,44 +26,26 @@ impl Debug for LabeledKnob {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Data)]
-pub enum LabelSide {
-    Left,
-    Right
-}
 
 enum LabeledKnobEvent {
     Value(f32),
 }
 
 impl LabeledKnob {
-    pub fn new(cx: &mut Context, normalized_value: f32, centered: bool, range: Range<f32>, side: LabelSide, label: impl AsRef<str>) -> Handle<Self> {
-        let normalized_value = normalized_value.clamp(0.0, 1.0);
+    pub fn new<L: Lens<Target = f32>>(cx: &mut Context, value: L, centered: bool, range: Range<f32>) -> Handle<Self> {
+        let normalized = normalize_value(value.get(cx), &range);
         Self {
-            real_value: range.start + (range.end - range.start) * normalized_value,
-            knob_value: normalized_value.clamp(0.0, 1.0),
+            real_value: value.get(cx),
+            knob_value: normalized,
             range: range,
             on_changing: None,
         }
         .build(cx, |cx| {
-            let render_label = |cx: &mut Context, label: &str| {
-                VStack::new(cx, |cx| {
-                    Label::new(cx, label).class("knob-name");
-                }).child_top(Stretch(1.0));
-            };
-            HStack::new(cx, |cx| {
-                if side == LabelSide::Left {
-                    render_label(cx, label.as_ref());
-                }
-                ZStack::new(cx, |cx| {
-                    Knob::new(cx, normalized_value, Self::knob_value, centered)
-                        .on_changing(|ex, val| ex.emit(LabeledKnobEvent::Value(val)));
-                    Label::new(cx, Self::real_value.map(|val| format!("{:.0}", val))).class("knob-value");
-                }).child_space(Stretch(1.0));
-                if side == LabelSide::Right {
-                    render_label(cx, label.as_ref());
-                }
-            });
+            ZStack::new(cx, |cx| {
+                Knob::new(cx, normalized, Self::knob_value, centered)
+                    .on_changing(|ex, val| ex.emit(LabeledKnobEvent::Value(val)));
+                Label::new(cx, Self::real_value.map(|val| format!("{:.0}", val))).class("knob-value");
+            }).child_space(Stretch(1.0));
         })
     }
 }

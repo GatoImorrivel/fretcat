@@ -1,8 +1,7 @@
 use serde::{Deserialize, Serialize};
 
-use crate::common::Envelope;
+use crate::{common::Envelope, effects::AudioEffect};
 
-use super::AudioEffect;
 
 #[derive(Debug, Clone, Copy, Deserialize, Serialize, Default)]
 pub struct NoiseGate {

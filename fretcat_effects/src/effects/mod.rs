@@ -5,29 +5,16 @@ use dyn_clone::DynClone;
 
 use nih_plug::vizia::prelude::*;
 
-// Distortions
-mod fuzz;
-mod gain;
-mod overdrive;
-mod mono;
-mod noise_gate;
-mod bit_crusher;
 
-// Reverbs
-mod studioreverb;
+mod distortion;
+pub use distortion::*;
+mod delay;
+pub use delay::*;
+mod dynamics;
+pub use dynamics::*;
+mod reverb;
+pub use reverb::*;
 
-#[cfg(feature = "simulate")]
-mod input_simulator;
-#[cfg(feature = "simulate")]
-pub use input_simulator::InputSimulator;
-
-pub use fuzz::Fuzz;
-pub use gain::Gain;
-pub use overdrive::Overdrive;
-pub use studioreverb::StudioReverb;
-pub use mono::{Mono, MonoState};
-pub use noise_gate::NoiseGate;
-pub use bit_crusher::BitCrusher;
 
 #[derive(Debug, Hash, PartialEq, Eq, Clone, Copy, Data)]
 pub struct PreFX(pub &'static str);

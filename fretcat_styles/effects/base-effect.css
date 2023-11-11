@@ -1,0 +1,13 @@
+.base-effect {
+    border-top-right-radius: 15px;
+    border-bottom-right-radius: 15px;
+    background-color: #121212;
+    overflow: hidden;
+    width: 1s;
+}
+
+.effect-title {
+    color: rgba(252, 145, 46, 1);
+    font-family: "Major Mono Display";
+    font-size: xx-large;
+}

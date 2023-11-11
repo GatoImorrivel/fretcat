@@ -3,7 +3,7 @@ effect-handle {
 }
 
 effect-handle .effect-bar {
-    background-color: #0f0f0f;
+    background-image: linear-gradient(135deg, #363636 0%, #303030 100%); 
     col-between: 1s;
     cursor: grab;
     border-top-left-radius: 15px;
@@ -11,13 +11,14 @@ effect-handle .effect-bar {
 }
 
 effect-handle .effect-bar button {
-    color: white;
+    color: #e3e3e3;
     width: 20pt;
     height: 20pt;
     background-color: transparent;
     border-width: 0px;
     border-color: transparent;
     border-radius: 20px;
+    transform: translate(-2px, 0px);
 }
 
 effect-handle .effect-bar button:hover {

@@ -4,9 +4,7 @@ use fretcat_macros::{Message};
 use nih_plug::vizia::prelude::*;
 use serde::{Deserialize, Serialize};
 
-use crate::EffectHandle;
-
-use super::AudioEffect;
+use crate::{EffectHandle, effects::AudioEffect};
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq)]
 pub struct Fuzz {

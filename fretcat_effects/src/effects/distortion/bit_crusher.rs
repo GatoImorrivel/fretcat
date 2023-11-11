@@ -3,9 +3,7 @@ use serde::{Deserialize, Serialize};
 
 use nih_plug::vizia::prelude::*;
 
-use crate::{common::normalize_value, components::LabeledKnob, EffectHandle};
-
-use super::AudioEffect;
+use crate::{components::LabeledKnob, EffectHandle, effects::AudioEffect};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct BitCrusher {
@@ -55,11 +53,9 @@ impl BitCrusherView {
         .build(cx, |cx| {
             LabeledKnob::new(
                 cx,
-                normalize_value(handle.bit_rate, 0.0..100.0),
+                Self::bit_rate,
                 false,
                 0.0..100.0,
-                crate::components::LabelSide::Right,
-                "Bit Rate",
             );
         })
     }

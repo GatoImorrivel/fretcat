@@ -16,3 +16,70 @@ button:hover {
     border-width: 2px;
     border-color: rgb(199, 119, 43);
 }
+
+knob {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+}
+
+.knob-track {
+    width: 1s;
+    height: 1s;
+}
+
+.knob-head {
+    width: 1s;
+    height: 1s;
+    top: 2px;
+    left: 2px;
+    right: 2px;
+    bottom: 2px;
+    border-radius: 50%;
+}
+
+.knob-tick {
+    width: 2px;
+    height: 8px;
+    left: 1s;
+    right: 1s;
+    top: 2px;
+    bottom: 1s;
+}
+
+knob {
+    background-color: #1d1d1d;
+}
+
+knob:focus-visible {
+    outline-width: 1px;
+    outline-color: #51afef80;
+    outline-offset: 3px;
+}
+
+knob .knob-track {
+    color: #51afef;
+}
+
+knob:disabled .knob-track {
+    color: #404040;
+}
+
+.knob-head {
+    background-color: #343434;
+    border-width: 1px;
+    border-color: #1d1d1d;
+}
+
+knob:disabled .knob-head {
+    background-color: #404040;
+}
+
+knob .knob-tick {
+    background-color: #fff;
+    border-radius: 1px;
+}
+
+knob:disabled .knob-tick {
+    background-color: #c4c4c4;
+}

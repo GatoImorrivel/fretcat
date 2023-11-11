@@ -29,7 +29,7 @@ pub use self::{
 }
 
 #[inline]
-pub fn normalize_value(input: f32, range: Range<f32>) -> f32 {
+pub fn normalize_value(input: f32, range: &Range<f32>) -> f32 {
     let clamped_input = input.max(range.start).min(range.end);
 
     let normalized = (clamped_input - range.start) / (range.end - range.start);

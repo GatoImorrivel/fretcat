@@ -19,8 +19,16 @@ lazy_static::lazy_static! {
             BIT_CRUSHER_CARD
         ]);
 
-        hashmap.insert(EffectKind::Delay, vec![]);
-        hashmap.insert(EffectKind::Dynamics, vec![]);
+        hashmap.insert(EffectKind::Delay, vec![
+            DELAY_CARD,
+            TWIN_DELAY_CARD
+        ]);
+        hashmap.insert(EffectKind::Dynamics, vec![
+            AUTO_WAH_CARD,
+            LOW_PASS_CARD,
+            HIGH_PASS_CARD,
+            BAND_PASS_CARD
+        ]);
         hashmap.insert(EffectKind::Reverb, vec![
             REVERB_CARD
         ]);

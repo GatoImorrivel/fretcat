@@ -117,3 +117,87 @@ pub const REVERB_CARD: Card = Card {
     },
     spawn: || Arc::new(StudioReverb::default()),
 };
+
+pub const DELAY_CARD: Card = Card {
+    content: |cx| {
+        VStack::new(cx, |cx| {
+            Label::new(cx, "Delay");
+        })
+        .child_space(Stretch(1.0));
+    },
+    drag: |ex| {
+        ex.emit(CardEvent::DragChange(Some(DELAY_CARD)));
+        ex.set_drop_data(ex.current());
+    },
+    spawn: || Arc::new(Delay::default()),
+};
+
+pub const TWIN_DELAY_CARD: Card = Card {
+    content: |cx| {
+        VStack::new(cx, |cx| {
+            Label::new(cx, "Twin Delay");
+        })
+        .child_space(Stretch(1.0));
+    },
+    drag: |ex| {
+        ex.emit(CardEvent::DragChange(Some(TWIN_DELAY_CARD)));
+        ex.set_drop_data(ex.current());
+    },
+    spawn: || Arc::new(TwinDelay::default()),
+};
+
+pub const AUTO_WAH_CARD: Card = Card {
+    content: |cx| {
+        VStack::new(cx, |cx| {
+            Label::new(cx, "Auto Wah");
+        })
+        .child_space(Stretch(1.0));
+    },
+    drag: |ex| {
+        ex.emit(CardEvent::DragChange(Some(AUTO_WAH_CARD)));
+        ex.set_drop_data(ex.current());
+    },
+    spawn: || Arc::new(AutoWah::default()),
+};
+
+pub const LOW_PASS_CARD: Card = Card {
+    content: |cx| {
+        VStack::new(cx, |cx| {
+            Label::new(cx, "Low Pass");
+        })
+        .child_space(Stretch(1.0));
+    },
+    drag: |ex| {
+        ex.emit(CardEvent::DragChange(Some(LOW_PASS_CARD)));
+        ex.set_drop_data(ex.current());
+    },
+    spawn: || Arc::new(LowPass::default()),
+};
+
+pub const HIGH_PASS_CARD: Card = Card {
+    content: |cx| {
+        VStack::new(cx, |cx| {
+            Label::new(cx, "High Pass");
+        })
+        .child_space(Stretch(1.0));
+    },
+    drag: |ex| {
+        ex.emit(CardEvent::DragChange(Some(HIGH_PASS_CARD)));
+        ex.set_drop_data(ex.current());
+    },
+    spawn: || Arc::new(HighPass::default()),
+};
+
+pub const BAND_PASS_CARD: Card = Card {
+    content: |cx| {
+        VStack::new(cx, |cx| {
+            Label::new(cx, "Band Pass");
+        })
+        .child_space(Stretch(1.0));
+    },
+    drag: |ex| {
+        ex.emit(CardEvent::DragChange(Some(BAND_PASS_CARD)));
+        ex.set_drop_data(ex.current());
+    },
+    spawn: || Arc::new(BandPass::default()),
+};

@@ -70,12 +70,79 @@ card-list .kind-btn label {
 button:hover {
     border-width: 2px;
     border-color: rgb(199, 119, 43);
+}
+
+knob {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+}
+
+.knob-track {
+    width: 1s;
+    height: 1s;
+}
+
+.knob-head {
+    width: 1s;
+    height: 1s;
+    top: 2px;
+    left: 2px;
+    right: 2px;
+    bottom: 2px;
+    border-radius: 50%;
+}
+
+.knob-tick {
+    width: 2px;
+    height: 8px;
+    left: 1s;
+    right: 1s;
+    top: 2px;
+    bottom: 1s;
+}
+
+knob {
+    background-color: #1d1d1d;
+}
+
+knob:focus-visible {
+    outline-width: 1px;
+    outline-color: #51afef80;
+    outline-offset: 3px;
+}
+
+knob .knob-track {
+    color: #51afef;
+}
+
+knob:disabled .knob-track {
+    color: #404040;
+}
+
+.knob-head {
+    background-color: #343434;
+    border-width: 1px;
+    border-color: #1d1d1d;
+}
+
+knob:disabled .knob-head {
+    background-color: #404040;
+}
+
+knob .knob-tick {
+    background-color: #fff;
+    border-radius: 1px;
+}
+
+knob:disabled .knob-tick {
+    background-color: #c4c4c4;
 }effect-handle {
     border-radius: 20px;
 }
 
 effect-handle .effect-bar {
-    background-color: #0f0f0f;
+    background-image: linear-gradient(135deg, #363636 0%, #303030 100%); 
     col-between: 1s;
     cursor: grab;
     border-top-left-radius: 15px;
@@ -83,13 +150,14 @@ effect-handle .effect-bar {
 }
 
 effect-handle .effect-bar button {
-    color: white;
+    color: #e3e3e3;
     width: 20pt;
     height: 20pt;
     background-color: transparent;
     border-width: 0px;
     border-color: transparent;
     border-radius: 20px;
+    transform: translate(-2px, 0px);
 }
 
 effect-handle .effect-bar button:hover {
@@ -115,27 +183,24 @@ effect-list .new-effect-indicator > vstack {
 effect-list .new-effect-indicator > vstack label {
     font-size: 100;
     color: #121212;
-}labeled-knob label {
-    font-family: "Montserrat";
-    color: #e3e3e3;
-}
-
-labeled-knob knob {
+}labeled-knob knob {
     width: 60px;
     height: 60px;
     background-image: linear-gradient(135deg, #363636 0%, #303030 100%); 
 }
 
-labeled-knob knob .knob-tick {
-    background-color: #e3e3e3;
-}
-
 labeled-knob .knob-value {
-    font-size: medium;
+    font-family: Montserrat;
+    color: #e3e3e3;
 }
 
-labeled-knob .knob-name {
-    font-size: large;
+labeled-knob knob .knob-head {
+    background-image: linear-gradient(135deg, #363636 0%, #303030 100%); 
+    border-color: #363636;
+}
+
+labeled-knob knob .knob-track {
+    color: rgba(252, 145, 46, 1);
 }.message-body {
     child-top: 1s;
     child-bottom: 1s;
@@ -312,7 +377,19 @@ sidebar .tab-selected-btn {
     border-color: rgba(252, 145, 46, 1);
     border-width: 2px;
 }
-bit-crusher {
+.base-effect {
+    border-top-right-radius: 15px;
+    border-bottom-right-radius: 15px;
+    background-color: #121212;
+    overflow: hidden;
+    width: 1s;
+}
+
+.effect-title {
+    color: rgba(252, 145, 46, 1);
+    font-family: "Major Mono Display";
+    font-size: xx-large;
+}bit-crusher {
     background-color: rgb(183, 17, 17);
 }
 
@@ -391,63 +468,6 @@ bit-crusher labeled-knob knob .knob-tick {
 }
 
 .fuzz-knob-group > knob {
-    border-radius: 100%;
-}overdrive {
-    overflow: hidden;
-    width: 1s;
-}
-
-overdrive .knob-tick {
-    background-color: #fafafa;
-}
-
-overdrive knob {
-    width: 100px;
-    height: 100px;
-}
-
-overdrive .tone-knob {
-    width: 50px;
-    height: 50px;
-}
-
-verdrive .volume-knob {
-    width: 75px;
-    height: 75px;
-}
-
-overdrive label {
-    color: black;
-    font-size: 30;
-}
-
-overdrive .knob-group .knob-head {
-    background-image: linear-gradient(180deg, rgb(39, 24, 37), rgb(41, 10, 37));
-    border-width: 0px;
-    background-color: transparent;
-}
-
-overdrive .knob-group arctrack {
-    color: rgb(232, 86, 215);
-}
-
-overdrive .knob-group {
-    child-top: 2s;
-}
-
-overdrive .knob-group:nth-child(1) {
-    width: 1s;
-}
-
-overdrive .knob-group:nth-child(2) {
-    width: 2s;
-}
-
-overdrive .knob-group:nth-child(3) {
-    width: 1s;
-}
-
-overdrive .knob-group > knob {
     border-radius: 100%;
 }.studio-reverb {
     background-image: url("reverb-background");

@@ -2,9 +2,7 @@ use fretcat_macros::Message;
 use nih_plug::{util::db_to_gain_fast, vizia::prelude::*};
 use serde::{Serialize, Deserialize};
 
-use crate::{common::normalize_value, components::{LabeledKnob, LabeledKnobModifier}, EffectHandle};
-
-use super::AudioEffect;
+use crate::{components::{LabeledKnob, LabeledKnobModifier}, EffectHandle, effects::AudioEffect};
 
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
 pub struct Gain {
@@ -56,11 +54,9 @@ impl GainView {
         .build(cx, |cx| {
             LabeledKnob::new(
                 cx,
-                normalize_value(handle.gain_in_db, -60.0..20.0),
+                Self::gain,
                 false,
                 -60.0..20.0,
-                crate::components::LabelSide::Right,
-                "Gain",
             ).on_changing(|ex, val| ex.emit(Message::Gain(val)));
         })
     }

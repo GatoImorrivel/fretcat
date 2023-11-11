@@ -83,7 +83,7 @@ impl Plugin for Fretcat {
 }
 
 impl Vst3Plugin for Fretcat {
-    const VST3_CLASS_ID: [u8; 16] = *b"FretcatGatoPlug.";
+    const VST3_CLASS_ID: [u8; 16] = *b"FretcatGatoPlugs";
     const VST3_SUBCATEGORIES: &'static [Vst3SubCategory] = &[
         Vst3SubCategory::Fx,
         Vst3SubCategory::Filter,
