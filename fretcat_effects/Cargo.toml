@@ -16,3 +16,5 @@ crossbeam = { version = "0.8.2", features = ["crossbeam-queue"] }
 serde = { version = "1.0.183", features = ["derive"] }
 hound = { version = "3.5.1" } 
 indexmap = { version = "2.0.2", features = ["serde"] }
+rustfft = "6.1.0"
+textplots = "0.8.4"

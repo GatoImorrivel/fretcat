@@ -1,5 +1,9 @@
-use std::fmt::Debug;
-use serde::{Serialize, Deserialize};
+use rustfft::{num_complex::Complex, FftPlanner};
+use serde::{Deserialize, Serialize};
+use std::{f64::consts::PI, fmt::Debug};
+use textplots::Plot;
+
+use crate::components::Point;
 
 use super::coeffs::SvfCoeffs;
 
@@ -7,7 +11,7 @@ use super::coeffs::SvfCoeffs;
 pub enum FilterMode {
     Highpass,
     Lowpass,
-    BandPass
+    BandPass,
 }
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq)]
@@ -18,22 +22,27 @@ pub struct Filter {
     sample_rate: f32,
     cutoff: f32,
     q: f32,
-    mode: FilterMode
+    mode: FilterMode,
 }
 
 impl Filter {
     pub fn new(mode: FilterMode, sample_rate: f32, cutoff: f32, q: f32) -> Self {
         let coeffs = Filter::get_coeffs(mode, sample_rate, cutoff, q);
 
-        Self { 
+        Self {
             coeffs,
             ic1eq: 0.0,
             ic2eq: 0.0,
             cutoff,
             q,
             sample_rate,
-            mode
+            mode,
         }
+    }
+
+    #[inline]
+    pub fn mode(&self) -> FilterMode {
+        self.mode
     }
 
     #[inline]
@@ -54,23 +63,29 @@ impl Filter {
         self.coeffs.m0 * v0 + self.coeffs.m1 * v1 + self.coeffs.m2 * v2
     }
 
-    pub fn recalculate_coeffs(&mut self, cutoff: f32, q: f32) {
+    pub fn recalculate_coeffs(&mut self, cutoff: f32, q: f32, sample_rate: f32) {
         self.cutoff = cutoff;
         self.q = q;
-        self.coeffs = Filter::get_coeffs(self.mode, self.sample_rate, cutoff, q);
+        self.coeffs = Filter::get_coeffs(self.mode, sample_rate, cutoff, q);
+    }
+
+    pub fn set_cutoff(&mut self, cutoff: f32) {
+        self.recalculate_coeffs(cutoff, self.q(), self.sample_rate());
+    }
+
+    pub fn set_q(&mut self, q: f32) {
+        self.recalculate_coeffs(self.cutoff(), q, self.sample_rate());
+    }
+
+    pub fn set_sample_rate(&mut self, sample_rate: f32) {
+        self.recalculate_coeffs(self.cutoff(), self.q(), sample_rate);
     }
 
     fn get_coeffs(mode: FilterMode, sample_rate: f32, cutoff: f32, q: f32) -> SvfCoeffs {
         match mode {
-            FilterMode::Highpass => {
-                SvfCoeffs::highpass(sample_rate, cutoff, q)
-            }
-            FilterMode::Lowpass => {
-                SvfCoeffs::lowpass(sample_rate, cutoff, q)
-            }
-            FilterMode::BandPass => {
-                SvfCoeffs::bandpass(sample_rate, cutoff, q)
-            }
+            FilterMode::Highpass => SvfCoeffs::highpass(sample_rate, cutoff, q),
+            FilterMode::Lowpass => SvfCoeffs::lowpass(sample_rate, cutoff, q),
+            FilterMode::BandPass => SvfCoeffs::bandpass(sample_rate, cutoff, q),
         }
     }
 
@@ -84,5 +99,26 @@ impl Filter {
 
     pub fn q(&self) -> f32 {
         self.q
+    }
+
+    pub fn frequency_response(&self) -> Vec<Point> {
+        let mut points: Vec<Point> = vec![];
+
+        let num_points = 1000;
+        let nyquist = (self.sample_rate() / 2.0) as f64;
+
+        for i in 0..nyquist as i32 {
+            let normalized_freq = i as f64 / nyquist;
+            let y = {
+                if (normalized_freq * nyquist) as i32 > self.cutoff() as i32 {
+                    0.0
+                } else {
+                    1.0
+                }
+            };
+            points.push(Point::new((normalized_freq * nyquist).round() as i32, y as i32));
+        }
+
+        points
     }
 }

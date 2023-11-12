@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     common::Filter,
-    components::{Graph, LabeledKnob, LabeledKnobModifier},
+    components::{Graph, LabeledKnobModifier, NamedKnob, Point},
     effects::AudioEffect,
     frame::Frame,
     EffectHandle,
@@ -57,6 +57,7 @@ struct HighPassView {
     cutoff: f32,
     #[msg]
     q: f32,
+    graph_points: Vec<Point>,
 
     #[lens(ignore)]
     handle: EffectHandle<HighPass>,
@@ -68,20 +69,27 @@ impl HighPassView {
             cutoff: handle.filter[0].cutoff(),
             q: handle.filter[0].q(),
             handle: handle.clone(),
+            graph_points: handle.filter[0].frequency_response()
         }
         .build(cx, |cx| {
             HStack::new(cx, |cx| {
-                LabeledKnob::new(
+                Graph::new(cx, Self::graph_points).class("filter-graph");
+                NamedKnob::new(
                     cx,
+                    "Cutoff",
                     Self::cutoff,
                     false,
                     handle.min_freq_hz..handle.max_freq_hz,
                 )
                 .on_changing(|ex, val| ex.emit(Message::Cutoff(val)))
+                .class("filter-knob")
+                .class("cutoff-knob")
                 .height(Stretch(1.0))
                 .width(Stretch(1.0));
-                LabeledKnob::new(cx, Self::q, false, 0.0..2.0)
+                NamedKnob::new(cx, "Resonance", Self::q, false, 0.0..2.0)
                     .on_changing(|ex, val| ex.emit(Message::Q(val)))
+                    .class("filter-knob")
+                    .class("q-knob")
                     .height(Stretch(1.0))
                     .width(Stretch(1.0));
                 Label::new(cx, "High Pass").class("effect-title");
@@ -102,14 +110,16 @@ impl View for HighPassView {
                 self.handle
                     .filter
                     .iter_mut()
-                    .for_each(|filter| filter.recalculate_coeffs(*val, self.q));
+                    .for_each(|filter| filter.set_cutoff(*val));
+                self.graph_points = self.handle.filter[0].frequency_response();
             }
             Message::Q(val) => {
                 self.q = *val;
                 self.handle
                     .filter
                     .iter_mut()
-                    .for_each(|filter| filter.recalculate_coeffs(self.cutoff, *val));
+                    .for_each(|filter| filter.set_q(*val));
+                self.graph_points = self.handle.filter[0].frequency_response();
             }
         })
     }

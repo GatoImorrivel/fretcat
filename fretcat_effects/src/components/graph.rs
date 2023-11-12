@@ -1,30 +1,47 @@
-use nih_plug::vizia::{prelude::*, vg::{Path, Paint}};
+use nih_plug::vizia::{
+    prelude::*,
+    vg::{Paint, Path},
+};
 
 use crate::common::map_value;
 
-pub struct Graph {
-    x: Vec<i32>,
-    y: Vec<i32>
+#[derive(Debug, Clone, Copy, Data, PartialEq, Eq, PartialOrd, Ord, Default)]
+pub struct Point {
+    pub x: i32,
+    pub y: i32,
 }
 
-impl Graph {
-    pub fn new<X, Y>(cx: &mut Context, x: X, y: Y) -> Handle<Self> 
-    where 
-        X: Lens<Target = Vec<i32>>,
-        Y: Lens<Target = Vec<i32>>,
-    {
+impl Point {
+    pub fn new(x: i32, y: i32) -> Self {
+        Self { x, y }
+    }
+}
+
+pub fn get_y_axis(points: &[Point]) -> Vec<i32> {
+    let y_axis = points.iter().map(|point| point.y).collect::<Vec<_>>();
+    y_axis
+}
+
+pub fn get_x_axis(points: &[Point]) -> Vec<i32> {
+    let x_axis = points.iter().map(|point| point.x).collect::<Vec<_>>();
+    x_axis
+}
+
+pub struct Graph<L: Lens<Target = Vec<Point>>> {
+    points: L,
+}
+
+impl<L: Lens<Target = Vec<Point>>> Graph<L> {
+    pub fn new(cx: &mut Context, points: L) -> Handle<Self> {
         Self {
-            x: x.get(cx),
-            y: y.get(cx),
-        }.build(cx, |cx| {
-
-        }).color(Color::white()).background_color(Color::red())
+            points,
+        }
+        .build(cx, |cx| {})
     }
 }
 
-impl View for Graph {
-    fn event(&mut self, cx: &mut EventContext, event: &mut Event) {
-    }
+impl<L: Lens<Target = Vec<Point>>> View for Graph<L> {
+    fn event(&mut self, cx: &mut EventContext, event: &mut Event) {}
 
     fn draw(&self, cx: &mut DrawContext, canvas: &mut Canvas) {
         let bg = cx.background_color();
@@ -34,24 +51,37 @@ impl View for Graph {
 
         let mut graph_line = Path::new();
 
-        let min_x = *self.x.iter().min().unwrap_or_else(|| &0) as f32;
-        let max_x = *self.x.iter().max().unwrap_or_else(|| &0) as f32;
+        let points = self.points.get(cx);
+        let x_axis = get_x_axis(&points);
+        let min_x = *x_axis.iter().min().unwrap_or_else(|| &0);
+        let max_x = *x_axis.iter().max().unwrap_or_else(|| &0);
 
-        let min_y = *self.y.iter().min().unwrap_or_else(|| &0) as f32;
-        let max_y = *self.y.iter().max().unwrap_or_else(|| &0) as f32;
+        let y_axis = get_y_axis(&points);
+        let min_y = *y_axis.iter().min().unwrap_or_else(|| &0);
+        let max_y = *y_axis.iter().max().unwrap_or_else(|| &0);
 
         let mut is_first = true;
-        self.x.iter().zip(self.y.iter()).for_each(|(x,y)| {
-            let x = map_value(*x as f32, min_x, max_x, bounds.x, bounds.right());
-            let mapped_y = map_value(*y as f32, min_y, max_y, bounds.y, bounds.bottom()) as f64;
-            let y = mapped_y - bounds.bottom() as f64;
-            let y = (y / 100.0).abs();
-            let y = bounds.y as f64 + bounds.w as f64 * y;
+        points.iter().for_each(|Point { x, y }| {
+            let mapped_x = map_value(
+                *x as f32,
+                min_x as f32,
+                max_x as f32,
+                bounds.x,
+                bounds.right(),
+            );
+            let mapped_y = map_value(
+                *y as f32,
+                min_y as f32,
+                max_y as f32,
+                bounds.y,
+                bounds.bottom(),
+            );
+            let y = bounds.bottom() - (mapped_y - bounds.top());
             if is_first {
-                graph_line.move_to(x, y as f32);
+                graph_line.move_to(mapped_x as f32, y as f32);
                 is_first = false;
             } else {
-                graph_line.line_to(x, y as f32);
+                graph_line.line_to(mapped_x as f32, y as f32);
             }
         });
 
@@ -60,7 +90,7 @@ impl View for Graph {
         canvas.fill_path(&bg_path, &Paint::color(bg.into()));
 
         let mut paint = Paint::color(line_color.into());
-        paint.set_line_width(2.0);
+        paint.set_line_width(1.0);
         paint.set_line_cap(nih_plug::vizia::vg::LineCap::Square);
         canvas.stroke_path(&graph_line, &paint);
     }

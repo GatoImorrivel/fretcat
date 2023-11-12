@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     common::Filter,
-    components::{Graph, LabeledKnob, LabeledKnobModifier},
+    components::{Graph, LabeledKnob, LabeledKnobModifier, NamedKnob, Point},
     effects::AudioEffect,
     frame::Frame,
     EffectHandle,
@@ -36,6 +36,10 @@ impl Default for LowPass {
 
 impl AudioEffect for LowPass {
     fn process(&mut self, input_buffer: &mut Frame, transport: &nih_plug::prelude::Transport) {
+        if self.filter[0].sample_rate() != transport.sample_rate {
+            self.filter[0].set_sample_rate(transport.sample_rate);
+            self.filter[1].set_sample_rate(transport.sample_rate);
+        }
         input_buffer.process_individual(|left, right| {
             *left = self.filter[0].tick(*left);
             *right = self.filter[1].tick(*right);
@@ -58,8 +62,7 @@ struct LowPassView {
     #[msg]
     q: f32,
 
-    x: Vec<i32>,
-    y: Vec<i32>,
+    graph_points: Vec<Point>,
 
     #[lens(ignore)]
     handle: EffectHandle<LowPass>,
@@ -71,26 +74,27 @@ impl LowPassView {
             cutoff: handle.filter[0].cutoff(),
             q: handle.filter[0].q(),
             handle: handle.clone(),
-            x: vec![0, 1, 2, 3],
-            y: vec![0, 1, 5, 3],
+            graph_points: handle.filter[0].frequency_response()
         }
         .build(cx, |cx| {
             HStack::new(cx, |cx| {
-                Graph::new(cx, Self::x, Self::y)
-                    .width(Pixels(100.0))
-                    .height(Pixels(100.0))
-                    .color(Color::blue());
-                LabeledKnob::new(
+                Graph::new(cx, Self::graph_points).class("filter-graph");
+                NamedKnob::new(
                     cx,
+                    "Cutoff",
                     Self::cutoff,
                     false,
                     handle.min_freq_hz..handle.max_freq_hz,
                 )
                 .on_changing(|ex, val| ex.emit(Message::Cutoff(val)))
+                .class("filter-knob")
+                .class("cutoff-knob")
                 .height(Stretch(1.0))
                 .width(Stretch(1.0));
-                LabeledKnob::new(cx, Self::q, false, 0.0..2.0)
+                NamedKnob::new(cx, "Resonance", Self::q, false, 0.0..2.0)
                     .on_changing(|ex, val| ex.emit(Message::Q(val)))
+                    .class("filter-knob")
+                    .class("q-knob")
                     .height(Stretch(1.0))
                     .width(Stretch(1.0));
                 Label::new(cx, "Low Pass").class("effect-title");
@@ -111,14 +115,16 @@ impl View for LowPassView {
                 self.handle
                     .filter
                     .iter_mut()
-                    .for_each(|filter| filter.recalculate_coeffs(*val, self.q));
+                    .for_each(|filter| filter.set_cutoff(*val));
+                self.graph_points = self.handle.filter[0].frequency_response();
             }
             Message::Q(val) => {
                 self.q = *val;
                 self.handle
                     .filter
                     .iter_mut()
-                    .for_each(|filter| filter.recalculate_coeffs(self.cutoff, *val));
+                    .for_each(|filter| filter.set_q(*val));
+                self.graph_points = self.handle.filter[0].frequency_response();
             }
         })
     }

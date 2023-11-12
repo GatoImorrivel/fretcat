@@ -1,8 +1,13 @@
 use fretcat_macros::Message;
 use nih_plug::{util::db_to_gain_fast, vizia::prelude::*};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
-use crate::{components::{LabeledKnob, LabeledKnobModifier}, EffectHandle, effects::AudioEffect, frame::Frame};
+use crate::{
+    components::{LabeledKnob, LabeledKnobModifier, NamedKnob},
+    effects::AudioEffect,
+    frame::Frame,
+    EffectHandle,
+};
 
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
 pub struct Gain {
@@ -23,7 +28,7 @@ impl AudioEffect for Gain {
     }
 
     fn view(&self, cx: &mut Context, effect: std::sync::Arc<dyn AudioEffect>) {
-        GainView::new(cx, EffectHandle::<Self>::from(effect));
+        GainView::new(cx, EffectHandle::<Self>::from(effect)).class("base-effect");
     }
 
     fn height(&self) -> f32 {
@@ -47,12 +52,11 @@ impl GainView {
             handle: handle.clone(),
         }
         .build(cx, |cx| {
-            LabeledKnob::new(
-                cx,
-                Self::gain,
-                false,
-                -60.0..20.0,
-            ).on_changing(|ex, val| ex.emit(Message::Gain(val)));
+            HStack::new(cx, |cx| {
+                NamedKnob::new(cx, "Gain", Self::gain, false, -60.0..20.0)
+                    .on_changing(|ex, val| ex.emit(Message::Gain(val)));
+                Label::new(cx, "Gain Booster").class("effect-title");
+            });
         })
     }
 }

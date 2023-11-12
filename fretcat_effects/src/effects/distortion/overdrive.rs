@@ -6,7 +6,7 @@ use nih_plug::util::db_to_gain_fast;
 use nih_plug::vizia::prelude::*;
 use serde::{Deserialize, Serialize};
 
-use crate::components::{LabeledKnob, LabeledKnobModifier};
+use crate::components::{LabeledKnob, LabeledKnobModifier, NamedKnob};
 use crate::effects::AudioEffect;
 use crate::frame::Frame;
 use crate::{EffectHandle, NUM_CHANNELS};
@@ -91,18 +91,19 @@ impl OverdriveView {
         }
         .build(cx, |cx| {
             HStack::new(cx, |cx| {
-                LabeledKnob::new(cx, Self::gain, false, 1.0..20.0)
+                NamedKnob::new(cx, "Gain", Self::gain, false, 1.0..20.0)
                     .on_changing(|ex, val| ex.emit(Message::Gain(val)))
                     .class("gain-knob");
-                LabeledKnob::new(
+                NamedKnob::new(
                     cx,
+                    "Tone",
                     Self::freq,
                     false,
                     handle.min_freq_hz..handle.max_freq_hz,
                 )
                 .on_changing(|ex, val| ex.emit(Message::Freq(val)))
                 .class("tone-knob");
-                LabeledKnob::new(cx, Self::volume, false, -10.0..10.0)
+                NamedKnob::new(cx, "Output Volume", Self::volume, false, -10.0..10.0)
                     .on_changing(|ex, val| ex.emit(Message::Volume(val)))
                     .class("volume-knob");
                 Label::new(cx, "Drive").class("effect-title");
@@ -125,12 +126,9 @@ impl View for OverdriveView {
             Message::Freq(val) => {
                 self.freq = *val;
                 self.handle.freq = *val;
-                let min_freq = self.handle.min_freq_hz;
-                let max_freq = self.handle.max_freq_hz;
                 self.handle.filter.iter_mut().for_each(|filter| {
-                    filter.recalculate_coeffs(
-                        normalize_value(*val, &(min_freq..max_freq)),
-                        filter.q(),
+                    filter.set_cutoff(
+                        *val,
                     );
                 });
             }
