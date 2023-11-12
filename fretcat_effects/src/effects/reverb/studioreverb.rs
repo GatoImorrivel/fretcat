@@ -31,7 +31,15 @@ impl Default for StudioReverb {
 
 impl AudioEffect for StudioReverb {
     fn process(&mut self, input_buffer: &mut Frame, transport: &nih_plug::prelude::Transport) {
+        if transport.sample_rate != self.reverb.sample_rate() {
+            nih_plug::util::permit_alloc(|| {
+                self.reverb = Freeverb::new(transport.sample_rate as usize);
+            });
+        }
 
+        input_buffer.process_individual(|left, right| {
+            (*left, *right) = self.reverb.tick((*left, *right));
+        });
     }
 
     fn view(&self, cx: &mut Context, effect: Arc<dyn AudioEffect>) {

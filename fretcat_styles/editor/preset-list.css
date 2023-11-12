@@ -1,6 +1,6 @@
 preset-list .kind-btn {
     border-radius: 20px;
-    background-color: #121212;
+    background-color: rgb(33,33,33);
     border-color: transparent;
     width: 1s;
     height: 50px;
@@ -25,7 +25,7 @@ preset-list .preset-card {
     height: 50px;
     child-space: 1s;
     border-radius: 15px;
-    background-color: #121212;
+    background-color: rgb(33,33,33);
     border-color: transparent;
 }
 

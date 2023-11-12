@@ -2,7 +2,7 @@
     width: 1s;
     height: 100px;
     border-radius: 20px; 
-    background-color: #121212;
+    background-color: rgb(33,33,33);
 }
 
 .card-base label {

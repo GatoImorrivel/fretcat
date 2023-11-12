@@ -1,6 +1,6 @@
 preset-control {
     border-radius: 20px;
-    background-color: #121212;
+    background-color: rgb(33,33,33);
 }
 
 preset-control .name-wrapper textbox {

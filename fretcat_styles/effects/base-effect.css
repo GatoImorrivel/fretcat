@@ -1,7 +1,7 @@
 .base-effect {
     border-top-right-radius: 15px;
     border-bottom-right-radius: 15px;
-    background-color: #121212;
+    background-color: rgb(34, 34, 34);
     width: 1s;
 }
 

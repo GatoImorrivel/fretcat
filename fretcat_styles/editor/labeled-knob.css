@@ -1,7 +1,8 @@
 labeled-knob knob {
     width: 60px;
     height: 60px;
-    background-image: linear-gradient(135deg, #363636 0%, #303030 100%); 
+    background-image: none; 
+    background-color: transparent;
 }
 
 labeled-knob .knob-value {
@@ -10,10 +11,13 @@ labeled-knob .knob-value {
 }
 
 labeled-knob knob .knob-head {
-    background-image: linear-gradient(135deg, #363636 0%, #303030 100%); 
-    border-color: #363636;
+    background-image: none;
+    background-color: rgb(54, 54, 54);
+    border-color: rgb(34, 34, 34);
+    border-width: 2px;
 }
 
 labeled-knob knob .knob-track {
     color: rgba(252, 145, 46, 1);
+    background-color: rgb(54, 54, 54);
 }

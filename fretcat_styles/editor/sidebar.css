@@ -1,7 +1,7 @@
 sidebar {
     width: 2s;
     border-radius: 16px; 
-    background-color: #121212;
+    background-color: rgb(33,33,33);
 }
 
 sidebar label {

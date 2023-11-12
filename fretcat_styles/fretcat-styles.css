@@ -22,7 +22,7 @@ audio-slider slider .thumb {
     background-color: rgb(35, 35, 35);
 }card-list .kind-btn {
     border-radius: 20px;
-    background-color: #121212;
+    background-color: rgb(33,33,33);
     border-color: transparent;
     width: 1s;
     height: 50px;
@@ -44,7 +44,7 @@ card-list .kind-btn label {
     width: 1s;
     height: 100px;
     border-radius: 20px; 
-    background-color: #121212;
+    background-color: rgb(33,33,33);
 }
 
 .card-base label {
@@ -64,7 +64,7 @@ card-list .kind-btn label {
     child-top: 3%;
     child-bottom: 3%;
 
-    background-color: rgb(33, 33, 33);
+    background-color: rgb(23, 23, 23);
 }
 
 button:hover {
@@ -183,10 +183,16 @@ effect-list .new-effect-indicator > vstack {
 effect-list .new-effect-indicator > vstack label {
     font-size: 100;
     color: #121212;
+}.filter-graph {
+    width: 200px;
+    height: 1s;
+    background-color: black;
+    color: #e3e3e3;
 }labeled-knob knob {
     width: 60px;
     height: 60px;
-    background-image: linear-gradient(135deg, #363636 0%, #303030 100%); 
+    background-image: none; 
+    background-color: transparent;
 }
 
 labeled-knob .knob-value {
@@ -195,12 +201,15 @@ labeled-knob .knob-value {
 }
 
 labeled-knob knob .knob-head {
-    background-image: linear-gradient(135deg, #363636 0%, #303030 100%); 
-    border-color: #363636;
+    background-image: none;
+    background-color: rgb(54, 54, 54);
+    border-color: rgb(34, 34, 34);
+    border-width: 2px;
 }
 
 labeled-knob knob .knob-track {
     color: rgba(252, 145, 46, 1);
+    background-color: rgb(54, 54, 54);
 }.message-body {
     child-top: 1s;
     child-bottom: 1s;
@@ -257,9 +266,17 @@ mono-control .selected-state.off-btn label {
 
 mono-control .off-btn {
     font-family: "Symbols Nerd Font Mono";
+}named-knob > zstack > label {
+    color: #e3e3e3;
+    font-family: Montserrat;
+    transform: translate(0px, 38px);
+}
+
+named-knob zstack {
+    child-space: 1s;
 }preset-control {
     border-radius: 20px;
-    background-color: #121212;
+    background-color: rgb(33,33,33);
 }
 
 preset-control .name-wrapper textbox {
@@ -306,7 +323,7 @@ preset-control > hstack {
     col-between: 1s;
 }preset-list .kind-btn {
     border-radius: 20px;
-    background-color: #121212;
+    background-color: rgb(33,33,33);
     border-color: transparent;
     width: 1s;
     height: 50px;
@@ -331,7 +348,7 @@ preset-list .preset-card {
     height: 50px;
     child-space: 1s;
     border-radius: 15px;
-    background-color: #121212;
+    background-color: rgb(33,33,33);
     border-color: transparent;
 }
 
@@ -342,7 +359,7 @@ preset-list .preset-card label {
 }sidebar {
     width: 2s;
     border-radius: 16px; 
-    background-color: #121212;
+    background-color: rgb(33,33,33);
 }
 
 sidebar label {
@@ -380,7 +397,7 @@ sidebar .tab-selected-btn {
 .base-effect {
     border-top-right-radius: 15px;
     border-bottom-right-radius: 15px;
-    background-color: #121212;
+    background-color: rgb(34, 34, 34);
     width: 1s;
 }
 
@@ -410,6 +427,8 @@ bit-crusher labeled-knob label {
 
 bit-crusher labeled-knob knob .knob-tick {
     background-color: #e3e3e3;
+}.filter-knob .knob-name {
+    transform: translate(0px, 35px);
 }.fuzz {
     background-image: url("fuzz-background");
     overflow: hidden;

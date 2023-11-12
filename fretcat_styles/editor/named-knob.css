@@ -1,0 +1,9 @@
+named-knob > zstack > label {
+    color: #e3e3e3;
+    font-family: Montserrat;
+    transform: translate(0px, 38px);
+}
+
+named-knob zstack {
+    child-space: 1s;
+}

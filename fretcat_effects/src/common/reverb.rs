@@ -49,6 +49,7 @@ pub struct Freeverb {
     dampening: f32,
     room_size: f32,
     frozen: bool,
+    sample_rate: f32
 }
 
 fn adjust_length(length: usize, sr: usize) -> usize {
@@ -118,6 +119,7 @@ impl Freeverb {
             dampening: 0.0,
             room_size: 0.0,
             frozen: false,
+            sample_rate: sr as f32
         };
 
         freeverb.set_wet(1.0);
@@ -202,6 +204,10 @@ impl Freeverb {
             combs.0.set_dampening(dampening);
             combs.1.set_dampening(dampening);
         }
+    }
+
+    pub fn sample_rate(&self) -> f32 {
+        self.sample_rate
     }
 
     pub fn set_dry(&mut self, value: f32) {

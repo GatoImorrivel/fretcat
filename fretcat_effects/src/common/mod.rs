@@ -12,6 +12,8 @@ mod filter;
 mod reverb;
 #[allow(unused)]
 mod adsr;
+#[allow(unused)]
+mod delay;
 
 use std::ops::Range;
 
@@ -19,7 +21,8 @@ pub use self::{
     allpass::AllPass,
     filter::{Filter, FilterMode},
     reverb::Freeverb,
-    adsr::Envelope
+    adsr::Envelope,
+    delay::Delay
 };
 
 
@@ -50,4 +53,13 @@ pub fn map_value(value: f32, min_input: f32, max_input: f32, min_output: f32, ma
 #[inline]
 pub fn rms(buffer: &[f32]) -> f32 {
     (buffer.iter().map(|sample| sample * sample).sum::<f32>() / buffer.len() as f32).sqrt()
+}
+
+#[inline]
+fn interpolate(s1: f32, s2: f32, offset: f32) -> f32 {
+    let one = 1.0_f32;
+    let offset = offset;
+    let rhs = offset * s2;
+    let lhs = (one - offset) * s1;
+    lhs + rhs
 }

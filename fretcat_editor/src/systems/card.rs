@@ -129,7 +129,7 @@ pub const DELAY_CARD: Card = Card {
         ex.emit(CardEvent::DragChange(Some(DELAY_CARD)));
         ex.set_drop_data(ex.current());
     },
-    spawn: || Arc::new(Delay::default()),
+    spawn: || Arc::new(MonoDelay::default()),
 };
 
 pub const TWIN_DELAY_CARD: Card = Card {

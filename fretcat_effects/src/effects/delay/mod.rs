@@ -1,5 +1,5 @@
 mod delay;
-pub use delay::Delay;
+pub use delay::MonoDelay;
 
 mod twin_delay;
 pub use twin_delay::TwinDelay;
