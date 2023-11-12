@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 
 use nih_plug::vizia::prelude::*;
 
-use crate::{components::LabeledKnob, EffectHandle, effects::AudioEffect};
+use crate::{components::LabeledKnob, EffectHandle, effects::AudioEffect, frame::Frame};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct BitCrusher {
@@ -17,12 +17,8 @@ impl Default for BitCrusher {
 }
 
 impl AudioEffect for BitCrusher {
-    fn process(&mut self, input_buffer: (&mut [f32], &mut [f32]), transport: &nih_plug::prelude::Transport) {
-        input_buffer
-            .0
-            .iter_mut()
-            .zip(input_buffer.1.iter_mut())
-            .for_each(|(left, right)| {});
+    fn process(&mut self, input_buffer: &mut Frame, transport: &nih_plug::prelude::Transport) {
+
     }
 
     fn view(&self, _cx: &mut Context, _effect: std::sync::Arc<dyn AudioEffect>) {

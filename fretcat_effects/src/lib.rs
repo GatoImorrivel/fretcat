@@ -1,4 +1,5 @@
 mod chain;
+mod frame;
 mod common;
 mod components;
 pub mod effects;

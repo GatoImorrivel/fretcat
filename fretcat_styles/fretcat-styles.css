@@ -142,7 +142,7 @@ knob:disabled .knob-tick {
 }
 
 effect-handle .effect-bar {
-    background-image: linear-gradient(135deg, #363636 0%, #303030 100%); 
+    background-image: linear-gradient(135deg, #2f2f2f 0%, #272727 100%); 
     col-between: 1s;
     cursor: grab;
     border-top-left-radius: 15px;
@@ -381,7 +381,6 @@ sidebar .tab-selected-btn {
     border-top-right-radius: 15px;
     border-bottom-right-radius: 15px;
     background-color: #121212;
-    overflow: hidden;
     width: 1s;
 }
 

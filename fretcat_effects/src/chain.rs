@@ -8,13 +8,14 @@ use nih_plug::{util::gain_to_db_fast, vizia::prelude::*};
 use crate::effects::{AudioEffect, Overdrive, StudioReverb};
 use crate::{
     common::rms,
-    effects::{Gain, Mono, NoiseGate, PostFX, PreFX},
+    effects::{Gain, Mono, NoiseGate, PostFX, PreFX, InputSimulator}, frame::Frame,
 };
 
 pub const NUM_CHANNELS: usize = 2;
 
 pub type Query<'a> = &'a Arc<dyn AudioEffect>;
 pub type QueryMut<'a> = &'a mut Arc<dyn AudioEffect>;
+
 
 #[derive(Debug, Lens, Clone)]
 pub struct ChainData {
@@ -82,35 +83,34 @@ pub struct Chain {
 
 impl Chain {
     #[inline]
-    pub fn process(&mut self, buffer: &mut [&mut [f32]], transport: &nih_plug::prelude::Transport) {
+    pub fn process<'a>(&mut self, buffer: &mut [&'a mut [f32]], transport: &nih_plug::prelude::Transport) {
         unsafe {
-            let left: *mut &mut [f32] = std::mem::transmute(&mut buffer[0]);
-            let right: *mut &mut [f32] = std::mem::transmute(&mut buffer[1]);
+            let mut frame = Frame::from(buffer);
 
             self.pre_fx
                 .iter_mut()
-                .for_each(|(_, fx)| fx.process((&mut *left, &mut *right), transport));
+                .for_each(|(_, fx)| fx.process(&mut frame, transport));
 
-            self.in_avg_amplitude = Self::get_rms((&*left, &*right));
+            self.in_avg_amplitude = Self::get_rms(&frame);
 
             self.effects.iter_mut().for_each(|e| {
                 let e = { &mut *Arc::as_ptr(e).cast_mut() };
-                e.process((&mut *left, &mut *right), transport)
+                e.process(&mut frame, transport)
             });
 
             self.post_fx
                 .iter_mut()
-                .for_each(|(_, fx)| fx.process((&mut *left, &mut *right), transport));
+                .for_each(|(_, fx)| fx.process(&mut frame, transport));
 
-            self.out_avg_amplitude = Self::get_rms((&*left, &*right));
+            self.out_avg_amplitude = Self::get_rms(&frame);
         }
     }
 
     #[inline]
-    fn get_rms(buffer: (&[f32], &[f32])) -> (f32, f32) {
+    fn get_rms(frame: &Frame) -> (f32, f32) {
         (
-            gain_to_db_fast(rms(buffer.0)),
-            gain_to_db_fast(rms(buffer.1)),
+            gain_to_db_fast(rms(&frame.get_left())),
+            gain_to_db_fast(rms(&frame.get_right())),
         )
     }
 
@@ -210,10 +210,6 @@ impl Default for Chain {
             .pre_fx
             .insert(PreFX("noise_gate"), Box::new(NoiseGate::default()));
 
-        #[cfg(feature = "simulate")]
-        {
-            //chain.pre_fx.insert(PreFX("input-simulator"), Box::new(InputSimulator::default()));
-        }
 
         chain
             .post_fx

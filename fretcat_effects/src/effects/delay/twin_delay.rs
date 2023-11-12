@@ -1,7 +1,7 @@
 use nih_plug::vizia::prelude::*;
 use serde::{Serialize, Deserialize};
 
-use crate::{EffectHandle, effects::AudioEffect};
+use crate::{EffectHandle, effects::AudioEffect, frame::Frame};
 
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -17,7 +17,7 @@ impl Default for TwinDelay {
 }
 
 impl AudioEffect for TwinDelay {
-    fn process(&mut self, input_buffer: (&mut [f32], &mut [f32]), transport: &nih_plug::prelude::Transport) {
+    fn process(&mut self, input_buffer: &mut Frame, transport: &nih_plug::prelude::Transport) {
         
     }
 

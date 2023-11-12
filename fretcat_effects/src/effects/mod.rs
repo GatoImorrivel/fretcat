@@ -15,6 +15,9 @@ pub use dynamics::*;
 mod reverb;
 pub use reverb::*;
 
+mod input_simulator;
+pub use input_simulator::InputSimulator;
+
 
 #[derive(Debug, Hash, PartialEq, Eq, Clone, Copy, Data)]
 pub struct PreFX(pub &'static str);
@@ -24,13 +27,15 @@ pub struct PostFX(pub &'static str);
 
 use core::any::Any;
 
+use crate::frame::Frame;
+
 pub trait DynPartialEq {
     fn box_eq(&self, other: &dyn Any) -> bool;
     fn as_any(&self) -> &dyn Any;
 }
 
 pub trait AudioEffect: fmt::Debug + Send + Sync + DynClone + DowncastSync {
-    fn process(&mut self, input_buffer: (&mut [f32], &mut [f32]), transport: &nih_plug::prelude::Transport);
+    fn process(&mut self, input_buffer: &mut Frame, transport: &nih_plug::prelude::Transport);
     fn view(&self, _cx: &mut Context, _effect: Arc<dyn AudioEffect>) {}
     fn height(&self) -> f32 {
         0.0

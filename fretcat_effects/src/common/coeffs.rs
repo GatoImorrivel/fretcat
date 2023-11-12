@@ -3,7 +3,7 @@ use std::f32::consts::PI;
 use serde::{Serialize, Deserialize};
 
 // this is from the fundsp crate
-#[derive(Debug, Clone, Copy, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Default, Serialize, Deserialize, PartialEq)]
 pub struct SvfCoeffs {
     pub a1: f32,
     pub a2: f32,

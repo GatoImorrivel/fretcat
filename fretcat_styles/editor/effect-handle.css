@@ -3,7 +3,7 @@ effect-handle {
 }
 
 effect-handle .effect-bar {
-    background-image: linear-gradient(135deg, #363636 0%, #303030 100%); 
+    background-image: linear-gradient(135deg, #2f2f2f 0%, #272727 100%); 
     col-between: 1s;
     cursor: grab;
     border-top-left-radius: 15px;

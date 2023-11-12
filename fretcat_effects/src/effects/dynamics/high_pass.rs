@@ -1,27 +1,49 @@
+use fretcat_macros::Message;
 use nih_plug::vizia::prelude::*;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
-use crate::{EffectHandle, effects::AudioEffect};
+use crate::{
+    common::Filter,
+    components::{Graph, LabeledKnob, LabeledKnobModifier},
+    effects::AudioEffect,
+    frame::Frame,
+    EffectHandle,
+};
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct HighPass {
-
-
+    filter: [Filter; 2],
+    min_freq_hz: f32,
+    max_freq_hz: f32,
 }
 
 impl Default for HighPass {
     fn default() -> Self {
-        Self {  }
+        let min_freq_hz = 20f32;
+        let max_freq_hz = 20000f32;
+        Self {
+            min_freq_hz,
+            max_freq_hz,
+            filter: [Filter::new(
+                crate::common::FilterMode::Highpass,
+                44100.0,
+                min_freq_hz,
+                1.0,
+            ); 2],
+        }
     }
 }
 
 impl AudioEffect for HighPass {
-    fn process(&mut self, input_buffer: (&mut [f32], &mut [f32]), transport: &nih_plug::prelude::Transport) {
-        
+    fn process(&mut self, input_buffer: &mut Frame, transport: &nih_plug::prelude::Transport) {
+        input_buffer.process_individual(|left, right| {
+            *left = self.filter[0].tick(*left);
+            *right = self.filter[1].tick(*right);
+        });
     }
 
     fn view(&self, _cx: &mut Context, _effect: std::sync::Arc<dyn AudioEffect>) {
-        HighPassView::new(_cx, EffectHandle::<Self>::from(_effect));
+        HighPassView::new(_cx, EffectHandle::<Self>::from(_effect)).class("base-effect");
     }
 
     fn height(&self) -> f32 {
@@ -29,25 +51,66 @@ impl AudioEffect for HighPass {
     }
 }
 
-#[derive(Debug, Clone, Lens)]
+#[derive(Debug, Clone, Lens, Message)]
 struct HighPassView {
+    #[msg]
+    cutoff: f32,
+    #[msg]
+    q: f32,
 
     #[lens(ignore)]
-    handle: EffectHandle<HighPass>
+    handle: EffectHandle<HighPass>,
 }
 
 impl HighPassView {
     pub fn new(cx: &mut Context, handle: EffectHandle<HighPass>) -> Handle<Self> {
         Self {
-            handle: handle.clone()
-        }.build(cx, |cx| {
-
+            cutoff: handle.filter[0].cutoff(),
+            q: handle.filter[0].q(),
+            handle: handle.clone(),
+        }
+        .build(cx, |cx| {
+            HStack::new(cx, |cx| {
+                LabeledKnob::new(
+                    cx,
+                    Self::cutoff,
+                    false,
+                    handle.min_freq_hz..handle.max_freq_hz,
+                )
+                .on_changing(|ex, val| ex.emit(Message::Cutoff(val)))
+                .height(Stretch(1.0))
+                .width(Stretch(1.0));
+                LabeledKnob::new(cx, Self::q, false, 0.0..2.0)
+                    .on_changing(|ex, val| ex.emit(Message::Q(val)))
+                    .height(Stretch(1.0))
+                    .width(Stretch(1.0));
+                Label::new(cx, "High Pass").class("effect-title");
+            });
         })
     }
 }
 
 impl View for HighPassView {
     fn element(&self) -> Option<&'static str> {
-        Some("auto-wah")
+        Some("high-pass")
+    }
+
+    fn event(&mut self, cx: &mut EventContext, event: &mut Event) {
+        event.map(|event, _| match event {
+            Message::Cutoff(val) => {
+                self.cutoff = *val;
+                self.handle
+                    .filter
+                    .iter_mut()
+                    .for_each(|filter| filter.recalculate_coeffs(*val, self.q));
+            }
+            Message::Q(val) => {
+                self.q = *val;
+                self.handle
+                    .filter
+                    .iter_mut()
+                    .for_each(|filter| filter.recalculate_coeffs(self.cutoff, *val));
+            }
+        })
     }
 }

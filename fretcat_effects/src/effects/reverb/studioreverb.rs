@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use crate::{common::Freeverb, EffectHandle, effects::AudioEffect};
+use crate::{common::Freeverb, EffectHandle, effects::AudioEffect, frame::Frame};
 use fretcat_macros::Message;
 use nih_plug::vizia::prelude::*;
 
@@ -30,14 +30,8 @@ impl Default for StudioReverb {
 }
 
 impl AudioEffect for StudioReverb {
-    fn process(&mut self, input_buffer: (&mut [f32], &mut [f32]), transport: &nih_plug::prelude::Transport) {
-        input_buffer
-            .0
-            .iter_mut()
-            .zip(input_buffer.1.iter_mut())
-            .for_each(|(left, right)| {
-                (*left, *right) = self.reverb.tick((*left, *right));
-            });
+    fn process(&mut self, input_buffer: &mut Frame, transport: &nih_plug::prelude::Transport) {
+
     }
 
     fn view(&self, cx: &mut Context, effect: Arc<dyn AudioEffect>) {

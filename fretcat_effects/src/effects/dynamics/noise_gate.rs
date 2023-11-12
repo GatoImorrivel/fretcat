@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::{common::Envelope, effects::AudioEffect};
+use crate::{common::Envelope, effects::AudioEffect, frame::Frame};
 
 
 #[derive(Debug, Clone, Copy, Deserialize, Serialize, Default)]
@@ -16,8 +16,7 @@ impl NoiseGate {
 }
 
 impl AudioEffect for NoiseGate {
-    fn process(&mut self, input_buffer: (&mut [f32], &mut [f32]), transport: &nih_plug::prelude::Transport) {
-        input_buffer.0.iter_mut().zip(input_buffer.1.iter_mut()).for_each(|(left, right)| {
-        });
+    fn process(&mut self, input_buffer: &mut Frame, transport: &nih_plug::prelude::Transport) {
+
     }
 }

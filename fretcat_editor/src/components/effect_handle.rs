@@ -35,7 +35,6 @@ impl EffectHandle {
                 VStack::new(cx, move |cx| effect.view(cx, effect.clone()))
                     .width(Stretch(100.0))
                     .height(Stretch(1.0))
-                    .overflow(Overflow::Hidden)
                     .class("effect-container")
                     .on_drop(move |ex, _| on_drop(ex, index));
 

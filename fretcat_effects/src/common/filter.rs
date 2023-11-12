@@ -3,13 +3,14 @@ use serde::{Serialize, Deserialize};
 
 use super::coeffs::SvfCoeffs;
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
 pub enum FilterMode {
     Highpass,
-    Lowpass
+    Lowpass,
+    BandPass
 }
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq)]
 pub struct Filter {
     coeffs: SvfCoeffs,
     ic1eq: f32,
@@ -66,6 +67,9 @@ impl Filter {
             }
             FilterMode::Lowpass => {
                 SvfCoeffs::lowpass(sample_rate, cutoff, q)
+            }
+            FilterMode::BandPass => {
+                SvfCoeffs::bandpass(sample_rate, cutoff, q)
             }
         }
     }

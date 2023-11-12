@@ -8,9 +8,10 @@ use serde::{Deserialize, Serialize};
 
 use crate::components::{LabeledKnob, LabeledKnobModifier};
 use crate::effects::AudioEffect;
+use crate::frame::Frame;
 use crate::{EffectHandle, NUM_CHANNELS};
 
-use crate::common::{map_normalized_value, Filter, FilterMode};
+use crate::common::{Filter, FilterMode, normalize_value};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Overdrive {
@@ -43,26 +44,18 @@ impl Default for Overdrive {
 }
 
 impl AudioEffect for Overdrive {
-    fn process(
-        &mut self,
-        input_buffer: (&mut [f32], &mut [f32]),
-        _transport: &nih_plug::prelude::Transport,
-    ) {
-        input_buffer
-            .0
-            .iter_mut()
-            .zip(input_buffer.1.iter_mut())
-            .for_each(|(left, right)| {
-                let clipping_fn = |sample: f32| (2.0 / PI) * f32::atan(sample);
+    fn process(&mut self, input_buffer: &mut Frame, _transport: &nih_plug::prelude::Transport) {
+        input_buffer.process_individual(|left, right| {
+            let clipping_fn = |sample: f32| (2.0 / PI) * f32::atan(sample);
 
-                let output_gain = db_to_gain_fast(self.volume);
+            let output_gain = db_to_gain_fast(self.volume);
 
-                *left = clipping_fn(*left * db_to_gain_fast(self.gain)) * output_gain;
-                *right = clipping_fn(*right * db_to_gain_fast(self.gain)) * output_gain;
+            *left = clipping_fn(*left * db_to_gain_fast(self.gain)) * output_gain;
+            *right = clipping_fn(*right * db_to_gain_fast(self.gain)) * output_gain;
 
-                *left = self.filter[0].tick(*left);
-                *right = self.filter[1].tick(*right);
-            });
+            *left = self.filter[0].tick(*left);
+            *right = self.filter[1].tick(*right);
+        });
     }
 
     fn view(&self, cx: &mut Context, effect: Arc<dyn AudioEffect>) {
@@ -98,24 +91,20 @@ impl OverdriveView {
         }
         .build(cx, |cx| {
             HStack::new(cx, |cx| {
-                LabeledKnob::new(
-                    cx,
-                    Self::gain,
-                    false,
-                    1.0..20.0,
-                ).on_changing(|ex, val| ex.emit(Message::Gain(val))).class("gain-knob");
+                LabeledKnob::new(cx, Self::gain, false, 1.0..20.0)
+                    .on_changing(|ex, val| ex.emit(Message::Gain(val)))
+                    .class("gain-knob");
                 LabeledKnob::new(
                     cx,
                     Self::freq,
                     false,
                     handle.min_freq_hz..handle.max_freq_hz,
-                ).on_changing(|ex, val| ex.emit(Message::Freq(val))).class("tone-knob");
-                LabeledKnob::new(
-                    cx,
-                    Self::volume,
-                    false,
-                    -10.0..10.0,
-                ).on_changing(|ex, val| ex.emit(Message::Volume(val))).class("volume-knob");
+                )
+                .on_changing(|ex, val| ex.emit(Message::Freq(val)))
+                .class("tone-knob");
+                LabeledKnob::new(cx, Self::volume, false, -10.0..10.0)
+                    .on_changing(|ex, val| ex.emit(Message::Volume(val)))
+                    .class("volume-knob");
                 Label::new(cx, "Drive").class("effect-title");
             });
         })
@@ -140,7 +129,7 @@ impl View for OverdriveView {
                 let max_freq = self.handle.max_freq_hz;
                 self.handle.filter.iter_mut().for_each(|filter| {
                     filter.recalculate_coeffs(
-                        map_normalized_value(*val, min_freq, max_freq),
+                        normalize_value(*val, &(min_freq..max_freq)),
                         filter.q(),
                     );
                 });
