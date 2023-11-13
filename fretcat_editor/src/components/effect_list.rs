@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use nih_plug::vizia::prelude::*;
 
-use crate::systems::{CardEvent, CardSystem};
+use crate::{systems::{CardEvent, CardSystem}, common::{LIST_SPACING, LIST_SPACING_UNITS}};
 
 use super::effect_handle::EffectHandle;
 use fretcat_effects::{Chain, ChainCommand};
@@ -38,7 +38,8 @@ impl EffectList {
                         VStack::new(cx, |cx| {
                             EffectHandle::new(cx, effect.clone(), index);
                         })
-                        .height(Pixels(effect.height()));
+                        .height(Pixels(effect.height() + if effect.height() > 100.0 { LIST_SPACING } else { 0.0 }));
+                        Element::new(cx).height(LIST_SPACING_UNITS);
                     }
                     VStack::new(cx, |cx| {
                         VStack::new(cx, |cx| {
@@ -56,6 +57,8 @@ impl EffectList {
                     });
                 });
             })
+            .width(Stretch(1.0))
+            .height(Stretch(1.0))
             .overflow(Overflow::Hidden);
         })
         .overflow(Overflow::Hidden)

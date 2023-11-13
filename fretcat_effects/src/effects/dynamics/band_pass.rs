@@ -9,7 +9,7 @@ pub struct BandPass {
 
 impl Default for BandPass {
     fn default() -> Self {
-        let min_freq_hz = 20f32;
+        let min_freq_hz = 440f32;
         let max_freq_hz = 20000f32;
         Self {  
             min_freq_hz,
@@ -55,7 +55,7 @@ impl BandPassView {
             cutoff: handle.filter[0].cutoff(),
             q: handle.filter[0].q(),
             handle: handle.clone(),
-            graph_points: handle.filter[0].frequency_response()
+            graph_points: handle.filter[0].graph()
         }
         .build(cx, |cx| {
             HStack::new(cx, |cx| {
@@ -97,7 +97,7 @@ impl View for BandPassView {
                     .filter
                     .iter_mut()
                     .for_each(|filter| filter.set_cutoff(*val));
-                self.graph_points = self.handle.filter[0].frequency_response();
+                self.graph_points = self.handle.filter[0].graph();
             }
             Message::Q(val) => {
                 self.q = *val;
@@ -105,7 +105,7 @@ impl View for BandPassView {
                     .filter
                     .iter_mut()
                     .for_each(|filter| filter.set_q(*val));
-                self.graph_points = self.handle.filter[0].frequency_response();
+                self.graph_points = self.handle.filter[0].graph();
             }
         })
     }

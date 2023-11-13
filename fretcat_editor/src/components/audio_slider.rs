@@ -2,7 +2,7 @@ use std::marker::PhantomData;
 
 use nih_plug::vizia::prelude::*;
 
-use crate::common::normalize;
+use crate::common::{normalize, normalize_db};
 
 #[derive(Debug, Clone, Copy, Lens)]
 pub struct AudioSlider<L: Lens<Target = (f32, f32)>> {
@@ -51,7 +51,7 @@ impl<L: Lens<Target = (f32, f32)>> AudioSlider<L> {
                             .class("audio-slider-mask")
                             .width(Stretch(1.0))
                             .height(lens.map(|channels| {
-                                Percentage(100.0 - normalize(channels.0, -100.0, 12.0, 0.0, 100.0))
+                                Percentage(100.0 - normalize_db(channels.0, -100.0, 12.0, 0.0, 100.0))
                             }));
                     });
                     ZStack::new(cx, |cx| {
@@ -63,7 +63,7 @@ impl<L: Lens<Target = (f32, f32)>> AudioSlider<L> {
                             .class("audio-slider-mask")
                             .width(Stretch(1.0))
                             .height(lens.map(|channels| {
-                                Percentage(100.0 - normalize(channels.1, -100.0, 12.0, 0.0, 100.0))
+                                Percentage(100.0 - normalize_db(channels.1, -100.0, 12.0, 0.0, 100.0))
                             }));
                     });
                 })

@@ -1,6 +1,6 @@
 use nih_plug::vizia::prelude::*;
 
-use crate::common::{EffectKind, EFFECT_CARDS};
+use crate::common::{EffectKind, EFFECT_CARDS, LIST_SPACING_UNITS};
 
 #[derive(Debug, Data, Clone, Lens)]
 pub struct CardList {
@@ -48,15 +48,14 @@ impl CardList {
             .class("kind-btn-wrapper");
 
             Binding::new(cx, Self::current_kind, |cx, bind| {
-                VStack::new(cx, |cx| {
+                ScrollView::new(cx, 0.0, 0.0, false, false, move |cx| {
                     let cards = EFFECT_CARDS.get(&bind.get(cx)).unwrap();
 
                     for card in cards {
                         card.render(cx);
+                        Element::new(cx).height(LIST_SPACING_UNITS);
                     }
-                })
-                .height(Percentage(85.0))
-                .row_between(Percentage(3.0));
+                });
             });
         })
     }

@@ -80,7 +80,9 @@ pub fn create(
         fretcat_effects::register_fonts(cx);
 
         cx.add_stylesheet(CSS::from_string(STYLES.lock().unwrap().as_str())).unwrap();
-        StyleReloader::new(cx);
+        if cfg!(debug_assertions) {
+            StyleReloader::new(cx);
+        }
 
         CardSystem::init(cx);
 

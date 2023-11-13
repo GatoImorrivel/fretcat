@@ -183,11 +183,6 @@ effect-list .new-effect-indicator > vstack {
 effect-list .new-effect-indicator > vstack label {
     font-size: 100;
     color: #121212;
-}.filter-graph {
-    width: 200px;
-    height: 1s;
-    background-color: black;
-    color: #e3e3e3;
 }labeled-knob knob {
     width: 60px;
     height: 60px;
@@ -349,7 +344,7 @@ preset-list .kind-btn label {
 
 preset-list .preset-card {
     width: 1s;
-    height: 50px;
+    height: 100px;
     child-space: 1s;
     border-radius: 15px;
     background-color: rgb(33,33,33);
@@ -360,6 +355,7 @@ preset-list .preset-card label {
     font-family: "Marvel";
     color: rgba(252, 145, 46, 1);
     font-weight: heavy;
+    font-size: 30;
 }sidebar {
     width: 2s;
     border-radius: 16px; 
@@ -437,6 +433,20 @@ bit-crusher labeled-knob knob .knob-tick {
     background-color: #e3e3e3;
 }.filter-knob .knob-name {
     transform: translate(0px, 35px);
+}
+
+low-pass .effect-title,
+high-pass .effect-title,
+band-pass .effect-title {
+    top: 40%;
+    left: 55%;
+}
+
+.filter-graph {
+    width: 200px;
+    height: 1s;
+    background-color: transparent;
+    color: #e3e3e3;
 }.fuzz knob {
     width: 100px;
     height: 100px;

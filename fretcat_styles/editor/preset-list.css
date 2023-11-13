@@ -22,7 +22,7 @@ preset-list .kind-btn label {
 
 preset-list .preset-card {
     width: 1s;
-    height: 50px;
+    height: 100px;
     child-space: 1s;
     border-radius: 15px;
     background-color: rgb(33,33,33);
@@ -33,4 +33,5 @@ preset-list .preset-card label {
     font-family: "Marvel";
     color: rgba(252, 145, 46, 1);
     font-weight: heavy;
+    font-size: 30;
 }

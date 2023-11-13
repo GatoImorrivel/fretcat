@@ -1,11 +1,12 @@
+use nih_plug::util::gain_to_db;
 use rustfft::{num_complex::Complex, FftPlanner};
-use serde::{Deserialize, Serialize};
-use std::{f64::consts::PI, fmt::Debug};
+use serde::{de, Deserialize, Serialize};
+use std::{f32::consts::PI, fmt::Debug};
 use textplots::Plot;
 
 use crate::components::Point;
 
-use super::coeffs::SvfCoeffs;
+use super::{coeffs::SvfCoeffs, normalize_value};
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
 pub enum FilterMode {
@@ -101,23 +102,41 @@ impl AudioFilter {
         self.q
     }
 
-    pub fn frequency_response(&self) -> Vec<Point> {
-        let mut points: Vec<Point> = vec![];
+    pub fn graph(&self) -> Vec<Point> {
+        let mut points = Vec::new();
+        let duration = 0.01; // Duration in seconds
 
-        let num_points = 1000;
-        let nyquist = (self.sample_rate() / 2.0) as f64;
+        let num_samples = (self.sample_rate() * duration) as usize;
 
-        for i in 0..nyquist as i32 {
-            let normalized_freq = i as f64 / nyquist;
-            let y = {
-                if (normalized_freq * nyquist) as i32 > self.cutoff() as i32 {
-                    0.0
-                } else {
-                    1.0
-                }
-            };
-            points.push(Point::new((normalized_freq * nyquist).round() as i32, y as i32));
+        let mut sine_wave: Vec<f32> = Vec::with_capacity(num_samples);
+
+        for i in 0..num_samples {
+            let time = i as f32 / self.sample_rate();
+            let min_frequency = 20.0;
+            let max_frequency = self.sample_rate() / 2.0; // Nyquist frequency
+            let frequency = min_frequency + (max_frequency - min_frequency) * time / duration; // Linearly increasing frequency
+            let amplitude = 100.0;
+
+            let sample = amplitude * (2.0 * PI * frequency * time).sin();
+
+            sine_wave.push(sample);
         }
+
+        let mut cloned = Self::new(self.mode(), self.sample_rate(), self.cutoff(), self.q());
+
+        sine_wave
+            .iter_mut()
+            .for_each(|sample| *sample = cloned.tick(*sample));
+
+        let sine_len = sine_wave.len();
+        let half = sine_wave.into_iter().take(sine_len / 2);
+
+        (0..num_samples / 2)
+            .into_iter()
+            .zip(half)
+            .for_each(|(x, y)| {
+                points.push(Point::new(x as i32, y as i32));
+            });
 
         points
     }

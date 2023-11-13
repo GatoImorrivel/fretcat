@@ -1,7 +1,7 @@
 use fretcat_serialization::{Preset, PresetCategory, ShallowPreset};
 use nih_plug::vizia::prelude::*;
 
-use crate::EditorEvent;
+use crate::{EditorEvent, common::LIST_SPACING_UNITS};
 
 #[derive(Debug, Clone, Lens)]
 pub struct PresetList {
@@ -83,10 +83,9 @@ impl PresetList {
                         },
                     )
                     .width(Stretch(1.0))
-                    .row_between(Pixels(10.0));
+                    .row_between(LIST_SPACING_UNITS);
                 })
-                .width(Stretch(1.0))
-                .height(Percentage(85.0));
+                .width(Stretch(1.0));
             });
         })
     }

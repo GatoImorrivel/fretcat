@@ -8,6 +8,9 @@ use crate::systems::*;
 pub const EDITOR_WIDTH: u32 = 1260;
 pub const EDITOR_HEIGHT: u32 = 848;
 
+pub const LIST_SPACING: f32 = 10.0;
+pub const LIST_SPACING_UNITS: Units = Pixels(LIST_SPACING);
+
 lazy_static::lazy_static! {
     pub static ref EFFECT_CARDS: HashMap<EffectKind, Vec<Card>> = {
         let mut hashmap: HashMap<EffectKind, Vec<Card>> = HashMap::new();
@@ -74,6 +77,22 @@ pub fn normalize(
     let input_range = max_input - min_input;
     let output_range = max_output - min_output;
     let normalized = (clamped_value - min_input) * output_range / input_range + min_output;
+
+    normalized
+}
+
+#[inline]
+pub fn normalize_db(
+    value: f32,
+    min_input: f32,
+    max_input: f32,
+    min_output: f32,
+    max_output: f32,
+) -> f32 {
+    let clamped_value = value.max(min_input).min(max_input);
+
+    let normalized = (clamped_value - min_input) / (max_input - min_input);
+    let normalized = normalized * (max_output - min_output) + min_output;
 
     normalized
 }
