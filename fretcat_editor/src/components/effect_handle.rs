@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use fretcat_effects::{effects::AudioEffect, ChainCommand};
 use nih_plug::vizia::prelude::*;
 
@@ -12,7 +10,7 @@ use crate::{
 pub struct EffectHandle;
 
 impl EffectHandle {
-    pub fn new(cx: &mut Context, effect: fretcat_effects::EffectHandle<dyn AudioEffect>, index: usize) -> Handle<Self> {
+    pub fn new(cx: &mut Context, effect: fretcat_effects::prelude::EffectHandle<dyn AudioEffect>, index: usize) -> Handle<Self> {
         Self.build(cx, |cx| {
             HStack::new(cx, move |cx| {
                 VStack::new(cx, move |cx| {

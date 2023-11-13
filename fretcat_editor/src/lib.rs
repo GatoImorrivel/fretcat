@@ -5,9 +5,6 @@ mod systems;
 mod hot_lib {
     hot_functions_from_file!("fretcat_styles/src/lib.rs");
 
-    #[lib_updated]
-    pub fn was_updated() -> bool {}
-
     #[lib_change_subscription]
     pub fn subscribe() -> hot_lib_reloader::LibReloadObserver {}
 }
@@ -81,7 +78,6 @@ pub fn create(
         .build(cx);
 
         fretcat_effects::register_fonts(cx);
-        fretcat_effects::register_images(cx);
 
         cx.add_stylesheet(CSS::from_string(STYLES.lock().unwrap().as_str())).unwrap();
         StyleReloader::new(cx);
