@@ -1,4 +1,4 @@
-use fretcat_effects::effects::{Fuzz, Overdrive, AudioEffect, StudioReverb, Gain, LowPass, HighPass, BandPass};
+use fretcat_effects::effects::{Fuzz, Overdrive, AudioEffect, StudioReverb, Gain, LowPass, HighPass, BandPass, MonoDelay, TwinDelay};
 use fretcat_macros::EffectMapper;
 
 use std::sync::Arc;
@@ -9,12 +9,16 @@ use serde::{Deserialize, Serialize};
 pub enum Mapper {
     Overdrive(Overdrive),
     Fuzz(Fuzz),
-    StudioReverb(StudioReverb),
     Gain(Gain),
 
     LowPass(LowPass),
     HighPass(HighPass),
     BandPass(BandPass),
+
+    MonoDelay(MonoDelay),
+    TwinDelay(TwinDelay),
+
+    StudioReverb(StudioReverb),
 }
 
 #[derive(Debug, Clone, Copy)]

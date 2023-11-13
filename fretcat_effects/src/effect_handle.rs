@@ -79,6 +79,6 @@ impl<T: AudioEffect + ?Sized> EffectHandle<T> {
     }
 
     pub fn get_mut(&mut self) -> &mut T {
-        unsafe { Arc::as_ptr(&self.handle).cast_mut().as_mut().unwrap() }
+        unsafe { Arc::as_ptr(&self.handle).cast_mut().as_mut().expect("FAILED TO DEREF") }
     }
 }

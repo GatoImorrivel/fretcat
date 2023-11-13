@@ -37,7 +37,7 @@ const ALLPASS_TUNING_R3: usize = 341 + STEREO_SPREAD;
 const ALLPASS_TUNING_L4: usize = 225;
 const ALLPASS_TUNING_R4: usize = 225 + STEREO_SPREAD;
 
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, PartialEq)]
 pub struct Freeverb {
     combs: [(Comb, Comb); 8],
     allpasses: [(AllPass, AllPass); 4],
@@ -162,6 +162,10 @@ impl Freeverb {
         self.update_combs();
     }
 
+    pub fn wet(&self) -> f32 {
+        self.wet / SCALE_WET
+    }
+
     pub fn set_wet(&mut self, value: f32) {
         self.wet = value * SCALE_WET;
         self.update_wet_gains();
@@ -183,6 +187,10 @@ impl Freeverb {
         self.frozen = frozen;
         self.input_gain = if frozen { 0.0 } else { 1.0 };
         self.update_combs();
+    }
+
+    pub fn room_size(&self) -> f32 {
+        self.room_size / SCALE_ROOM - OFFSET_ROOM
     }
 
     pub fn set_room_size(&mut self, value: f32) {

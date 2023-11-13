@@ -1,18 +1,10 @@
 use crate::prelude::*;
 
-
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct StudioReverb {
     pub wet: f32,
     pub size: f32,
     reverb: Freeverb,
-}
-
-impl PartialEq for StudioReverb {
-    fn eq(&self, other: &Self) -> bool {
-        self.wet == other.wet &&
-        self.size == other.size
-    }
 }
 
 impl Default for StudioReverb {
@@ -25,16 +17,26 @@ impl Default for StudioReverb {
     }
 }
 
+impl PartialEq for StudioReverb {
+    fn eq(&self, other: &Self) -> bool {
+        self.wet == other.wet && self.size == other.size
+    }
+}
+
 impl AudioEffect for StudioReverb {
     fn process(&mut self, input_buffer: &mut Frame, transport: &nih_plug::prelude::Transport) {
         if transport.sample_rate != self.reverb.sample_rate() {
             nih_plug::util::permit_alloc(|| {
                 self.reverb = Freeverb::new(transport.sample_rate as usize);
+                self.reverb.set_wet(self.wet);
+                self.reverb.set_room_size(self.size);
             });
         }
 
         input_buffer.process_individual(|left, right| {
-            (*left, *right) = self.reverb.tick((*left, *right));
+            let (reverbed_l, reverbed_r) = self.reverb.tick((*left, *right));
+            *left = ((1.0 - self.wet) * *left) + reverbed_l;
+            *right = ((1.0 - self.wet) * *right) + reverbed_r;
         });
     }
 
@@ -62,28 +64,17 @@ pub struct StudioReverbView {
 impl StudioReverbView {
     pub fn new(cx: &mut Context, handle: EffectHandle<StudioReverb>) -> Handle<Self> {
         Self {
-            size: handle.size,
-            wet: handle.wet,
-            handle,
+            size: handle.size * 100.0,
+            wet: handle.wet * 100.0,
+            handle: handle.clone(),
         }
         .build(cx, |cx| {
             HStack::new(cx, |cx| {
-                HStack::new(cx, |cx| {
-                    Knob::new(cx, 1.0, Self::size, false)
-                        .on_changing(|cx, val| cx.emit(Message::Size(val)))
-                        .class("size-knob");
-                    Label::new(cx, "Room Size");
-                })
-                .class("studio-reverb-knob-group");
-                HStack::new(cx, |cx| {
-                    Knob::new(cx, 1.0, Self::wet, false)
-                        .on_changing(|cx, val| cx.emit(Message::Wet(val)))
-                        .class("wet-knob");
-                    Label::new(cx, "Wet");
-                })
-                .class("studio-reverb-knob-group");
-            })
-            .class("studio-reverb");
+                NamedKnob::new(cx, "Room Size", Self::size, false, 0.0..100.0)
+                    .on_changing(|ex, val| ex.emit(Message::Size(val)));
+                NamedKnob::new(cx, "Wet", Self::wet, false, 0.0..100.0)
+                    .on_changing(|ex, val| ex.emit(Message::Wet(val)));
+            });
         })
     }
 }
@@ -94,16 +85,16 @@ impl View for StudioReverbView {
     }
 
     fn event(&mut self, _cx: &mut EventContext, event: &mut Event) {
-        event.map(|e, _| {
-            match e {
-                Message::Size(val) => {
-                    self.size = *val;
-                    self.handle.reverb.set_room_size(*val);
-                }
-                Message::Wet(val) => {
-                    self.wet = *val;
-                    self.handle.reverb.set_wet(*val);
-                }
+        event.map(|e, _| match e {
+            Message::Size(val) => {
+                self.size = *val;
+                self.handle.size = *val / 100.0;
+                self.handle.reverb.set_room_size(*val / 100.0);
+            }
+            Message::Wet(val) => {
+                self.wet = *val;
+                self.handle.wet = *val / 100.0;
+                self.handle.reverb.set_wet(*val / 100.0);
             }
         });
     }

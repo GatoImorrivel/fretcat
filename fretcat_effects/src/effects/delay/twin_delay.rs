@@ -17,6 +17,17 @@ impl Default for TwinDelay {
     }
 }
 
+impl PartialEq for TwinDelay {
+    fn eq(&self, other: &Self) -> bool {
+        self.wet_l == other.wet_l &&
+        self.wet_r == other.wet_r &&
+        self.delays[0].feedback() == other.delays[0].feedback() &&
+        self.delays[1].feedback() == other.delays[1].feedback() &&
+        self.delays[0].delay_time_secs() == other.delays[0].delay_time_secs() &&
+        self.delays[1].delay_time_secs() == other.delays[1].delay_time_secs()
+    }
+}
+
 impl AudioEffect for TwinDelay {
     fn process(&mut self, input_buffer: &mut Frame, transport: &nih_plug::prelude::Transport) {
         if transport.sample_rate != self.delays[0].sample_rate() {
@@ -93,7 +104,7 @@ impl TwinDelayView {
                 .class("knob-group");
                 VStack::new(cx, |cx| {
                     HStack::new(cx, |cx| {
-                        NamedKnob::new(cx, "Time", Self::wet_r, false, 20.0..1000.0)
+                        NamedKnob::new(cx, "Time", Self::time_r, false, 20.0..1000.0)
                             .on_changing(|ex, val| ex.emit(Message::Time_r(val)));
                         Label::new(cx, "Right").class("side-indicator");
                         NamedKnob::new(cx, "Feedback", Self::feedback_r, false, 0.0..100.0)
@@ -139,12 +150,12 @@ impl View for TwinDelayView {
 
             Message::Wet_l(val) => {
                 self.wet_l = *val;
-                self.wet_l = *val / 100.0;
+                self.handle.wet_l = *val / 100.0;
             }
 
             Message::Wet_r(val) => {
                 self.wet_r = *val;
-                self.wet_r = *val / 100.0;
+                self.handle.wet_r = *val / 100.0;
             }
         });
     }

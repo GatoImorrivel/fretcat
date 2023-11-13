@@ -6,6 +6,16 @@ pub struct MonoDelay {
     delays: [Delay; 2]
 }
 
+impl PartialEq for MonoDelay {
+    fn eq(&self, other: &Self) -> bool {
+        self.wet == other.wet &&
+        self.delays[0].feedback() == other.delays[0].feedback() &&
+        self.delays[1].feedback() == other.delays[1].feedback() &&
+        self.delays[0].delay_time_secs() == other.delays[0].delay_time_secs() &&
+        self.delays[1].delay_time_secs() == other.delays[1].delay_time_secs()
+    }
+}
+
 impl MonoDelay {
     pub fn set_feedback(&mut self, feedback: f32) {
         self.delays.iter_mut().for_each(|delay| {

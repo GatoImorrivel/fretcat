@@ -1,6 +1,6 @@
 use super::delayline::DelayLine;
 
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, PartialEq)]
 pub struct Comb {
     delay_line: DelayLine,
     feedback: f32,

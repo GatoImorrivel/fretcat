@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 use super::interpolate;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct Delay {
     feedback: f32,
     delay_time_secs: f32,
