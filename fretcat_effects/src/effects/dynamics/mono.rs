@@ -20,7 +20,7 @@ impl Mono {
 }
 
 impl AudioEffect for Mono {
-    fn process(&mut self, input_buffer: &mut Frame, transport: &nih_plug::prelude::Transport) {
+    fn process(&mut self, input_buffer: &mut Frame, _transport: &nih_plug::prelude::Transport) {
         match self.mono_state {
             MonoState::Left => {
                 input_buffer.process_individual(|left, right| *right = *left);

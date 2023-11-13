@@ -1,20 +1,15 @@
 use std::sync::Arc;
 
-use downcast_rs::Downcast;
 use indexmap::IndexMap;
-use nih_plug::{util::gain_to_db_fast, vizia::prelude::*};
 
-#[allow(unused_imports)]
-use crate::effects::{AudioEffect, Overdrive, StudioReverb};
-use crate::{
-    common::rms,
-    effects::{Gain, Mono, NoiseGate, PostFX, PreFX, InputSimulator}, frame::Frame,
-};
+use crate::effects::{Mono, Gain, NoiseGate};
+
+pub use super::prelude::*;
 
 pub const NUM_CHANNELS: usize = 2;
 
-pub type Query<'a> = &'a Arc<dyn AudioEffect>;
-pub type QueryMut<'a> = &'a mut Arc<dyn AudioEffect>;
+pub type Query<'a> = &'a EffectHandle<dyn AudioEffect>;
+pub type QueryMut<'a> = &'a mut EffectHandle<dyn AudioEffect>;
 
 
 #[derive(Debug, Lens, Clone)]
@@ -74,7 +69,7 @@ pub enum ChainCommand {
 
 #[derive(Debug, Clone)]
 pub struct Chain {
-    pub effects: Vec<Arc<dyn AudioEffect>>,
+    pub effects: Vec<EffectHandle<dyn AudioEffect>>,
     pub pre_fx: IndexMap<PreFX, Box<dyn AudioEffect>>,
     pub post_fx: IndexMap<PostFX, Box<dyn AudioEffect>>,
     pub in_avg_amplitude: (f32, f32),
@@ -84,7 +79,6 @@ pub struct Chain {
 impl Chain {
     #[inline]
     pub fn process<'a>(&mut self, buffer: &mut [&'a mut [f32]], transport: &nih_plug::prelude::Transport) {
-        unsafe {
             let mut frame = Frame::from(buffer);
 
             self.pre_fx
@@ -94,7 +88,6 @@ impl Chain {
             self.in_avg_amplitude = Self::get_rms(&frame);
 
             self.effects.iter_mut().for_each(|e| {
-                let e = { &mut *Arc::as_ptr(e).cast_mut() };
                 e.process(&mut frame, transport)
             });
 
@@ -103,7 +96,6 @@ impl Chain {
                 .for_each(|(_, fx)| fx.process(&mut frame, transport));
 
             self.out_avg_amplitude = Self::get_rms(&frame);
-        }
     }
 
     #[inline]
@@ -126,12 +118,12 @@ impl Chain {
 
     #[inline]
     pub fn load(&mut self, effects: Vec<Arc<dyn AudioEffect>>) {
-        self.effects = effects;
+        self.effects = effects.into_iter().map(|effect| EffectHandle::from(effect)).collect::<Vec<_>>();
     }
 
     #[inline]
     pub fn insert(&mut self, audio_effect: Arc<dyn AudioEffect>) -> usize {
-        self.effects.push(audio_effect);
+        self.effects.push(EffectHandle::from(audio_effect));
         self.effects
             .clone()
             .into_iter()
@@ -143,7 +135,7 @@ impl Chain {
 
     #[inline]
     pub fn insert_at(&mut self, index: usize, audio_effect: Arc<dyn AudioEffect>) {
-        self.effects.insert(index, audio_effect);
+        self.effects.insert(index, EffectHandle::from(audio_effect));
     }
 
     #[inline]
@@ -169,7 +161,7 @@ impl Chain {
     #[inline]
     pub fn query_cast<T: AudioEffect + 'static>(&self, effect: usize) -> Option<&T> {
         let effect = self.effects.get(effect)?;
-        Downcast::as_any(effect).downcast_ref::<T>()
+        effect.as_any().downcast_ref::<T>()
     }
 
     #[inline]

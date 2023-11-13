@@ -15,7 +15,7 @@ pub enum FilterMode {
 }
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq)]
-pub struct Filter {
+pub struct AudioFilter {
     coeffs: SvfCoeffs,
     ic1eq: f32,
     ic2eq: f32,
@@ -25,9 +25,9 @@ pub struct Filter {
     mode: FilterMode,
 }
 
-impl Filter {
+impl AudioFilter {
     pub fn new(mode: FilterMode, sample_rate: f32, cutoff: f32, q: f32) -> Self {
-        let coeffs = Filter::get_coeffs(mode, sample_rate, cutoff, q);
+        let coeffs = AudioFilter::get_coeffs(mode, sample_rate, cutoff, q);
 
         Self {
             coeffs,
@@ -66,7 +66,7 @@ impl Filter {
     pub fn recalculate_coeffs(&mut self, cutoff: f32, q: f32, sample_rate: f32) {
         self.cutoff = cutoff;
         self.q = q;
-        self.coeffs = Filter::get_coeffs(self.mode, sample_rate, cutoff, q);
+        self.coeffs = AudioFilter::get_coeffs(self.mode, sample_rate, cutoff, q);
     }
 
     pub fn set_cutoff(&mut self, cutoff: f32) {

@@ -1,8 +1,4 @@
-use std::sync::Arc;
-
-use crate::{common::Freeverb, EffectHandle, effects::AudioEffect, frame::Frame};
-use fretcat_macros::Message;
-use nih_plug::vizia::prelude::*;
+use crate::prelude::*;
 
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -42,8 +38,8 @@ impl AudioEffect for StudioReverb {
         });
     }
 
-    fn view(&self, cx: &mut Context, effect: Arc<dyn AudioEffect>) {
-        StudioReverbView::new(cx, EffectHandle::<Self>::from(effect));
+    fn view(&self, cx: &mut Context, handle: EffectHandle<dyn AudioEffect>) {
+        StudioReverbView::new(cx, EffectHandle::<Self>::from(handle)).class("base-effect");
     }
 
     fn height(&self) -> f32 {

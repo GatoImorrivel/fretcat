@@ -1,8 +1,4 @@
-use nih_plug::vizia::prelude::*;
-use serde::{Serialize, Deserialize};
-
-use crate::{EffectHandle, effects::AudioEffect, frame::Frame};
-
+use crate::prelude::*;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TwinDelay {
@@ -21,8 +17,8 @@ impl AudioEffect for TwinDelay {
         
     }
 
-    fn view(&self, _cx: &mut Context, _effect: std::sync::Arc<dyn AudioEffect>) {
-        TwinDelayView::new(_cx, EffectHandle::<Self>::from(_effect));
+    fn view(&self, cx: &mut Context, handle: EffectHandle<dyn AudioEffect>) {
+        TwinDelayView::new(cx, EffectHandle::<Self>::from(handle));
     }
 
     fn height(&self) -> f32 {

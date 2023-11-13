@@ -12,7 +12,7 @@ use crate::{
 pub struct EffectHandle;
 
 impl EffectHandle {
-    pub fn new(cx: &mut Context, effect: Arc<dyn AudioEffect>, index: usize) -> Handle<Self> {
+    pub fn new(cx: &mut Context, effect: fretcat_effects::EffectHandle<dyn AudioEffect>, index: usize) -> Handle<Self> {
         Self.build(cx, |cx| {
             HStack::new(cx, move |cx| {
                 VStack::new(cx, move |cx| {

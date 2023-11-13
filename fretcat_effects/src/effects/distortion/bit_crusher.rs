@@ -1,9 +1,4 @@
-use fretcat_macros::Message;
-use serde::{Deserialize, Serialize};
-
-use nih_plug::vizia::prelude::*;
-
-use crate::{components::LabeledKnob, EffectHandle, effects::AudioEffect, frame::Frame};
+use crate::prelude::*;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct BitCrusher {
@@ -21,8 +16,8 @@ impl AudioEffect for BitCrusher {
 
     }
 
-    fn view(&self, _cx: &mut Context, _effect: std::sync::Arc<dyn AudioEffect>) {
-        BitCrusherView::new(_cx, EffectHandle::<Self>::from(_effect));
+    fn view(&self, cx: &mut Context, handle: EffectHandle<dyn AudioEffect>) {
+        BitCrusherView::new(cx, EffectHandle::<Self>::from(handle));
     }
 
     fn height(&self) -> f32 {

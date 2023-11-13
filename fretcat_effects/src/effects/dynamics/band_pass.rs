@@ -1,12 +1,8 @@
-use fretcat_macros::Message;
-use nih_plug::vizia::prelude::*;
-use serde::{Serialize, Deserialize};
-
-use crate::{EffectHandle, effects::AudioEffect, common::Filter, frame::Frame, components::{Graph, LabeledKnob, LabeledKnobModifier, NamedKnob, Point}};
+use crate::prelude::*;
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct BandPass {
-    filter: [Filter; 2],
+    filter: [AudioFilter; 2],
     min_freq_hz: f32,
     max_freq_hz: f32,
 }
@@ -18,7 +14,7 @@ impl Default for BandPass {
         Self {  
             min_freq_hz,
             max_freq_hz,
-            filter: [Filter::new(crate::common::FilterMode::BandPass, 44100.0, min_freq_hz, 1.0); 2]
+            filter: [AudioFilter::new(crate::common::FilterMode::BandPass, 44100.0, min_freq_hz, 1.0); 2]
         }
     }
 }
@@ -31,8 +27,8 @@ impl AudioEffect for BandPass {
         });
     }
 
-    fn view(&self, _cx: &mut Context, _effect: std::sync::Arc<dyn AudioEffect>) {
-        BandPassView::new(_cx, EffectHandle::<Self>::from(_effect)).class("base-effect");
+    fn view(&self, cx: &mut Context, handle: EffectHandle<dyn AudioEffect>) {
+        BandPassView::new(cx, EffectHandle::<Self>::from(handle)).class("base-effect");
     }
 
     fn height(&self) -> f32 {

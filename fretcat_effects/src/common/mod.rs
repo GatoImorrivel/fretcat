@@ -19,7 +19,7 @@ use std::ops::Range;
 
 pub use self::{
     allpass::AllPass,
-    filter::{Filter, FilterMode},
+    filter::{AudioFilter, FilterMode},
     reverb::Freeverb,
     adsr::Envelope,
     delay::Delay

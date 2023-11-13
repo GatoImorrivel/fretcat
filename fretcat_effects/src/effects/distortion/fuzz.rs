@@ -1,10 +1,5 @@
-use std::sync::Arc;
+use crate::prelude::*;
 
-use fretcat_macros::Message;
-use nih_plug::vizia::prelude::*;
-use serde::{Deserialize, Serialize};
-
-use crate::{effects::AudioEffect, frame::Frame, EffectHandle};
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq)]
 pub struct Fuzz {
@@ -18,10 +13,10 @@ impl Default for Fuzz {
 }
 
 impl AudioEffect for Fuzz {
-    fn process(&mut self, input_buffer: &mut Frame, transport: &nih_plug::prelude::Transport) {}
+    fn process(&mut self, input_buffer: &mut Frame, _transport: &nih_plug::prelude::Transport) {}
 
-    fn view(&self, cx: &mut Context, effect: Arc<dyn AudioEffect>) {
-        FuzzView::new(cx, EffectHandle::<Self>::from(effect));
+    fn view(&self, cx: &mut Context, handle: EffectHandle<dyn AudioEffect>) {
+        FuzzView::new(cx, EffectHandle::<Self>::from(handle));
     }
 
     fn height(&self) -> f32 {

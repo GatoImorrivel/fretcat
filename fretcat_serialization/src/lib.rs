@@ -199,7 +199,7 @@ impl From<Arc<Chain>> for Preset {
         let mappers = value
             .effects
             .iter()
-            .map(|e| Mapper::try_from(e.clone()).unwrap())
+            .map(|e| Mapper::try_from(e.handle()).unwrap())
             .collect();
 
         me.effects = mappers;
@@ -215,7 +215,7 @@ impl From<&Chain> for Preset {
         let mappers = value
             .effects
             .iter()
-            .map(|e| Mapper::try_from(e.clone()).unwrap())
+            .map(|e| Mapper::try_from(e.handle()).unwrap())
             .collect();
 
         me.effects = mappers;

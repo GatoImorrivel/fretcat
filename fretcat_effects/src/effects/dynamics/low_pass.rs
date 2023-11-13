@@ -1,18 +1,8 @@
-use fretcat_macros::Message;
-use nih_plug::vizia::prelude::*;
-use serde::{Deserialize, Serialize};
-
-use crate::{
-    common::Filter,
-    components::{Graph, LabeledKnob, LabeledKnobModifier, NamedKnob, Point},
-    effects::AudioEffect,
-    frame::Frame,
-    EffectHandle,
-};
+use crate::prelude::*;
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct LowPass {
-    filter: [Filter; 2],
+    filter: [AudioFilter; 2],
     min_freq_hz: f32,
     max_freq_hz: f32,
 }
@@ -24,7 +14,7 @@ impl Default for LowPass {
         Self {
             min_freq_hz,
             max_freq_hz,
-            filter: [Filter::new(
+            filter: [AudioFilter::new(
                 crate::common::FilterMode::Lowpass,
                 44100.0,
                 min_freq_hz,
@@ -46,8 +36,8 @@ impl AudioEffect for LowPass {
         });
     }
 
-    fn view(&self, _cx: &mut Context, _effect: std::sync::Arc<dyn AudioEffect>) {
-        LowPassView::new(_cx, EffectHandle::<Self>::from(_effect)).class("base-effect");
+    fn view(&self, cx: &mut Context, handle: EffectHandle<dyn AudioEffect>) {
+        LowPassView::new(cx, EffectHandle::<Self>::from(handle)).class("base-effect");
     }
 
     fn height(&self) -> f32 {
@@ -108,7 +98,7 @@ impl View for LowPassView {
         Some("low-pass")
     }
 
-    fn event(&mut self, cx: &mut EventContext, event: &mut Event) {
+    fn event(&mut self, _cx: &mut EventContext, event: &mut Event) {
         event.map(|event, _| match event {
             Message::Cutoff(val) => {
                 self.cutoff = *val;

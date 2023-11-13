@@ -1,13 +1,5 @@
-use fretcat_macros::Message;
-use nih_plug::{util::db_to_gain_fast, vizia::prelude::*};
-use serde::{Deserialize, Serialize};
+use crate::prelude::*;
 
-use crate::{
-    components::{LabeledKnob, LabeledKnobModifier, NamedKnob},
-    effects::AudioEffect,
-    frame::Frame,
-    EffectHandle,
-};
 
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
 pub struct Gain {
@@ -21,14 +13,14 @@ impl Default for Gain {
 }
 
 impl AudioEffect for Gain {
-    fn process(&mut self, input_buffer: &mut Frame, transport: &nih_plug::prelude::Transport) {
+    fn process(&mut self, input_buffer: &mut Frame, _transport: &nih_plug::prelude::Transport) {
         input_buffer.process_both(|sample| {
             *sample *= db_to_gain_fast(self.gain_in_db);
         });
     }
 
-    fn view(&self, cx: &mut Context, effect: std::sync::Arc<dyn AudioEffect>) {
-        GainView::new(cx, EffectHandle::<Self>::from(effect)).class("base-effect");
+    fn view(&self, cx: &mut Context, handle: EffectHandle<dyn AudioEffect>) {
+        GainView::new(cx, EffectHandle::<Self>::from(handle)).class("base-effect");
     }
 
     fn height(&self) -> f32 {

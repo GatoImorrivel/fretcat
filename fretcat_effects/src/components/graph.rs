@@ -36,13 +36,11 @@ impl<L: Lens<Target = Vec<Point>>> Graph<L> {
         Self {
             points,
         }
-        .build(cx, |cx| {})
+        .build(cx, |_| {})
     }
 }
 
 impl<L: Lens<Target = Vec<Point>>> View for Graph<L> {
-    fn event(&mut self, cx: &mut EventContext, event: &mut Event) {}
-
     fn draw(&self, cx: &mut DrawContext, canvas: &mut Canvas) {
         let bg = cx.background_color();
         let line_color = cx.font_color();

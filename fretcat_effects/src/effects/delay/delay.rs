@@ -1,11 +1,8 @@
-use fretcat_macros::Message;
-use nih_plug::vizia::prelude::*;
-use serde::{Serialize, Deserialize};
-
-use crate::{EffectHandle, effects::AudioEffect, frame::Frame, common::{Delay, normalize_value}, components::{NamedKnob, LabeledKnobModifier}};
+use crate::prelude::*;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MonoDelay {
+    wet: f32,
     delays: [Delay; 2]
 }
 
@@ -21,11 +18,16 @@ impl MonoDelay {
             delay.set_delay_time_secs(time_in_seconds);
         });
     }
+
+    pub fn set_wet(&mut self, wet: f32) {
+        self.wet = wet.clamp(0.0, 1.0);
+    }
 }
 
 impl Default for MonoDelay {
     fn default() -> Self {
         Self {  
+            wet: 0.5,
             delays: [Delay::default(), Delay::default()]
         }
     }
@@ -42,14 +44,14 @@ impl AudioEffect for MonoDelay {
 
         input_buffer.process_individual(|left, right| {
             nih_plug::util::permit_alloc(|| {
-                *left = self.delays[0].tick(*left);
-                *right = self.delays[1].tick(*right);
+                *left = ((1.0 - self.wet) * *left) + (self.wet * self.delays[0].tick(*left));
+                *right = ((1.0 - self.wet) * *right) + (self.wet * self.delays[1].tick(*right));
             });
         });
     }
 
-    fn view(&self, _cx: &mut Context, _effect: std::sync::Arc<dyn AudioEffect>) {
-        DelayView::new(_cx, EffectHandle::<Self>::from(_effect));
+    fn view(&self, cx: &mut Context, handle: EffectHandle<dyn AudioEffect>) {
+        DelayView::new(cx, EffectHandle::<Self>::from(handle)).class("base-effect");
     }
 
     fn height(&self) -> f32 {
@@ -63,6 +65,8 @@ struct DelayView {
     time: f32,
     #[msg]
     feedback: f32,
+    #[msg]
+    wet: f32,
 
     #[lens(ignore)]
     handle: EffectHandle<MonoDelay>
@@ -71,6 +75,7 @@ struct DelayView {
 impl DelayView {
     pub fn new(cx: &mut Context, handle: EffectHandle<MonoDelay>) -> Handle<Self> {
         Self {
+            wet: handle.wet * 100.0,
             time: handle.delays[0].delay_time_secs() * 1000.0,
             feedback: handle.delays[0].feedback() * 100.0,
             handle: handle.clone()
@@ -80,6 +85,8 @@ impl DelayView {
                     .on_changing(|ex, val| ex.emit(Message::Time(val)));
                 NamedKnob::new(cx, "Feedback", Self::feedback, false, 0.0..100.0)
                     .on_changing(|ex, val| ex.emit(Message::Feedback(val)));
+                NamedKnob::new(cx, "Wet", Self::wet, false, 0.0..100.0)
+                    .on_changing(|ex, val| ex.emit(Message::Wet(val)));
                 Label::new(cx, "Delay").class("effect-title");
             });
         })
@@ -91,7 +98,7 @@ impl View for DelayView {
         Some("delay")
     }
 
-    fn event(&mut self, cx: &mut EventContext, event: &mut Event) {
+    fn event(&mut self, _cx: &mut EventContext, event: &mut Event) {
         event.map(|event, _| match event {
             Message::Feedback(val) => {
                 self.feedback = *val;
@@ -100,6 +107,10 @@ impl View for DelayView {
             Message::Time(val) => {
                 self.time = *val;
                 self.handle.set_time(*val / 1000.0);
+            }
+            Message::Wet(val) => {
+                self.wet = *val;
+                self.handle.set_wet(*val / 100.0);
             }
         });
     }

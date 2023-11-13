@@ -41,7 +41,7 @@ impl InputSimulator {
 }
 
 impl AudioEffect for InputSimulator {
-    fn process(&mut self, input_buffer: &mut Frame, transport: &Transport) {
+    fn process(&mut self, input_buffer: &mut Frame, _transport: &Transport) {
         input_buffer.process_individual(|left, right| {
             *left += self.tick();
             *right += self.tick();

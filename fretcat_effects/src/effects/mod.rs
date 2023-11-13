@@ -1,5 +1,4 @@
 use core::fmt;
-use std::sync::Arc;
 use downcast_rs::{impl_downcast, DowncastSync};
 use dyn_clone::DynClone;
 
@@ -25,18 +24,12 @@ pub struct PreFX(pub &'static str);
 #[derive(Debug, Hash, PartialEq, Eq, Clone, Copy, Data)]
 pub struct PostFX(pub &'static str);
 
-use core::any::Any;
-
-use crate::frame::Frame;
-
-pub trait DynPartialEq {
-    fn box_eq(&self, other: &dyn Any) -> bool;
-    fn as_any(&self) -> &dyn Any;
-}
+use crate::{frame::Frame, effect_handle::EffectHandle};
 
 pub trait AudioEffect: fmt::Debug + Send + Sync + DynClone + DowncastSync {
     fn process(&mut self, input_buffer: &mut Frame, transport: &nih_plug::prelude::Transport);
-    fn view(&self, _cx: &mut Context, _effect: Arc<dyn AudioEffect>) {}
+    #[allow(unused_variables)]
+    fn view(&self, cx: &mut Context, handle: EffectHandle<dyn AudioEffect>) {}
     fn height(&self) -> f32 {
         0.0
     }

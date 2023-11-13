@@ -1,7 +1,4 @@
-use nih_plug::vizia::prelude::*;
-use serde::{Serialize, Deserialize};
-
-use crate::{EffectHandle, effects::AudioEffect, frame::Frame};
+use crate::prelude::*;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AutoWah {
@@ -20,8 +17,8 @@ impl AudioEffect for AutoWah {
         
     }
 
-    fn view(&self, _cx: &mut Context, _effect: std::sync::Arc<dyn AudioEffect>) {
-        AutoWahView::new(_cx, EffectHandle::<Self>::from(_effect)).class("base-effect");
+    fn view(&self, cx: &mut Context, handle: EffectHandle<dyn AudioEffect>) {
+        AutoWahView::new(cx, EffectHandle::<Self>::from(handle)).class("base-effect");
     }
 
     fn height(&self) -> f32 {

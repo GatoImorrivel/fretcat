@@ -1,17 +1,8 @@
-use std::sync::Arc;
-use std::{f32::consts::PI, fmt::Debug};
+use std::f32::consts::PI;
 
-use fretcat_macros::Message;
-use nih_plug::util::db_to_gain_fast;
-use nih_plug::vizia::prelude::*;
-use serde::{Deserialize, Serialize};
+use crate::prelude::*;
 
-use crate::components::{LabeledKnob, LabeledKnobModifier, NamedKnob};
-use crate::effects::AudioEffect;
-use crate::frame::Frame;
-use crate::{EffectHandle, NUM_CHANNELS};
-
-use crate::common::{Filter, FilterMode, normalize_value};
+use crate::common::{AudioFilter, FilterMode};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Overdrive {
@@ -20,7 +11,7 @@ pub struct Overdrive {
     pub volume: f32,
     max_freq_hz: f32,
     min_freq_hz: f32,
-    filter: [Filter; NUM_CHANNELS],
+    filter: [AudioFilter; NUM_CHANNELS],
 }
 
 impl PartialEq for Overdrive {
@@ -38,7 +29,7 @@ impl Default for Overdrive {
             volume: 1.0,
             max_freq_hz: 2000.0,
             min_freq_hz,
-            filter: [Filter::new(FilterMode::Lowpass, 44100.0, min_freq_hz, 1.0); 2],
+            filter: [AudioFilter::new(FilterMode::Lowpass, 44100.0, min_freq_hz, 1.0); 2],
         }
     }
 }
@@ -58,8 +49,8 @@ impl AudioEffect for Overdrive {
         });
     }
 
-    fn view(&self, cx: &mut Context, effect: Arc<dyn AudioEffect>) {
-        OverdriveView::new(cx, EffectHandle::<Self>::from(effect)).class("base-effect");
+    fn view(&self, cx: &mut Context, handle: EffectHandle<dyn AudioEffect>) {
+        OverdriveView::new(cx, EffectHandle::<Self>::from(handle)).class("base-effect");
     }
 
     fn height(&self) -> f32 {

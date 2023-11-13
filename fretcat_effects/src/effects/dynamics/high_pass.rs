@@ -1,18 +1,8 @@
-use fretcat_macros::Message;
-use nih_plug::vizia::prelude::*;
-use serde::{Deserialize, Serialize};
-
-use crate::{
-    common::Filter,
-    components::{Graph, LabeledKnobModifier, NamedKnob, Point},
-    effects::AudioEffect,
-    frame::Frame,
-    EffectHandle,
-};
+use crate::prelude::*;
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct HighPass {
-    filter: [Filter; 2],
+    filter: [AudioFilter; 2],
     min_freq_hz: f32,
     max_freq_hz: f32,
 }
@@ -24,7 +14,7 @@ impl Default for HighPass {
         Self {
             min_freq_hz,
             max_freq_hz,
-            filter: [Filter::new(
+            filter: [AudioFilter::new(
                 crate::common::FilterMode::Highpass,
                 44100.0,
                 min_freq_hz,
@@ -42,8 +32,8 @@ impl AudioEffect for HighPass {
         });
     }
 
-    fn view(&self, _cx: &mut Context, _effect: std::sync::Arc<dyn AudioEffect>) {
-        HighPassView::new(_cx, EffectHandle::<Self>::from(_effect)).class("base-effect");
+    fn view(&self, cx: &mut Context, handle: EffectHandle<dyn AudioEffect>) {
+        HighPassView::new(cx, EffectHandle::<Self>::from(handle)).class("base-effect");
     }
 
     fn height(&self) -> f32 {
