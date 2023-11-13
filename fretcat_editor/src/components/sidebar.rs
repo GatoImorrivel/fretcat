@@ -35,9 +35,10 @@ impl Sidebar {
                 Button::new(
                     cx,
                     |ex| ex.emit(SidebarMessage::ChangeTab(SidebarTab::Effect)),
-                    |cx| Label::new(cx, "󰡀"),
+                    |cx| Label::new(cx, "󰤽"),
                 )
                 .class("tab-btn")
+                .class("effect-tab-btn")
                 .toggle_class(
                     "tab-selected-btn",
                     Self::current_tab.map(|tab| *tab == SidebarTab::Effect),
@@ -49,6 +50,7 @@ impl Sidebar {
                     |cx| Label::new(cx, ""),
                 )
                 .class("tab-btn")
+                .class("preset-tab-btn")
                 .toggle_class(
                     "tab-selected-btn",
                     Self::current_tab.map(|tab| *tab == SidebarTab::Preset),

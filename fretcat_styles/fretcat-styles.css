@@ -20,6 +20,14 @@ audio-slider slider .thumb {
     height: 2%;
     width: 105%;
     background-color: rgb(35, 35, 35);
+}
+
+audio-slider slider .thumb:hover {
+    background-color: rgb(199, 119, 43);
+}
+
+audio-slider slider .thumb:active {
+    background-color: rgb(199, 119, 43);
 }card-list .kind-btn {
     border-radius: 20px;
     background-color: rgb(33,33,33);
@@ -320,6 +328,15 @@ preset-control .save-btn label {
 
 preset-control > hstack {
     col-between: 1s;
+}
+
+preset-control button:hover {
+    border-width: 2px;
+    border-color: rgb(199, 119, 43);
+}
+
+preset-control textbox:hover {
+    color: rgb(199, 119, 43);
 }preset-list .kind-btn {
     border-radius: 20px;
     background-color: rgb(33,33,33);
@@ -383,6 +400,14 @@ sidebar .tab-btn {
     border-radius: 50px;
 }
 
+sidebar .preset-tab-btn label {
+    font-size: 25;
+}
+
+sidebar .effect-tab-btn label {
+    font-size: 35;
+}
+
 sidebar .tab-btn label {
     color: #e3e3e3;
     text-align: center;
@@ -392,6 +417,11 @@ sidebar .tab-btn label {
 sidebar .tab-selected-btn {
     border-color: rgba(252, 145, 46, 1);
     border-width: 2px;
+}
+
+sidebar button:hover {
+    border-width: 2px;
+    border-color: rgb(199, 119, 43);
 }
 .base-effect {
     border-top-right-radius: 15px;

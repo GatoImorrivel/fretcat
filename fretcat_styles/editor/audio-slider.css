@@ -21,3 +21,11 @@ audio-slider slider .thumb {
     width: 105%;
     background-color: rgb(35, 35, 35);
 }
+
+audio-slider slider .thumb:hover {
+    background-color: rgb(199, 119, 43);
+}
+
+audio-slider slider .thumb:active {
+    background-color: rgb(199, 119, 43);
+}

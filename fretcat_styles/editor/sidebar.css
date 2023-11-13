@@ -25,6 +25,14 @@ sidebar .tab-btn {
     border-radius: 50px;
 }
 
+sidebar .preset-tab-btn label {
+    font-size: 25;
+}
+
+sidebar .effect-tab-btn label {
+    font-size: 35;
+}
+
 sidebar .tab-btn label {
     color: #e3e3e3;
     text-align: center;
@@ -34,4 +42,9 @@ sidebar .tab-btn label {
 sidebar .tab-selected-btn {
     border-color: rgba(252, 145, 46, 1);
     border-width: 2px;
+}
+
+sidebar button:hover {
+    border-width: 2px;
+    border-color: rgb(199, 119, 43);
 }

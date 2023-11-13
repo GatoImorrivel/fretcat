@@ -46,3 +46,12 @@ preset-control .save-btn label {
 preset-control > hstack {
     col-between: 1s;
 }
+
+preset-control button:hover {
+    border-width: 2px;
+    border-color: rgb(199, 119, 43);
+}
+
+preset-control textbox:hover {
+    color: rgb(199, 119, 43);
+}
