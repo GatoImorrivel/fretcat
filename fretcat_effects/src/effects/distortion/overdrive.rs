@@ -97,7 +97,7 @@ impl OverdriveView {
                 NamedKnob::new(cx, "Output Volume", Self::volume, false, -10.0..10.0)
                     .on_changing(|ex, val| ex.emit(Message::Volume(val)))
                     .class("volume-knob");
-                Label::new(cx, "Drive").class("effect-title");
+                Label::new(cx, "DRIVE").class("effect-title");
             });
         })
     }

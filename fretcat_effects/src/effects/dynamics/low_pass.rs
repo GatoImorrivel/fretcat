@@ -87,7 +87,7 @@ impl LowPassView {
                     .class("q-knob")
                     .height(Stretch(1.0))
                     .width(Stretch(1.0));
-                Label::new(cx, "Low Pass").class("effect-title");
+                Label::new(cx, "LOW PASS").class("effect-title");
             });
         })
     }

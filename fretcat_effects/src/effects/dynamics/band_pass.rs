@@ -78,7 +78,7 @@ impl BandPassView {
                     .class("q-knob")
                     .height(Stretch(1.0))
                     .width(Stretch(1.0));
-                Label::new(cx, "Band Pass").class("effect-title");
+                Label::new(cx, "BAND PASS").class("effect-title");
             });
         })
     }

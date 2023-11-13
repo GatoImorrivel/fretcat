@@ -82,7 +82,7 @@ impl HighPassView {
                     .class("q-knob")
                     .height(Stretch(1.0))
                     .width(Stretch(1.0));
-                Label::new(cx, "High Pass").class("effect-title");
+                Label::new(cx, "HIGH PASS").class("effect-title");
             });
         })
     }

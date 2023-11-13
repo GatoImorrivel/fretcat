@@ -3,6 +3,7 @@ use std::ops::{Deref, DerefMut};
 use std::sync::atomic::AtomicBool;
 
 use crate::effects::AudioEffect;
+use crate::prelude::{Frame, Transport};
 
 #[derive(Debug)]
 pub struct EffectHandle<T: AudioEffect + ?Sized> {
@@ -59,12 +60,22 @@ impl<T: AudioEffect + ?Sized> EffectHandle<T> {
         }
     }
 
+    pub fn process_if_active(&mut self, input_buffer: &mut Frame, transport: &Transport) {
+        if self.active.load(std::sync::atomic::Ordering::Relaxed) {
+            self.process(input_buffer, transport)
+        }
+    }
+
     pub fn handle(&self) -> Arc<T> {
         self.handle.clone()
     }
 
     pub fn set_active(&mut self, active: bool) {
         self.active.store(active, std::sync::atomic::Ordering::Relaxed);
+    }
+
+    pub fn active(&self) -> bool {
+        self.active.load(std::sync::atomic::Ordering::Relaxed)
     }
 
     pub fn get_mut(&mut self) -> &mut T {

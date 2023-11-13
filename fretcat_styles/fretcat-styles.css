@@ -38,7 +38,7 @@ card-list .kind-selected-btn {
 }
 
 card-list .kind-btn label {
-    font-family: Montserrat;
+    font-family: Sparkler-Demo;
     color: #E3E3E3;
 }.card-base {
     width: 1s;
@@ -49,7 +49,7 @@ card-list .kind-btn label {
 
 .card-base label {
     font-size: 30;
-    font-family: "Major Mono Display";
+    font-family: "Marvel";
     color: rgba(252, 145, 46, 1);
     font-weight: heavy;
 }
@@ -196,7 +196,7 @@ effect-list .new-effect-indicator > vstack label {
 }
 
 labeled-knob .knob-value {
-    font-family: Montserrat;
+    font-family: Sparkler-Demo;
     color: #e3e3e3;
 }
 
@@ -226,7 +226,7 @@ labeled-knob knob .knob-track {
 }
 
 .message-text {
-    font-family: 'Montserrat';
+    font-family: 'Sparkler-Demo';
     left: 10px;
 }
 
@@ -237,7 +237,7 @@ labeled-knob knob .knob-track {
     border-radius: 0px;
     border-color: transparent;
     border-width: 0px;
-    font-family: "Montserrat";
+    font-family: "Sparkler-Demo";
     width: 1s;
     height: 1s;
     border-radius: 5px;
@@ -268,12 +268,16 @@ mono-control .off-btn {
     font-family: "Symbols Nerd Font Mono";
 }named-knob > zstack > label {
     color: #e3e3e3;
-    font-family: Montserrat;
+    font-family: "Sparkler-Demo";
     transform: translate(0px, 38px);
 }
 
 named-knob zstack {
     child-space: 1s;
+}
+
+named-knob:disabled > zstack > label {
+    color: #404040;
 }preset-control {
     border-radius: 20px;
     background-color: rgb(33,33,33);
@@ -284,7 +288,7 @@ preset-control .name-wrapper textbox {
     background-color: transparent;
     border-color: transparent;
     font-size: 36;
-    font-family: 'Montserrat';
+    font-family: 'Sparkler-Demo';
     border-width: 0px;
     width: 100%;
 }
@@ -353,7 +357,7 @@ preset-list .preset-card {
 }
 
 preset-list .preset-card label {
-    font-family: "Major Mono Display";
+    font-family: "Marvel";
     color: rgba(252, 145, 46, 1);
     font-weight: heavy;
 }sidebar {
@@ -403,8 +407,13 @@ sidebar .tab-selected-btn {
 
 .effect-title {
     color: rgba(252, 145, 46, 1);
-    font-family: "Major Mono Display";
+    font-family: "Marvel";
     font-size: xx-large;
+    position-type: self-directed;
+}
+
+.effect-title:disabled {
+    color: #404040;
 }bit-crusher {
     background-color: rgb(183, 17, 17);
 }
@@ -421,7 +430,7 @@ bit-crusher labeled-knob {
 }
 
 bit-crusher labeled-knob label {
-    font-family: Montserrat;
+    font-family: Sparkler-Demo;
     color: #e3e3e3;
 }
 
@@ -429,13 +438,7 @@ bit-crusher labeled-knob knob .knob-tick {
     background-color: #e3e3e3;
 }.filter-knob .knob-name {
     transform: translate(0px, 35px);
-}.fuzz {
-    background-image: url("fuzz-background");
-    overflow: hidden;
-    width: 1s;
-}
-
-.fuzz knob {
+}.fuzz knob {
     width: 100px;
     height: 100px;
 }
@@ -487,13 +490,7 @@ bit-crusher labeled-knob knob .knob-tick {
 
 .fuzz-knob-group > knob {
     border-radius: 100%;
-}.studio-reverb {
-    background-image: url("reverb-background");
-    overflow: hidden;
-    width: 1s;
-}
-
-.studio-reverb .wet-knob {
+}.studio-reverb .wet-knob {
     width: 75px;
     height: 75px;
 }
@@ -505,7 +502,7 @@ bit-crusher labeled-knob knob .knob-tick {
 
 .studio-reverb label {
     color: whitesmoke;
-    font-family: "Montserrat";
+    font-family: "Sparkler-Demo";
     font-size: 30;
 }
 
@@ -529,4 +526,20 @@ bit-crusher labeled-knob knob .knob-tick {
 
 .studio-reverb-knob-group > knob {
     border-radius: 100%;
+}twin-delay .effect-title {
+    left: 45%;
+    top: 85%;
+}
+
+twin-delay .side-indicator {
+    color: #e3e3e3;
+    font-family: Sparkler-Demo;
+    top: 50%;
+    font-size: xx-large;
+}
+
+twin-delay:disabled .side-indicator {
+    color: #404040;
+    font-family: Sparkler-Demo;
+    top: 50%;
 }

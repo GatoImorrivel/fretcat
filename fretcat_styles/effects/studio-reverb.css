@@ -1,9 +1,3 @@
-.studio-reverb {
-    background-image: url("reverb-background");
-    overflow: hidden;
-    width: 1s;
-}
-
 .studio-reverb .wet-knob {
     width: 75px;
     height: 75px;
@@ -16,7 +10,7 @@
 
 .studio-reverb label {
     color: whitesmoke;
-    font-family: "Montserrat";
+    font-family: "Sparkler-Demo";
     font-size: 30;
 }
 

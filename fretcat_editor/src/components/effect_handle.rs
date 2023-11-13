@@ -6,18 +6,35 @@ use crate::{
     systems::{CardEvent, CardSystem},
 };
 
-#[derive(Debug, Clone, Copy, Data)]
-pub struct EffectHandle;
+#[derive(Debug, Clone, Lens)]
+pub struct EffectHandle {
+    handle: fretcat_effects::prelude::EffectHandle<dyn AudioEffect>,
+    active: bool
+}
+
+enum EffectHandleEvent {
+    Toggle
+}
 
 impl EffectHandle {
     pub fn new(cx: &mut Context, effect: fretcat_effects::prelude::EffectHandle<dyn AudioEffect>, index: usize) -> Handle<Self> {
-        Self.build(cx, |cx| {
+        Self {
+            active: effect.active(),
+            handle: effect.clone()
+        }.build(cx, |cx| {
             HStack::new(cx, move |cx| {
                 VStack::new(cx, move |cx| {
                     Button::new(
                         cx,
                         move |ex| ex.emit(ChainCommand::Remove(index)),
                         |cx| Label::new(cx, ""),
+                    )
+                    .class("delete-effect-btn")
+                    .font_family(vec![FamilyOwned::Name("Symbols Nerd Font Mono".to_owned())]);
+                    Button::new(
+                        cx,
+                        move |ex| ex.emit(EffectHandleEvent::Toggle),
+                        |cx| Label::new(cx, Self::active.map(|active| if *active { "" } else { "" })),
                     )
                     .class("delete-effect-btn")
                     .font_family(vec![FamilyOwned::Name("Symbols Nerd Font Mono".to_owned())]);
@@ -34,7 +51,8 @@ impl EffectHandle {
                     .width(Stretch(100.0))
                     .height(Stretch(1.0))
                     .class("effect-container")
-                    .on_drop(move |ex, _| on_drop(ex, index));
+                    .on_drop(move |ex, _| on_drop(ex, index))
+                    .disabled(Self::active.map(|active| !*active));
 
                 Element::new(cx)
                     .position_type(PositionType::SelfDirected)
@@ -59,6 +77,15 @@ impl EffectHandle {
 impl View for EffectHandle {
     fn element(&self) -> Option<&'static str> {
         Some("effect-handle")
+    }
+
+    fn event(&mut self, _cx: &mut EventContext, event: &mut Event) {
+        event.map(|event, _| match event {
+            EffectHandleEvent::Toggle => {
+                self.handle.set_active(!self.handle.active());
+                self.active = self.handle.active();
+            }
+        });
     }
 }
 

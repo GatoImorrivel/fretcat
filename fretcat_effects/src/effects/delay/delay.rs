@@ -87,7 +87,7 @@ impl DelayView {
                     .on_changing(|ex, val| ex.emit(Message::Feedback(val)));
                 NamedKnob::new(cx, "Wet", Self::wet, false, 0.0..100.0)
                     .on_changing(|ex, val| ex.emit(Message::Wet(val)));
-                Label::new(cx, "Delay").class("effect-title");
+                Label::new(cx, "DELAY").class("effect-title");
             });
         })
     }

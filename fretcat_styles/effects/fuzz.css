@@ -1,9 +1,3 @@
-.fuzz {
-    background-image: url("fuzz-background");
-    overflow: hidden;
-    width: 1s;
-}
-
 .fuzz knob {
     width: 100px;
     height: 100px;

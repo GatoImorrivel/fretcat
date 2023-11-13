@@ -1,0 +1,17 @@
+twin-delay .effect-title {
+    left: 45%;
+    top: 85%;
+}
+
+twin-delay .side-indicator {
+    color: #e3e3e3;
+    font-family: Sparkler-Demo;
+    top: 50%;
+    font-size: xx-large;
+}
+
+twin-delay:disabled .side-indicator {
+    color: #404040;
+    font-family: Sparkler-Demo;
+    top: 50%;
+}

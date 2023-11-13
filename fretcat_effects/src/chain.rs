@@ -88,7 +88,7 @@ impl Chain {
             self.in_avg_amplitude = Self::get_rms(&frame);
 
             self.effects.iter_mut().for_each(|e| {
-                e.process(&mut frame, transport)
+                e.process_if_active(&mut frame, transport)
             });
 
             self.post_fx

@@ -17,7 +17,18 @@ pub fn register_fonts(cx: &mut Context) {
         "../../assets/fonts/SymbolsNerdFontMono-Regular.ttf"
     ));
     cx.add_font_mem(include_bytes!(
-        "../../assets/fonts/MajorMonoDisplay-Regular.ttf"
+        "../../assets/fonts/Marvel-Regular.ttf"
     ));
-    cx.add_font_mem(include_bytes!("../../assets/fonts/Montserrat.ttf"));
+    cx.add_font_mem(include_bytes!(
+        "../../assets/fonts/Marvel-Italic.ttf"
+    ));
+    cx.add_font_mem(include_bytes!(
+        "../../assets/fonts/Marvel-BoldItalic.ttf"
+    ));
+    cx.add_font_mem(include_bytes!(
+        "../../assets/fonts/Marvel-Bold.ttf"
+    ));
+    cx.add_font_mem(include_bytes!(
+        "../../assets/fonts/Sparkler-demo.ttf"
+    ));
 }

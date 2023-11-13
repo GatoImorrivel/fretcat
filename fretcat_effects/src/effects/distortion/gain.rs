@@ -47,7 +47,7 @@ impl GainView {
             HStack::new(cx, |cx| {
                 NamedKnob::new(cx, "Gain", Self::gain, false, -60.0..20.0)
                     .on_changing(|ex, val| ex.emit(Message::Gain(val)));
-                Label::new(cx, "Gain Booster").class("effect-title");
+                Label::new(cx, "GAIN BOOSTER").class("effect-title");
             });
         })
     }

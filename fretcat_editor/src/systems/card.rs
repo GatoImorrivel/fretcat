@@ -37,7 +37,7 @@ impl Card {
 pub const GAIN_BOOSTER_CARD: Card = Card {
     content: |cx| {
         VStack::new(cx, |cx| {
-            Label::new(cx, "Gain Booster");
+            Label::new(cx, "GAIN BOOSTER");
         })
         .child_space(Stretch(1.0));
     },
@@ -51,7 +51,7 @@ pub const GAIN_BOOSTER_CARD: Card = Card {
 pub const OVERDRIVE_CARD: Card = Card {
     content: |cx| {
         VStack::new(cx, |cx| {
-            Label::new(cx, "Drive");
+            Label::new(cx, "DRIVE");
         })
         .child_space(Stretch(1.0));
     },
@@ -65,7 +65,7 @@ pub const OVERDRIVE_CARD: Card = Card {
 pub const FUZZ_CARD: Card = Card {
     content: |cx| {
         VStack::new(cx, |cx| {
-            Label::new(cx, "Fuzz");
+            Label::new(cx, "FUZZ");
         })
         .child_space(Stretch(1.0));
     },
@@ -79,7 +79,7 @@ pub const FUZZ_CARD: Card = Card {
 pub const DISTORTION_CARD: Card = Card {
     content: |cx| {
         VStack::new(cx, |cx| {
-            Label::new(cx, "Distortion");
+            Label::new(cx, "DISTORTION");
         })
         .child_space(Stretch(1.0));
     },
@@ -93,7 +93,7 @@ pub const DISTORTION_CARD: Card = Card {
 pub const BIT_CRUSHER_CARD: Card = Card {
     content: |cx| {
         VStack::new(cx, |cx| {
-            Label::new(cx, "Bit Crusher");
+            Label::new(cx, "BIT CRUSHER");
         })
         .child_space(Stretch(1.0));
     },
@@ -107,7 +107,7 @@ pub const BIT_CRUSHER_CARD: Card = Card {
 pub const REVERB_CARD: Card = Card {
     content: |cx| {
         VStack::new(cx, |cx| {
-            Label::new(cx, "Studio Reverb");
+            Label::new(cx, "STUDIO REVERB");
         })
         .child_space(Stretch(1.0));
     },
@@ -121,7 +121,7 @@ pub const REVERB_CARD: Card = Card {
 pub const DELAY_CARD: Card = Card {
     content: |cx| {
         VStack::new(cx, |cx| {
-            Label::new(cx, "Delay");
+            Label::new(cx, "DELAY");
         })
         .child_space(Stretch(1.0));
     },
@@ -135,7 +135,7 @@ pub const DELAY_CARD: Card = Card {
 pub const TWIN_DELAY_CARD: Card = Card {
     content: |cx| {
         VStack::new(cx, |cx| {
-            Label::new(cx, "Twin Delay");
+            Label::new(cx, "TWIN DELAY");
         })
         .child_space(Stretch(1.0));
     },
@@ -149,7 +149,7 @@ pub const TWIN_DELAY_CARD: Card = Card {
 pub const AUTO_WAH_CARD: Card = Card {
     content: |cx| {
         VStack::new(cx, |cx| {
-            Label::new(cx, "Auto Wah");
+            Label::new(cx, "AUTO WAH");
         })
         .child_space(Stretch(1.0));
     },
@@ -163,7 +163,7 @@ pub const AUTO_WAH_CARD: Card = Card {
 pub const LOW_PASS_CARD: Card = Card {
     content: |cx| {
         VStack::new(cx, |cx| {
-            Label::new(cx, "Low Pass");
+            Label::new(cx, "LOW PASS");
         })
         .child_space(Stretch(1.0));
     },
@@ -177,7 +177,7 @@ pub const LOW_PASS_CARD: Card = Card {
 pub const HIGH_PASS_CARD: Card = Card {
     content: |cx| {
         VStack::new(cx, |cx| {
-            Label::new(cx, "High Pass");
+            Label::new(cx, "HIGH PASS");
         })
         .child_space(Stretch(1.0));
     },
@@ -191,7 +191,7 @@ pub const HIGH_PASS_CARD: Card = Card {
 pub const BAND_PASS_CARD: Card = Card {
     content: |cx| {
         VStack::new(cx, |cx| {
-            Label::new(cx, "Band Pass");
+            Label::new(cx, "BAND PASS");
         })
         .child_space(Stretch(1.0));
     },

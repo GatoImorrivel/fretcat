@@ -36,7 +36,7 @@ impl<L: Lens<Target = (f32, f32)>> AudioSlider<L> {
         }
         .build(cx, |cx| {
             Label::new(cx, Self::gain.map(|gain| format!("{:.1}db", gain)))
-                .font_family(vec![FamilyOwned::Name("Montserrat".to_owned())])
+                .font_family(vec![FamilyOwned::Name("Sparkler-Demo".to_owned())])
                 .color(Color::white())
                 .font_size(12.0)
                 .text_align(TextAlign::Center);
