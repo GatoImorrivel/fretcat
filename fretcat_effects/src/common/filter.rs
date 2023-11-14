@@ -135,7 +135,7 @@ impl AudioFilter {
             .into_iter()
             .zip(half)
             .for_each(|(x, y)| {
-                points.push(Point::new(x as i32, y as i32));
+                points.push(Point::new(x as i32, (y * 1000.0).round() as i32));
             });
 
         points

@@ -72,6 +72,43 @@ impl EffectHandle {
             .width(Stretch(1.0));
         }).overflow(Overflow::Hidden)
     }
+
+    pub fn drag_handle(cx: &mut Context, effect: fretcat_effects::prelude::EffectHandle<dyn AudioEffect>) -> Handle<Self> {
+        Self {
+            active: effect.active(),
+            handle: effect.clone()
+        }.build(cx, |cx| {
+            HStack::new(cx, move |cx| {
+                VStack::new(cx, move |cx| {
+                    Button::new(
+                        cx,
+                        move |_| {},
+                        |cx| Label::new(cx, ""),
+                    )
+                    .class("delete-effect-btn")
+                    .font_family(vec![FamilyOwned::Name("Symbols Nerd Font Mono".to_owned())]);
+                    Button::new(
+                        cx,
+                        move |ex| ex.emit(EffectHandleEvent::Toggle),
+                        |cx| Label::new(cx, Self::active.map(|active| if *active { "" } else { "" })),
+                    )
+                    .class("delete-effect-btn")
+                    .font_family(vec![FamilyOwned::Name("Symbols Nerd Font Mono".to_owned())]);
+                })
+                .class("effect-bar")
+                .height(Stretch(1.0))
+                .width(Stretch(3.0));
+
+                VStack::new(cx, move |cx| effect.view(cx, effect.clone()))
+                    .width(Stretch(100.0))
+                    .height(Stretch(1.0))
+                    .class("effect-container")
+                    .disabled(true);
+            })
+            .class("effect-handle")
+            .width(Stretch(1.0));
+        }).overflow(Overflow::Hidden)
+    }
 }
 
 impl View for EffectHandle {

@@ -14,7 +14,7 @@ impl Default for BandPass {
         Self {  
             min_freq_hz,
             max_freq_hz,
-            filter: [AudioFilter::new(crate::common::FilterMode::BandPass, 44100.0, min_freq_hz, 1.0); 2]
+            filter: [AudioFilter::new(crate::common::FilterMode::BandPass, 44100.0, (max_freq_hz + min_freq_hz) / 2.0, 1.0); 2]
         }
     }
 }

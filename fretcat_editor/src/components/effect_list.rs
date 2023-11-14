@@ -2,7 +2,10 @@ use std::sync::Arc;
 
 use nih_plug::vizia::prelude::*;
 
-use crate::{systems::{CardEvent, CardSystem}, common::{LIST_SPACING, LIST_SPACING_UNITS}};
+use crate::{
+    common::{LIST_SPACING, LIST_SPACING_UNITS},
+    systems::{CardEvent, CardSystem},
+};
 
 use super::effect_handle::EffectHandle;
 use fretcat_effects::{Chain, ChainCommand};
@@ -14,7 +17,7 @@ pub struct EffectList {
 }
 
 pub enum EffectListEvent {
-    DragChange(Option<usize>)
+    DragChange(Option<usize>),
 }
 
 impl EffectList {
@@ -24,10 +27,10 @@ impl EffectList {
             update_counter: 0,
         }
         .build(cx, move |cx| {
-            cx.add_listener(|view: &mut EffectList, _cx, event| {
+            cx.add_listener(|view: &mut EffectList, cx, event| {
                 event.map::<ChainCommand, _>(|_, _| {
                     view.update_counter += 1;
-                })
+                });
             });
 
             ScrollView::new(cx, 0.0, 0.0, false, false, move |cx| {
@@ -38,7 +41,14 @@ impl EffectList {
                         VStack::new(cx, |cx| {
                             EffectHandle::new(cx, effect.clone(), index);
                         })
-                        .height(Pixels(effect.height() + if effect.height() > 100.0 { LIST_SPACING } else { 0.0 }));
+                        .height(Pixels(
+                            effect.height()
+                                + if effect.height() > 100.0 {
+                                    LIST_SPACING
+                                } else {
+                                    0.0
+                                },
+                        ));
                         Element::new(cx).height(LIST_SPACING_UNITS);
                     }
                     VStack::new(cx, |cx| {

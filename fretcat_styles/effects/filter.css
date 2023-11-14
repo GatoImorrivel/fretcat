@@ -15,3 +15,7 @@ band-pass .effect-title {
     background-color: transparent;
     color: #e3e3e3;
 }
+
+.filter-graph:disabled {
+    color: #404040;
+}

@@ -191,6 +191,8 @@ effect-list .new-effect-indicator > vstack {
 effect-list .new-effect-indicator > vstack label {
     font-size: 100;
     color: #121212;
+}graph:disabled {
+    color: #404040;
 }labeled-knob knob {
     width: 60px;
     height: 60px;
@@ -477,6 +479,10 @@ band-pass .effect-title {
     height: 1s;
     background-color: transparent;
     color: #e3e3e3;
+}
+
+.filter-graph:disabled {
+    color: #404040;
 }.fuzz knob {
     width: 100px;
     height: 100px;

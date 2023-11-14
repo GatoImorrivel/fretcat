@@ -17,7 +17,7 @@ impl Default for HighPass {
             filter: [AudioFilter::new(
                 crate::common::FilterMode::Highpass,
                 44100.0,
-                min_freq_hz,
+                max_freq_hz,
                 1.0,
             ); 2],
         }

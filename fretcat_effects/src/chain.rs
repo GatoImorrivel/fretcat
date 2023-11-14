@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use indexmap::IndexMap;
 
-use crate::effects::{Mono, Gain, NoiseGate};
+use crate::effects::{Gain, Mono, NoiseGate};
 
 pub use super::prelude::*;
 
@@ -10,7 +10,6 @@ pub const NUM_CHANNELS: usize = 2;
 
 pub type Query<'a> = &'a EffectHandle<dyn AudioEffect>;
 pub type QueryMut<'a> = &'a mut EffectHandle<dyn AudioEffect>;
-
 
 #[derive(Debug, Lens, Clone)]
 pub struct ChainData {
@@ -31,7 +30,7 @@ impl ChainData {
 
 impl Model for ChainData {
     fn event(&mut self, _cx: &mut EventContext, event: &mut Event) {
-        let chain = unsafe { &mut *Arc::as_ptr(&self.chain).cast_mut() };
+        let chain = unsafe { Arc::as_ptr(&self.chain).cast_mut().as_mut().expect("CRASHED GUI") };
         event.map(|event, _| match event {
             ChainCommand::Insert(audio_effect) => {
                 chain.insert(audio_effect.clone());
@@ -78,24 +77,28 @@ pub struct Chain {
 
 impl Chain {
     #[inline]
-    pub fn process<'a>(&mut self, buffer: &mut [&'a mut [f32]], transport: &nih_plug::prelude::Transport) {
-            let mut frame = Frame::from(buffer);
+    pub fn process<'a>(
+        &mut self,
+        buffer: &mut [&'a mut [f32]],
+        transport: &nih_plug::prelude::Transport,
+    ) {
+        let mut frame = Frame::from(buffer);
 
-            self.pre_fx
-                .iter_mut()
-                .for_each(|(_, fx)| fx.process(&mut frame, transport));
+        self.pre_fx
+            .iter_mut()
+            .for_each(|(_, fx)| fx.process(&mut frame, transport));
 
-            self.in_avg_amplitude = Self::get_rms(&frame);
+        self.in_avg_amplitude = Self::get_rms(&frame);
 
-            self.effects.iter_mut().for_each(|e| {
-                e.process_if_active(&mut frame, transport)
-            });
+        self.effects
+            .iter_mut()
+            .for_each(|e| e.process_if_active(&mut frame, transport));
 
-            self.post_fx
-                .iter_mut()
-                .for_each(|(_, fx)| fx.process(&mut frame, transport));
+        self.post_fx
+            .iter_mut()
+            .for_each(|(_, fx)| fx.process(&mut frame, transport));
 
-            self.out_avg_amplitude = Self::get_rms(&frame);
+        self.out_avg_amplitude = Self::get_rms(&frame);
     }
 
     #[inline]
@@ -118,7 +121,10 @@ impl Chain {
 
     #[inline]
     pub fn load(&mut self, effects: Vec<Arc<dyn AudioEffect>>) {
-        self.effects = effects.into_iter().map(|effect| EffectHandle::from(effect)).collect::<Vec<_>>();
+        self.effects = effects
+            .into_iter()
+            .map(|effect| EffectHandle::from(effect))
+            .collect::<Vec<_>>();
     }
 
     #[inline]
@@ -201,7 +207,6 @@ impl Default for Chain {
         chain
             .pre_fx
             .insert(PreFX("noise_gate"), Box::new(NoiseGate::default()));
-
 
         chain
             .post_fx
