@@ -441,28 +441,9 @@ sidebar button:hover {
 
 .effect-title:disabled {
     color: #404040;
-}bit-crusher {
-    background-color: rgb(183, 17, 17);
-}
-
-bit-crusher labeled-knob knob {
-    width: 60px;
-    height: 60px;
-    background-image: linear-gradient(135deg, #363636 0%, #303030 100%); 
-    background-color: transparent;
-}
-
-bit-crusher labeled-knob {
-    width: 150px;
-}
-
-bit-crusher labeled-knob label {
-    font-family: Sparkler-Demo;
-    color: #e3e3e3;
-}
-
-bit-crusher labeled-knob knob .knob-tick {
-    background-color: #e3e3e3;
+}bit-crusher .effect-title {
+    top: 37%;
+    left: 5%;
 }.filter-knob .knob-name {
     transform: translate(0px, 35px);
 }
@@ -535,42 +516,9 @@ band-pass .effect-title {
 
 .fuzz-knob-group > knob {
     border-radius: 100%;
-}.studio-reverb .wet-knob {
-    width: 75px;
-    height: 75px;
-}
-
-.studio-reverb .size-knob {
-    width: 100px;
-    height: 100px;
-}
-
-.studio-reverb label {
-    color: whitesmoke;
-    font-family: "Sparkler-Demo";
-    font-size: 30;
-}
-
-.studio-reverb-knob-group .knob-head {
-    background-image: linear-gradient(180deg, rgb(0, 0, 0), rgb(24, 24, 24));
-    border-width: 0px;
-    background-color: transparent;
-}
-
-.studio-reverb-knob-group arctrack {
-    color: rgb(169, 58, 2);
-}
-
-.studio-reverb-knob-group > knob {
-    box-shadow: -1px -1px 8px #110220;
-}
-
-.studio-reverb-knob-group {
-    child-top: 2s;
-}
-
-.studio-reverb-knob-group > knob {
-    border-radius: 100%;
+}studio-reverb .effect-title {
+    left: 43%;
+    top: 75%;
 }twin-delay .effect-title {
     left: 45%;
     top: 85%;

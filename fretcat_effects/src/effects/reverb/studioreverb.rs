@@ -74,6 +74,7 @@ impl StudioReverbView {
                     .on_changing(|ex, val| ex.emit(Message::Size(val)));
                 NamedKnob::new(cx, "Wet", Self::wet, false, 0.0..100.0)
                     .on_changing(|ex, val| ex.emit(Message::Wet(val)));
+                Label::new(cx, "STUDIO REVERB").class("effect-title");
             });
         })
     }

@@ -38,10 +38,8 @@ impl AudioEffect for TwinDelay {
         }
 
         input_buffer.process_individual(|left, right| {
-            nih_plug::util::permit_alloc(|| {
-                *left = ((1.0 - self.wet_l) * *left) + (self.wet_l * self.delays[0].tick(*left));
-                *right = ((1.0 - self.wet_r) * *right) + (self.wet_r * self.delays[1].tick(*right));
-            });
+            *left = ((1.0 - self.wet_l) * *left) + (self.wet_l * self.delays[0].tick(*left));
+            *right = ((1.0 - self.wet_r) * *right) + (self.wet_r * self.delays[1].tick(*right));
         });
     }
 

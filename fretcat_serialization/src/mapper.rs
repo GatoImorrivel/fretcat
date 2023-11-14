@@ -1,4 +1,4 @@
-use fretcat_effects::effects::{Fuzz, Overdrive, AudioEffect, StudioReverb, Gain, LowPass, HighPass, BandPass, MonoDelay, TwinDelay};
+use fretcat_effects::effects::{Fuzz, Overdrive, AudioEffect, StudioReverb, Gain, LowPass, HighPass, BandPass, MonoDelay, TwinDelay, BitCrusher};
 use fretcat_macros::EffectMapper;
 
 use std::sync::Arc;
@@ -10,6 +10,7 @@ pub enum Mapper {
     Overdrive(Overdrive),
     Fuzz(Fuzz),
     Gain(Gain),
+    BitCrusher(BitCrusher),
 
     LowPass(LowPass),
     HighPass(HighPass),

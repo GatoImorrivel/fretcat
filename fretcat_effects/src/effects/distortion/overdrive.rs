@@ -2,21 +2,20 @@ use std::f32::consts::PI;
 
 use crate::prelude::*;
 
-use crate::common::{AudioFilter, FilterMode};
-
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Overdrive {
-    pub gain: f32,
-    pub freq: f32,
-    pub volume: f32,
+    pub drive: f32,
+    pub tone: f32,
+    pub boost: f32,
     max_freq_hz: f32,
     min_freq_hz: f32,
-    filter: [AudioFilter; NUM_CHANNELS],
+    filter: [ButterLowpass; NUM_CHANNELS],
+    pre_filter: [DCBlock; NUM_CHANNELS],
 }
 
 impl PartialEq for Overdrive {
     fn eq(&self, other: &Self) -> bool {
-        self.gain == other.gain && self.freq == other.freq && self.volume == other.volume
+        self.drive == other.drive && self.tone == other.tone && self.boost == other.boost
     }
 }
 
@@ -24,25 +23,46 @@ impl Default for Overdrive {
     fn default() -> Self {
         let min_freq_hz = 1000.0;
         Self {
-            gain: 1.0,
-            freq: min_freq_hz,
-            volume: 1.0,
+            drive: 1.0,
+            tone: min_freq_hz,
+            boost: 1.0,
             max_freq_hz: 2000.0,
             min_freq_hz,
-            filter: [AudioFilter::new(FilterMode::Lowpass, 44100.0, min_freq_hz, 1.0); 2],
+            filter: [ButterLowpass::new(min_freq_hz); NUM_CHANNELS],
+            pre_filter: [DCBlock::new(500.0); NUM_CHANNELS],
         }
     }
 }
 
 impl AudioEffect for Overdrive {
     fn process(&mut self, input_buffer: &mut Frame, _transport: &nih_plug::prelude::Transport) {
+        if self.filter[0].sample_rate() != _transport.sample_rate {
+            self.filter[0].set_sample_rate(_transport.sample_rate);
+            self.filter[1].set_sample_rate(_transport.sample_rate);
+        }
+
+        if self.pre_filter[0].sample_rate() != _transport.sample_rate {
+            self.pre_filter[0].set_sample_rate(_transport.sample_rate);
+            self.pre_filter[1].set_sample_rate(_transport.sample_rate);
+        }
+
         input_buffer.process_individual(|left, right| {
-            let clipping_fn = |sample: f32| (2.0 / PI) * f32::atan(sample);
+            *left = self.pre_filter[0].tick(*left);
+            *right = self.pre_filter[1].tick(*right);
 
-            let output_gain = db_to_gain_fast(self.volume);
+            let gain = ((self.boost / 100.0) * 100.0) + 1.0;
 
-            *left = clipping_fn(*left * db_to_gain_fast(self.gain)) * output_gain;
-            *right = clipping_fn(*right * db_to_gain_fast(self.gain)) * output_gain;
+            *left *= gain;
+            *right *= gain;
+
+            let a = (((self.drive + 1.0) / 101.0) * (PI / 2.0)).sin();
+            let k = 2.0 * a / (1.0 - a);
+
+            let drive_l = (1.0 + k) * *left / (1.0 + k * left.abs());
+            let drive_r = (1.0 + k) * *right / (1.0 + k * right.abs());
+
+            *left = drive_l;
+            *right = drive_r;
 
             *left = self.filter[0].tick(*left);
             *right = self.filter[1].tick(*right);
@@ -61,11 +81,11 @@ impl AudioEffect for Overdrive {
 #[derive(Debug, Clone, Data, Lens, Message)]
 pub struct OverdriveView {
     #[msg]
-    pub gain: f32,
+    pub drive: f32,
     #[msg]
-    pub freq: f32,
+    pub tone: f32,
     #[msg]
-    pub volume: f32,
+    pub boost: f32,
 
     #[lens(ignore)]
     #[data(ignore)]
@@ -75,28 +95,28 @@ pub struct OverdriveView {
 impl OverdriveView {
     pub fn new(cx: &mut Context, handle: EffectHandle<Overdrive>) -> Handle<Self> {
         Self {
-            gain: handle.gain,
-            freq: handle.freq,
-            volume: handle.volume,
+            drive: handle.drive,
+            tone: handle.tone,
+            boost: handle.boost,
             handle: handle.clone(),
         }
         .build(cx, |cx| {
             HStack::new(cx, |cx| {
-                NamedKnob::new(cx, "Gain", Self::gain, false, 1.0..20.0)
-                    .on_changing(|ex, val| ex.emit(Message::Gain(val)))
+                NamedKnob::new(cx, "Drive", Self::drive, false, 1.0..99.0)
+                    .on_changing(|ex, val| ex.emit(Message::Drive(val)))
                     .class("gain-knob");
+                NamedKnob::new(cx, "Boost", Self::boost, false, 1.0..99.0)
+                    .on_changing(|ex, val| ex.emit(Message::Boost(val)))
+                    .class("volume-knob");
                 NamedKnob::new(
                     cx,
                     "Tone",
-                    Self::freq,
+                    Self::tone,
                     false,
                     handle.min_freq_hz..handle.max_freq_hz,
                 )
-                .on_changing(|ex, val| ex.emit(Message::Freq(val)))
+                .on_changing(|ex, val| ex.emit(Message::Tone(val)))
                 .class("tone-knob");
-                NamedKnob::new(cx, "Output Volume", Self::volume, false, -10.0..10.0)
-                    .on_changing(|ex, val| ex.emit(Message::Volume(val)))
-                    .class("volume-knob");
                 Label::new(cx, "DRIVE").class("effect-title");
             });
         })
@@ -110,22 +130,22 @@ impl View for OverdriveView {
 
     fn event(&mut self, _cx: &mut EventContext, event: &mut Event) {
         event.map(|event, _| match event {
-            Message::Gain(val) => {
-                self.gain = *val;
-                self.handle.gain = *val;
+            Message::Drive(val) => {
+                self.drive = *val;
+                self.handle.drive = *val;
             }
-            Message::Freq(val) => {
-                self.freq = *val;
-                self.handle.freq = *val;
+            Message::Tone(val) => {
+                self.tone = *val;
+                self.handle.tone = *val;
                 self.handle.filter.iter_mut().for_each(|filter| {
                     filter.set_cutoff(
                         *val,
                     );
                 });
             }
-            Message::Volume(val) => {
-                self.volume = *val;
-                self.handle.volume = *val;
+            Message::Boost(val) => {
+                self.boost = *val;
+                self.handle.boost = *val;
             }
         });
     }

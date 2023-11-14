@@ -1,37 +1,4 @@
-.studio-reverb .wet-knob {
-    width: 75px;
-    height: 75px;
-}
-
-.studio-reverb .size-knob {
-    width: 100px;
-    height: 100px;
-}
-
-.studio-reverb label {
-    color: whitesmoke;
-    font-family: "Sparkler-Demo";
-    font-size: 30;
-}
-
-.studio-reverb-knob-group .knob-head {
-    background-image: linear-gradient(180deg, rgb(0, 0, 0), rgb(24, 24, 24));
-    border-width: 0px;
-    background-color: transparent;
-}
-
-.studio-reverb-knob-group arctrack {
-    color: rgb(169, 58, 2);
-}
-
-.studio-reverb-knob-group > knob {
-    box-shadow: -1px -1px 8px #110220;
-}
-
-.studio-reverb-knob-group {
-    child-top: 2s;
-}
-
-.studio-reverb-knob-group > knob {
-    border-radius: 100%;
+studio-reverb .effect-title {
+    left: 43%;
+    top: 75%;
 }

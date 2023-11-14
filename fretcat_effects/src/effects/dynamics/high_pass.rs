@@ -2,7 +2,7 @@ use crate::prelude::*;
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct HighPass {
-    filter: [AudioFilter; 2],
+    filter: [SvfFilter; 2],
     min_freq_hz: f32,
     max_freq_hz: f32,
 }
@@ -14,7 +14,7 @@ impl Default for HighPass {
         Self {
             min_freq_hz,
             max_freq_hz,
-            filter: [AudioFilter::new(
+            filter: [SvfFilter::new(
                 crate::common::FilterMode::Highpass,
                 44100.0,
                 max_freq_hz,

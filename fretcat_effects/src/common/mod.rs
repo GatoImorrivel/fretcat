@@ -7,7 +7,9 @@ mod comb;
 #[allow(unused)]
 mod delayline;
 #[allow(unused)]
-mod filter;
+mod svf_filter;
+#[allow(unused)]
+mod iir_filter;
 #[allow(unused)]
 mod reverb;
 #[allow(unused)]
@@ -19,10 +21,11 @@ use std::ops::Range;
 
 pub use self::{
     allpass::AllPass,
-    filter::{AudioFilter, FilterMode},
+    svf_filter::{SvfFilter, FilterMode},
     reverb::Freeverb,
     adsr::Envelope,
-    delay::Delay
+    delay::Delay,
+    iir_filter::*,
 };
 
 

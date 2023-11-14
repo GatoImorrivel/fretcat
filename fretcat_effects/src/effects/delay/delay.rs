@@ -3,16 +3,16 @@ use crate::prelude::*;
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MonoDelay {
     wet: f32,
-    delays: [Delay; 2]
+    delays: [Delay; 2],
 }
 
 impl PartialEq for MonoDelay {
     fn eq(&self, other: &Self) -> bool {
-        self.wet == other.wet &&
-        self.delays[0].feedback() == other.delays[0].feedback() &&
-        self.delays[1].feedback() == other.delays[1].feedback() &&
-        self.delays[0].delay_time_secs() == other.delays[0].delay_time_secs() &&
-        self.delays[1].delay_time_secs() == other.delays[1].delay_time_secs()
+        self.wet == other.wet
+            && self.delays[0].feedback() == other.delays[0].feedback()
+            && self.delays[1].feedback() == other.delays[1].feedback()
+            && self.delays[0].delay_time_secs() == other.delays[0].delay_time_secs()
+            && self.delays[1].delay_time_secs() == other.delays[1].delay_time_secs()
     }
 }
 
@@ -36,9 +36,9 @@ impl MonoDelay {
 
 impl Default for MonoDelay {
     fn default() -> Self {
-        Self {  
+        Self {
             wet: 0.5,
-            delays: [Delay::default(), Delay::default()]
+            delays: [Delay::default(), Delay::default()],
         }
     }
 }
@@ -53,10 +53,8 @@ impl AudioEffect for MonoDelay {
         }
 
         input_buffer.process_individual(|left, right| {
-            nih_plug::util::permit_alloc(|| {
-                *left = ((1.0 - self.wet) * *left) + (self.wet * self.delays[0].tick(*left));
-                *right = ((1.0 - self.wet) * *right) + (self.wet * self.delays[1].tick(*right));
-            });
+            *left = ((1.0 - self.wet) * *left) + (self.wet * self.delays[0].tick(*left));
+            *right = ((1.0 - self.wet) * *right) + (self.wet * self.delays[1].tick(*right));
         });
     }
 
@@ -79,7 +77,7 @@ struct DelayView {
     wet: f32,
 
     #[lens(ignore)]
-    handle: EffectHandle<MonoDelay>
+    handle: EffectHandle<MonoDelay>,
 }
 
 impl DelayView {
@@ -88,8 +86,9 @@ impl DelayView {
             wet: handle.wet * 100.0,
             time: handle.delays[0].delay_time_secs() * 1000.0,
             feedback: handle.delays[0].feedback() * 100.0,
-            handle: handle.clone()
-        }.build(cx, |cx| {
+            handle: handle.clone(),
+        }
+        .build(cx, |cx| {
             HStack::new(cx, |cx| {
                 NamedKnob::new(cx, "Time", Self::time, false, 20.0..1000.0)
                     .on_changing(|ex, val| ex.emit(Message::Time(val)));

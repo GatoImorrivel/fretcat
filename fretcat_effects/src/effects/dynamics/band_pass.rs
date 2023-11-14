@@ -2,7 +2,7 @@ use crate::prelude::*;
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct BandPass {
-    filter: [AudioFilter; 2],
+    filter: [SvfFilter; 2],
     min_freq_hz: f32,
     max_freq_hz: f32,
 }
@@ -14,7 +14,7 @@ impl Default for BandPass {
         Self {  
             min_freq_hz,
             max_freq_hz,
-            filter: [AudioFilter::new(crate::common::FilterMode::BandPass, 44100.0, (max_freq_hz + min_freq_hz) / 2.0, 1.0); 2]
+            filter: [SvfFilter::new(crate::common::FilterMode::BandPass, 44100.0, (max_freq_hz + min_freq_hz) / 2.0, 1.0); 2]
         }
     }
 }

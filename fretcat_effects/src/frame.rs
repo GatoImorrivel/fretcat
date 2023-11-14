@@ -20,6 +20,12 @@ impl<'a> Frame<'a> {
     }
 
     #[inline]
+    pub fn process_channel(&mut self, mut f: impl FnMut(&mut [f32])) {
+        (f)(self.left);
+        (f)(self.right);
+    }
+
+    #[inline]
     pub fn get_mut_left(&mut self) -> &mut [f32] {
         self.left
     }
