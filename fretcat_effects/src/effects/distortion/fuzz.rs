@@ -16,7 +16,7 @@ pub struct Fuzz {
 
 impl PartialEq for Fuzz {
     fn eq(&self, other: &Self) -> bool {
-        self.drive == other.drive && self.tone == other.tone && self.boost == other.boost
+        self.drive == other.drive && self.tone == other.tone && self.boost == other.boost && self.fuzziness == other.fuzziness
     }
 }
 
