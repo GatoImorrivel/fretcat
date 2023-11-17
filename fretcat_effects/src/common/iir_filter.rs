@@ -122,11 +122,6 @@ impl Biquad {
         self.y2 = self.y1;
         self.y1 = y0;
         y0
-
-        // Transposed Direct Form II would be:
-        //   y0 = b0 * x0 + s1
-        //   s1 = s2 + b1 * x0 - a1 * y0
-        //   s2 = b2 * x0 - a2 * y0
     }
 }
 

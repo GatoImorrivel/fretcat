@@ -82,7 +82,7 @@ impl PresetControl {
         })
     }
 
-    fn discard_changes(cx: &mut Context, current: Preset) {
+    pub fn discard_changes(cx: &mut Context, current: Preset) {
         Button::new(
             cx,
             move |ex| {
@@ -93,7 +93,7 @@ impl PresetControl {
         );
     }
 
-    fn overwrite(cx: &mut Context, current: Preset) {
+    pub fn overwrite(cx: &mut Context, current: Preset) {
         Button::new(
             cx,
             move |ex| {

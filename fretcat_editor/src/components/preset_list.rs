@@ -1,7 +1,10 @@
+use fretcat_effects::ChainData;
 use fretcat_serialization::{Preset, PresetCategory, ShallowPreset};
 use nih_plug::vizia::prelude::*;
 
-use crate::{EditorEvent, common::LIST_SPACING_UNITS};
+use crate::{common::LIST_SPACING_UNITS, EditorEvent, EditorData, systems::{MessageEvent, Message}};
+
+use super::PresetControl;
 
 #[derive(Debug, Clone, Lens)]
 pub struct PresetList {
@@ -12,6 +15,7 @@ pub struct PresetList {
 
 pub enum PresetListEvent {
     ChangeCategory(PresetCategory),
+    LoadShallowPreset(ShallowPreset),
     Refresh,
 }
 
@@ -75,11 +79,12 @@ impl PresetList {
                             let preset2 = preset.clone();
                             Button::new(
                                 cx,
-                                move |ex| ex.emit(EditorEvent::LoadShallowPreset(preset.clone())),
-                                move |cx| {
-                                    Label::new(cx, preset2.get_name())
+                                move |ex| {
+                                    ex.emit(PresetListEvent::LoadShallowPreset(preset.clone()))
                                 },
-                            ).class("preset-card");
+                                move |cx| Label::new(cx, preset2.get_name()),
+                            )
+                            .class("preset-card");
                         },
                     )
                     .width(Stretch(1.0))
@@ -96,10 +101,27 @@ impl View for PresetList {
         Some("preset-list")
     }
 
-    fn event(&mut self, _cx: &mut EventContext, event: &mut Event) {
+    fn event(&mut self, cx: &mut EventContext, event: &mut Event) {
         event.map(|event, _| match event {
             PresetListEvent::ChangeCategory(category) => {
                 self.current_category = *category;
+            }
+            PresetListEvent::LoadShallowPreset(p) => {
+                let original_data = EditorData::current_preset.get(cx);
+                let mut current = Preset::from(ChainData::chain.get(cx));
+                current.set_name(original_data.lock().unwrap().get_name().to_owned());
+
+                if *original_data.lock().unwrap() != current || !current.already_exists() {
+                    let p = p.clone();
+                    cx.emit(MessageEvent::Custom(
+                        Message::make_warning("Unsaved changes").with_custom_content(
+                            move |cx, _| PresetControl::discard_changes(cx, p.clone().load()),
+                        ),
+                    ))
+                } else {
+                    cx.emit(EditorEvent::LoadPreset(p.clone().load()));
+                    cx.emit(MessageEvent::ClearAll);
+                }
             }
             _ => {}
         });

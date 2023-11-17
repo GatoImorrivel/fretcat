@@ -18,7 +18,6 @@ lazy_static::lazy_static! {
             GAIN_BOOSTER_CARD,
             OVERDRIVE_CARD,
             FUZZ_CARD,
-            DISTORTION_CARD,
             BIT_CRUSHER_CARD
         ]);
 
@@ -27,7 +26,6 @@ lazy_static::lazy_static! {
             TWIN_DELAY_CARD
         ]);
         hashmap.insert(EffectKind::Dynamics, vec![
-            AUTO_WAH_CARD,
             LOW_PASS_CARD,
             HIGH_PASS_CARD,
             BAND_PASS_CARD
